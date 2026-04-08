@@ -1,0 +1,20 @@
+{
+  "expo": {
+    "name": "roadmate_mvp",
+    "slug": "roadmate-mvp",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/roadmate-mark.png",
+    "userInterfaceStyle": "automatic",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.nahyeongyu.roadmatemvp"
+    },
+    "android": {
+      "package": "com.nahyeongyu.roadmatemvp"
+    },
+    "plugins": [
+      "@react-native-community/datetimepicker"
+    ]
+  }
+}

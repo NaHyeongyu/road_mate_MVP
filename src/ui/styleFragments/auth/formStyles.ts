@@ -1,0 +1,142 @@
+import type { AppColors } from "../../../brandTheme";
+import type { StyleMap } from "../styleTypes";
+import { AUTH_BODY_FONT, AUTH_BODY_FONT_EMPHASIS, AUTH_DISPLAY_FONT } from "./constants";
+
+export const createAuthFormStyles = (colors: AppColors) =>
+  ({
+    authCard: {
+      backgroundColor: colors.panel,
+      borderColor: colors.border,
+      borderWidth: 1,
+      borderRadius: 24,
+      paddingHorizontal: 16,
+      paddingVertical: 18,
+      gap: 12,
+      shadowColor: colors.shadow,
+      shadowOpacity: 0.08,
+      shadowRadius: 14,
+      shadowOffset: { width: 0, height: 4 },
+      elevation: 3,
+      marginTop: -24,
+      marginHorizontal: 6,
+    },
+    authStandaloneCard: {
+      marginTop: 0,
+      marginHorizontal: 0,
+      width: "100%",
+      maxWidth: 420,
+      alignSelf: "center",
+    },
+    authEntryCard: {
+      gap: 12,
+    },
+    authCardHeader: {
+      gap: 6,
+    },
+    authEntryTitle: {
+      fontSize: 22,
+      fontWeight: "800",
+      color: colors.text,
+    },
+    authEntrySubtitle: {
+      fontSize: 13,
+      color: colors.subtext,
+      lineHeight: 20,
+    },
+    authTitle: {
+      color: colors.text,
+      fontSize: 24,
+      fontWeight: "700",
+      fontFamily: AUTH_DISPLAY_FONT,
+      letterSpacing: -0.6,
+    },
+    authSubtitle: {
+      color: colors.subtext,
+      fontSize: 14,
+      lineHeight: 21,
+      fontFamily: AUTH_BODY_FONT,
+      letterSpacing: -0.1,
+    },
+    authModeRow: {
+      marginTop: 4,
+      flexDirection: "row",
+      borderRadius: 12,
+      borderWidth: 1,
+      borderColor: colors.border,
+      backgroundColor: colors.panelAlt,
+      padding: 4,
+      gap: 4,
+    },
+    authModeButton: {
+      flex: 1,
+      minHeight: 36,
+      borderRadius: 10,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    authModeButtonActive: {
+      backgroundColor: colors.panel,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+    authModeButtonText: {
+      color: colors.subtext,
+      fontSize: 13,
+      fontWeight: "700",
+      fontFamily: AUTH_BODY_FONT_EMPHASIS,
+      letterSpacing: -0.1,
+    },
+    authModeButtonTextActive: {
+      color: colors.text,
+    },
+    authHint: {
+      color: colors.subtext,
+      fontSize: 13,
+      lineHeight: 20,
+      fontFamily: AUTH_BODY_FONT,
+      letterSpacing: -0.1,
+    },
+    authInput: {
+      height: 50,
+      borderRadius: 12,
+      borderWidth: 1,
+      borderColor: colors.border,
+      backgroundColor: colors.panelAlt,
+      color: colors.text,
+      paddingHorizontal: 14,
+      fontSize: 15,
+      fontFamily: AUTH_BODY_FONT,
+      letterSpacing: -0.1,
+    },
+    authSubmitButton: {
+      marginTop: 2,
+      height: 50,
+      borderRadius: 12,
+      backgroundColor: colors.brand,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    authSubmitButtonText: {
+      fontSize: 15,
+      fontWeight: "800",
+      color: colors.brandText,
+    },
+    authEntryHint: {
+      fontSize: 12,
+      color: colors.subtext,
+      lineHeight: 18,
+    },
+    configBlock: {
+      borderRadius: 16,
+      backgroundColor: colors.panelAlt,
+      borderWidth: 1,
+      borderColor: colors.border,
+      padding: 14,
+      gap: 8,
+    },
+    configCode: {
+      color: colors.text,
+      fontSize: 13,
+      fontWeight: "700",
+    },
+  }) satisfies StyleMap;
