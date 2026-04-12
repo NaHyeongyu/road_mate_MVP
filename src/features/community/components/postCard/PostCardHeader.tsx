@@ -11,6 +11,8 @@ type PostCardHeaderProps = {
   isRegular: boolean;
   seatsLabel?: string;
   noticeDateLabel?: string;
+  noticeCountdownLabel?: string;
+  noticeCountdownTone?: "upcoming" | "past" | "unknown";
 };
 
 export function PostCardHeader({
@@ -19,8 +21,12 @@ export function PostCardHeader({
   isRegular,
   seatsLabel,
   noticeDateLabel,
+  noticeCountdownLabel,
+  noticeCountdownTone = "unknown",
 }: PostCardHeaderProps) {
   const typeIconColor = isRegular ? "#0B0F14" : "#475569";
+  const isPastNotice = noticeCountdownTone === "past";
+  const isUpcomingNotice = noticeCountdownTone === "upcoming";
 
   return (
     <View style={styles.postHeaderRow}>
@@ -55,6 +61,36 @@ export function PostCardHeader({
           <MaterialCommunityIcons name="calendar-month-outline" size={14} color="#1D4ED8" />
           <Text style={[styles.postMetaBadgeText, styles.postMetaBadgeTextPrimary]}>
             {noticeDateLabel}
+          </Text>
+        </View>
+      ) : null}
+      {!isRegular && noticeCountdownLabel ? (
+        <View
+          style={[
+            styles.postMetaBadge,
+            isPastNotice
+              ? styles.postMetaBadgeNeutral
+              : isUpcomingNotice
+                ? styles.postMetaBadgeWarning
+                : null,
+          ]}
+        >
+          <MaterialCommunityIcons
+            name={isPastNotice ? "clock-alert-outline" : "calendar-check-outline"}
+            size={14}
+            color={isPastNotice ? "#475569" : "#92400E"}
+          />
+          <Text
+            style={[
+              styles.postMetaBadgeText,
+              isPastNotice
+                ? styles.postMetaBadgeTextNeutral
+                : isUpcomingNotice
+                  ? styles.postMetaBadgeTextWarning
+                  : null,
+            ]}
+          >
+            {noticeCountdownLabel}
           </Text>
         </View>
       ) : null}

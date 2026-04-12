@@ -38,6 +38,14 @@ export const createCommunityPostDetailStyles = (colors: AppColors) =>
       borderColor: "#BFDBFE",
       backgroundColor: "#EFF6FF",
     },
+    postMetaBadgeWarning: {
+      borderColor: "#FCD34D",
+      backgroundColor: "#FFFBEB",
+    },
+    postMetaBadgeNeutral: {
+      borderColor: "#CBD5E1",
+      backgroundColor: "#F8FAFC",
+    },
     postMetaBadgeText: {
       color: colors.subtext,
       fontSize: 12,
@@ -46,6 +54,14 @@ export const createCommunityPostDetailStyles = (colors: AppColors) =>
     postMetaBadgeTextPrimary: {
       color: "#1D4ED8",
       fontWeight: "800",
+    },
+    postMetaBadgeTextWarning: {
+      color: "#92400E",
+      fontWeight: "800",
+    },
+    postMetaBadgeTextNeutral: {
+      color: "#475569",
+      fontWeight: "700",
     },
     postWeekdayRow: {
       flexDirection: "row",

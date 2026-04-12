@@ -7,7 +7,7 @@ import type { RouteKind, RoutePost } from "../../../../../model";
 import type { AppStyles } from "../../../../../ui/types";
 import { PostCard } from "../../../components/PostCard";
 import { getQldPlaceSuggestions } from "../../../utils/placeQuickSearch";
-import { getPostSaveKey } from "../../../utils/storage";
+import { getNoticeDayDelta, getPostSaveKey } from "../../../utils/storage";
 
 type RiderFeedSectionProps = {
   colors: AppColors;
@@ -39,6 +39,7 @@ export function RiderFeedSection({
   onToggleSavedPost,
 }: RiderFeedSectionProps) {
   const isNoticeFilter = filter === "one_time";
+  const [noticeScope, setNoticeScope] = useState<"upcoming" | "all">("upcoming");
   const savedPostKeySet = useMemo(() => new Set(savedPostKeys), [savedPostKeys]);
   const toInputRef = useRef<TextInput>(null);
   const blurTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -76,6 +77,12 @@ export function RiderFeedSection({
     []
   );
 
+  useEffect(() => {
+    if (!isNoticeFilter) {
+      setNoticeScope("upcoming");
+    }
+  }, [isNoticeFilter]);
+
   const handleSelectFromSuggestion = (value: string) => {
     clearBlurTimeout();
     onFromSearchQueryChange(value);
@@ -106,6 +113,28 @@ export function RiderFeedSection({
   const handleToggleFeedType = () => {
     onFilterChange(isNoticeFilter ? "regular" : "one_time");
   };
+
+  const pastNoticeCount = useMemo(() => {
+    if (!isNoticeFilter) {
+      return 0;
+    }
+
+    return visiblePosts.filter((post) => {
+      const dayDelta = getNoticeDayDelta(post.noticeDate, post.createdAt);
+      return dayDelta !== null && dayDelta < 0;
+    }).length;
+  }, [isNoticeFilter, visiblePosts]);
+
+  const feedPosts = useMemo(() => {
+    if (!isNoticeFilter || noticeScope === "all") {
+      return visiblePosts;
+    }
+
+    return visiblePosts.filter((post) => {
+      const dayDelta = getNoticeDayDelta(post.noticeDate, post.createdAt);
+      return dayDelta === null || dayDelta >= 0;
+    });
+  }, [isNoticeFilter, noticeScope, visiblePosts]);
 
   return (
     <>
@@ -155,6 +184,39 @@ export function RiderFeedSection({
           </Text>
         </Pressable>
       </View>
+
+      {isNoticeFilter ? (
+        <View style={styles.row}>
+          <Pressable
+            onPress={() => setNoticeScope("upcoming")}
+            style={({ pressed }) => [
+              styles.chip,
+              noticeScope === "upcoming" ? styles.chipActive : null,
+              pressed ? styles.routeFilterItemPressed : null,
+            ]}
+          >
+            <Text style={[styles.chipText, noticeScope === "upcoming" ? styles.chipTextActive : null]}>
+              Upcoming
+            </Text>
+          </Pressable>
+          <Pressable
+            onPress={() => setNoticeScope("all")}
+            style={({ pressed }) => [
+              styles.chip,
+              noticeScope === "all" ? styles.chipActive : null,
+              pressed ? styles.routeFilterItemPressed : null,
+            ]}
+          >
+            <Text style={[styles.chipText, noticeScope === "all" ? styles.chipTextActive : null]}>
+              All notices
+            </Text>
+          </Pressable>
+        </View>
+      ) : null}
+
+      {isNoticeFilter && noticeScope === "upcoming" && pastNoticeCount > 0 ? (
+        <Text style={styles.cardBody}>{pastNoticeCount} past notices are hidden.</Text>
+      ) : null}
 
       <View style={styles.routeSearchGrid}>
         <View style={styles.routeSearchField}>
@@ -258,12 +320,22 @@ export function RiderFeedSection({
         </View>
       </View>
 
-      {visiblePosts.length === 0 ? (
+      {feedPosts.length === 0 ? (
         <View style={styles.card}>
           <Text style={styles.empty}>
-            {isNoticeFilter ? "No notices match this filter or search." : "No rides match this filter or search."}
+            {isNoticeFilter && noticeScope === "upcoming" && pastNoticeCount > 0
+              ? "Only past notices match this filter or search."
+              : isNoticeFilter
+                ? "No notices match this filter or search."
+                : "No rides match this filter or search."}
           </Text>
           <View style={styles.postActionsRow}>
+            {isNoticeFilter && noticeScope === "upcoming" && pastNoticeCount > 0 ? (
+              <Pressable style={styles.postActionInfo} onPress={() => setNoticeScope("all")}>
+                <MaterialCommunityIcons name="clock-outline" size={15} color="#1D4ED8" />
+                <Text style={styles.postActionInfoText}>Show past notices</Text>
+              </Pressable>
+            ) : null}
             {hasSearchQuery ? (
               <Pressable style={styles.postActionInfo} onPress={handleClearSearch}>
                 <MaterialCommunityIcons name="close-circle-outline" size={15} color="#1D4ED8" />
@@ -286,7 +358,7 @@ export function RiderFeedSection({
           </View>
         </View>
       ) : (
-        visiblePosts.map((post) => (
+        feedPosts.map((post) => (
           <PostCard
             key={post.id}
             post={post}

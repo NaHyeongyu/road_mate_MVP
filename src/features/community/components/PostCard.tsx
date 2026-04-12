@@ -3,7 +3,7 @@ import { Text, View } from "react-native";
 
 import type { RoutePost } from "../../../model";
 import type { AppStyles } from "../../../ui/types";
-import { formatNoticeDate } from "../utils/storage";
+import { formatNoticeCountdown, formatNoticeDate, getNoticeDayDelta } from "../utils/storage";
 import { RoutePostDetailModal } from "./RoutePostDetailModal";
 import { PostCardActions } from "./postCard/PostCardActions";
 import { PostCardHeader } from "./postCard/PostCardHeader";
@@ -37,6 +37,15 @@ export function PostCard({
   const isRegular = post.kind === "regular";
   const seatsLabel = isRegular ? `${post.availableSeats} seats left` : undefined;
   const noticeDateLabel = isRegular ? undefined : formatNoticeDate(post.noticeDate, post.createdAt);
+  const noticeDayDelta = isRegular ? null : getNoticeDayDelta(post.noticeDate, post.createdAt);
+  const noticeCountdownLabel = isRegular ? undefined : formatNoticeCountdown(noticeDayDelta);
+  const noticeCountdownTone = isRegular
+    ? "unknown"
+    : noticeDayDelta === null
+      ? "unknown"
+      : noticeDayDelta < 0
+        ? "past"
+        : "upcoming";
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const operatingDaysSummary = useMemo(() => {
     if (!post.operatingDays.length) {
@@ -65,6 +74,8 @@ export function PostCard({
           isRegular={isRegular}
           seatsLabel={seatsLabel}
           noticeDateLabel={noticeDateLabel}
+          noticeCountdownLabel={noticeCountdownLabel}
+          noticeCountdownTone={noticeCountdownTone}
         />
         <PostCardRouteStack post={post} styles={styles} isRegular={isRegular} />
 

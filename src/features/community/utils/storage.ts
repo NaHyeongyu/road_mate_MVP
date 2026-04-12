@@ -161,3 +161,50 @@ export const formatNoticeDate = (value: string | undefined, fallbackCreatedAt?: 
     day: "numeric",
   });
 };
+
+const NOTICE_DAY_MS = 24 * 60 * 60 * 1000;
+
+const parseNoticeDateValue = (value: string | undefined, fallbackCreatedAt?: string) => {
+  const raw = String(value ?? "").trim() || String(fallbackCreatedAt ?? "").trim().slice(0, 10);
+  if (!raw) {
+    return null;
+  }
+
+  const date = raw.includes("T") ? new Date(raw) : new Date(`${raw}T00:00:00`);
+  if (Number.isNaN(date.getTime())) {
+    return null;
+  }
+
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+};
+
+export const getNoticeDayDelta = (value: string | undefined, fallbackCreatedAt?: string) => {
+  const noticeDate = parseNoticeDateValue(value, fallbackCreatedAt);
+  if (!noticeDate) {
+    return null;
+  }
+
+  const today = new Date();
+  const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+  return Math.round((noticeDate.getTime() - todayStart.getTime()) / NOTICE_DAY_MS);
+};
+
+export const formatNoticeCountdown = (dayDelta: number | null) => {
+  if (dayDelta === null) {
+    return "Date TBD";
+  }
+
+  if (dayDelta < 0) {
+    return "Past";
+  }
+
+  if (dayDelta === 0) {
+    return "Today";
+  }
+
+  if (dayDelta === 1) {
+    return "Tomorrow";
+  }
+
+  return `D-${dayDelta}`;
+};
