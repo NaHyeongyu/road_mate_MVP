@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { DateTimePickerEvent } from "@react-native-community/datetimepicker";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Platform, Pressable, Text, TextInput, View } from "react-native";
 
 import type { AppColors } from "../../../../../brandTheme";
@@ -23,6 +22,7 @@ import { DriverGarageSection } from "./DriverGarageSection";
 import { OperatingDaysChips } from "./OperatingDaysChips";
 import { RouteDateField } from "./RouteDateField";
 import { RouteDraftTextField } from "./RouteDraftTextField";
+import { RoutePlaceField } from "./RoutePlaceField";
 import { RouteTimeField } from "./RouteTimeField";
 import {
   buildRequiredChecks,
@@ -326,102 +326,52 @@ export function DriverRouteComposerSection({
         />
       ) : null}
 
-      <Label text="From" styles={styles} />
-      <View style={styles.routeSearchInput}>
-        <TextInput
-          value={routeDraft.from}
-          onChangeText={(value) => updateRouteDraft({ from: value })}
-          placeholder="Brisbane CBD, QLD"
-          placeholderTextColor={colors.subtext}
-          style={styles.routeSearchInputField}
-          autoCorrect={false}
-          autoCapitalize="words"
-          returnKeyType="next"
-          blurOnSubmit={false}
-          onFocus={() => {
-            clearBlurTimeout();
-            setActivePlaceField("from");
-          }}
-          onBlur={() => scheduleCloseSuggestions("from")}
-          onSubmitEditing={() => toInputRef.current?.focus()}
-        />
-        {routeDraft.from.trim() ? (
-          <Pressable
-            style={styles.routeSearchClearButton}
-            onPress={() => {
-              updateRouteDraft({ from: "" });
-              setActivePlaceField("from");
-            }}
-          >
-            <MaterialCommunityIcons name="close-circle" size={18} color="#64748B" />
-          </Pressable>
-        ) : null}
-      </View>
-      {showFromSuggestions ? (
-        <View style={styles.routeSuggestionsPanel}>
-          {fromSuggestions.map((suggestion) => (
-            <Pressable
-              key={suggestion}
-              onPressIn={() => handleSelectFromSuggestion(suggestion)}
-              style={({ pressed }) => [
-                styles.routeSuggestionItem,
-                pressed ? styles.routeSuggestionItemPressed : null,
-              ]}
-            >
-              <Text style={styles.routeSuggestionText}>{suggestion}</Text>
-            </Pressable>
-          ))}
-        </View>
-      ) : null}
+      <RoutePlaceField
+        colors={colors}
+        styles={styles}
+        label="From"
+        value={routeDraft.from}
+        placeholder="Brisbane CBD, QLD"
+        suggestions={fromSuggestions}
+        showSuggestions={showFromSuggestions}
+        returnKeyType="next"
+        onChangeText={(value) => updateRouteDraft({ from: value })}
+        onFocus={() => {
+          clearBlurTimeout();
+          setActivePlaceField("from");
+        }}
+        onBlur={() => scheduleCloseSuggestions("from")}
+        onSubmitEditing={() => toInputRef.current?.focus()}
+        onClear={() => {
+          updateRouteDraft({ from: "" });
+          setActivePlaceField("from");
+        }}
+        onSelectSuggestion={handleSelectFromSuggestion}
+      />
 
-      <Label text="To" styles={styles} />
-      <View style={styles.routeSearchInput}>
-        <TextInput
-          ref={toInputRef}
-          value={routeDraft.to}
-          onChangeText={(value) => updateRouteDraft({ to: value })}
-          placeholder="St Lucia, QLD"
-          placeholderTextColor={colors.subtext}
-          style={styles.routeSearchInputField}
-          autoCorrect={false}
-          autoCapitalize="words"
-          returnKeyType="done"
-          blurOnSubmit={false}
-          onFocus={() => {
-            clearBlurTimeout();
-            setActivePlaceField("to");
-          }}
-          onBlur={() => scheduleCloseSuggestions("to")}
-          onSubmitEditing={() => (isOneTimeRoute ? openDatePicker() : openTimePicker("schedule"))}
-        />
-        {routeDraft.to.trim() ? (
-          <Pressable
-            style={styles.routeSearchClearButton}
-            onPress={() => {
-              updateRouteDraft({ to: "" });
-              setActivePlaceField("to");
-            }}
-          >
-            <MaterialCommunityIcons name="close-circle" size={18} color="#64748B" />
-          </Pressable>
-        ) : null}
-      </View>
-      {showToSuggestions ? (
-        <View style={styles.routeSuggestionsPanel}>
-          {toSuggestions.map((suggestion) => (
-            <Pressable
-              key={suggestion}
-              onPressIn={() => handleSelectToSuggestion(suggestion)}
-              style={({ pressed }) => [
-                styles.routeSuggestionItem,
-                pressed ? styles.routeSuggestionItemPressed : null,
-              ]}
-            >
-              <Text style={styles.routeSuggestionText}>{suggestion}</Text>
-            </Pressable>
-          ))}
-        </View>
-      ) : null}
+      <RoutePlaceField
+        colors={colors}
+        styles={styles}
+        label="To"
+        value={routeDraft.to}
+        placeholder="St Lucia, QLD"
+        suggestions={toSuggestions}
+        showSuggestions={showToSuggestions}
+        inputRef={toInputRef}
+        returnKeyType="done"
+        onChangeText={(value) => updateRouteDraft({ to: value })}
+        onFocus={() => {
+          clearBlurTimeout();
+          setActivePlaceField("to");
+        }}
+        onBlur={() => scheduleCloseSuggestions("to")}
+        onSubmitEditing={() => (isOneTimeRoute ? openDatePicker() : openTimePicker("schedule"))}
+        onClear={() => {
+          updateRouteDraft({ to: "" });
+          setActivePlaceField("to");
+        }}
+        onSelectSuggestion={handleSelectToSuggestion}
+      />
 
       <View style={styles.routeComposerDivider} />
 
