@@ -1,6 +1,10 @@
 import { Alert } from "react-native";
 
 import { deleteMyRoutePostsInDb, isRoutePostRepositoryEnabled } from "../data/routePostRepository";
+import {
+  deleteMyDriverProfileInDb,
+  isDriverProfileRepositoryEnabled,
+} from "../data/driverProfileRepository";
 import { supabase } from "../../../lib/supabase";
 import type { CommunityActionsContext } from "./types";
 
@@ -71,6 +75,9 @@ export const createCommunityAccountActions = (
                 await context.clearCurrentUserStorage();
                 if (isRoutePostRepositoryEnabled()) {
                   await deleteMyRoutePostsInDb(context.currentUserId);
+                }
+                if (isDriverProfileRepositoryEnabled()) {
+                  await deleteMyDriverProfileInDb(context.currentUserId);
                 }
 
                 const { error: updateError } = await authClient.auth.updateUser({

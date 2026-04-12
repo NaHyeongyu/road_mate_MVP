@@ -9,6 +9,7 @@ type DriverHomeSectionProps = {
   styles: AppStyles;
   driverRouteKind: "regular" | "one_time";
   routeDraft: RouteDraft;
+  hasDriverContactMethod: boolean;
   myPosts: RoutePost[];
   onRouteDraftChange: (draft: RouteDraft) => void;
   onSaveRouteQuickSettings: (input: {
@@ -22,17 +23,23 @@ type DriverHomeSectionProps = {
 const MIN_SEATS = 1;
 const MAX_SEATS = 8;
 
-const isRouteDraftReady = (routeDraft: RouteDraft) => {
+const isRouteDraftReady = (routeDraft: RouteDraft, hasDriverContactMethod: boolean) => {
   if (routeDraft.kind === "one_time") {
+    const hasReturnTime =
+      routeDraft.oneTimeTripType !== "round_trip" || isRouteTimeValue(routeDraft.returnSchedule);
+
     return Boolean(
       isRouteDateValue(routeDraft.noticeDate) &&
       routeDraft.from.trim() &&
         routeDraft.to.trim() &&
-        isRouteTimeValue(routeDraft.schedule)
+        isRouteTimeValue(routeDraft.schedule) &&
+        hasReturnTime
     );
   }
 
-  const hasContactMethod = Boolean(routeDraft.contactPhone.trim() || routeDraft.contactLink.trim());
+  const hasContactMethod = Boolean(
+    hasDriverContactMethod || routeDraft.contactPhone.trim() || routeDraft.contactLink.trim()
+  );
   const hasCoreRouteInfo = Boolean(
     routeDraft.from.trim() &&
       routeDraft.to.trim() &&
@@ -45,6 +52,10 @@ const isRouteDraftReady = (routeDraft: RouteDraft) => {
 
 const toDraftFromPost = (post: RoutePost): RouteDraft => ({
   kind: post.kind,
+  oneTimeTripType:
+    post.kind === "one_time"
+      ? post.oneTimeTripType ?? (post.returnSchedule ? "round_trip" : "one_way")
+      : "round_trip",
   noticeDate: post.noticeDate ?? "",
   from: post.from,
   to: post.to,
@@ -72,13 +83,16 @@ const hasRouteDraftInput = (routeDraft: RouteDraft) =>
       routeDraft.note.trim()
   );
 
-const getMissingRequiredLabels = (routeDraft: RouteDraft): string[] => {
+const getMissingRequiredLabels = (routeDraft: RouteDraft, hasDriverContactMethod: boolean): string[] => {
   if (routeDraft.kind === "one_time") {
     const checks = [
       { label: "From", done: Boolean(routeDraft.from.trim()) },
       { label: "To", done: Boolean(routeDraft.to.trim()) },
       { label: "Date", done: isRouteDateValue(routeDraft.noticeDate) },
       { label: "Time", done: isRouteTimeValue(routeDraft.schedule) },
+      ...(routeDraft.oneTimeTripType === "round_trip"
+        ? [{ label: "Return time", done: isRouteTimeValue(routeDraft.returnSchedule) }]
+        : []),
     ];
 
     return checks.filter((check) => !check.done).map((check) => check.label);
@@ -89,7 +103,10 @@ const getMissingRequiredLabels = (routeDraft: RouteDraft): string[] => {
     { label: "To", done: Boolean(routeDraft.to.trim()) },
     { label: "Departure time", done: isRouteTimeValue(routeDraft.schedule) },
     { label: "Arrival time", done: isRouteTimeValue(routeDraft.returnSchedule) },
-    { label: "Contact", done: Boolean(routeDraft.contactPhone.trim() || routeDraft.contactLink.trim()) },
+    {
+      label: "Contact",
+      done: Boolean(hasDriverContactMethod || routeDraft.contactPhone.trim() || routeDraft.contactLink.trim()),
+    },
   ];
 
   return checks.filter((check) => !check.done).map((check) => check.label);
@@ -99,6 +116,7 @@ export function DriverHomeSection({
   styles,
   driverRouteKind,
   routeDraft,
+  hasDriverContactMethod,
   myPosts,
   onRouteDraftChange,
   onSaveRouteQuickSettings,
@@ -106,8 +124,11 @@ export function DriverHomeSection({
 }: DriverHomeSectionProps) {
   const [isQuickSettingSaving, setIsQuickSettingSaving] = useState(false);
   const hasDraftInput = hasRouteDraftInput(routeDraft);
-  const isDraftReady = isRouteDraftReady(routeDraft);
-  const missingRequiredLabels = useMemo(() => getMissingRequiredLabels(routeDraft), [routeDraft]);
+  const isDraftReady = isRouteDraftReady(routeDraft, hasDriverContactMethod);
+  const missingRequiredLabels = useMemo(
+    () => getMissingRequiredLabels(routeDraft, hasDriverContactMethod),
+    [hasDriverContactMethod, routeDraft]
+  );
   const myPostsForActiveKind = useMemo(
     () => myPosts.filter((post) => post.kind === driverRouteKind),
     [driverRouteKind, myPosts]

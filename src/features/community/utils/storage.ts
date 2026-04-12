@@ -30,6 +30,8 @@ export const parseVehicle = (raw: string | null): VehicleInfo => {
       model: String(parsed.model ?? "").trim(),
       plate: String(parsed.plate ?? "").trim(),
       note: String(parsed.note ?? "").trim(),
+      contactPhone: String(parsed.contactPhone ?? "").trim(),
+      contactLink: String(parsed.contactLink ?? "").trim(),
     };
   } catch {
     return EMPTY_VEHICLE;
@@ -85,6 +87,12 @@ export const parsePosts = (raw: string | null): RoutePost[] => {
         {
           id,
           kind: post.kind === "one_time" ? "one_time" : "regular",
+          oneTimeTripType:
+            post.kind === "one_time"
+              ? post.oneTimeTripType === "round_trip" || returnSchedule
+                ? "round_trip"
+                : "one_way"
+              : undefined,
           noticeDate:
             post.kind === "one_time"
               ? noticeDate || String(post.createdAt ?? "").trim().slice(0, 10) || undefined

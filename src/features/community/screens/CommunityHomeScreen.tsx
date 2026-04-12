@@ -34,6 +34,7 @@ export type CommunityHomeScreenProps = {
   savedPostKeys: string[];
   vehicleDraft: VehicleInfo;
   savedVehicle: VehicleInfo;
+  hasDriverContactMethod: boolean;
   routeDraft: RouteDraft;
   hasVehicle: boolean;
   onSignOut: () => void;
@@ -56,17 +57,23 @@ export type CommunityHomeScreenProps = {
   onToggleSavedPost: (post: RoutePost) => void;
 };
 
-const isRouteDraftReady = (routeDraft: RouteDraft) => {
+const isRouteDraftReady = (routeDraft: RouteDraft, hasDriverContactMethod: boolean) => {
   if (routeDraft.kind === "one_time") {
+    const hasReturnTime =
+      routeDraft.oneTimeTripType !== "round_trip" || isRouteTimeValue(routeDraft.returnSchedule);
+
     return Boolean(
       isRouteDateValue(routeDraft.noticeDate) &&
       routeDraft.from.trim() &&
       routeDraft.to.trim() &&
-      isRouteTimeValue(routeDraft.schedule)
+      isRouteTimeValue(routeDraft.schedule) &&
+      hasReturnTime
     );
   }
 
-  const hasContactMethod = Boolean(routeDraft.contactPhone.trim() || routeDraft.contactLink.trim());
+  const hasContactMethod = Boolean(
+    hasDriverContactMethod || routeDraft.contactPhone.trim() || routeDraft.contactLink.trim()
+  );
   const hasCoreRouteInfo = Boolean(
     routeDraft.from.trim() &&
       routeDraft.to.trim() &&
@@ -91,6 +98,10 @@ const hasRouteDraftInput = (routeDraft: RouteDraft) =>
 
 const toDraftFromPost = (post: RoutePost): RouteDraft => ({
   kind: post.kind,
+  oneTimeTripType:
+    post.kind === "one_time"
+      ? post.oneTimeTripType ?? (post.returnSchedule ? "round_trip" : "one_way")
+      : "round_trip",
   noticeDate: post.noticeDate ?? "",
   from: post.from,
   to: post.to,
@@ -122,6 +133,7 @@ export function CommunityHomeScreen({
   savedPostKeys,
   vehicleDraft,
   savedVehicle,
+  hasDriverContactMethod,
   routeDraft,
   hasVehicle,
   onSignOut,
@@ -150,7 +162,9 @@ export function CommunityHomeScreen({
   );
   const latestRegisteredPost = myPostsForActiveKind[0] ?? null;
   const activeRouteDraft =
-    isRouteDraftReady(routeDraft) || !latestRegisteredPost ? routeDraft : toDraftFromPost(latestRegisteredPost);
+    isRouteDraftReady(routeDraft, hasDriverContactMethod) || !latestRegisteredPost
+      ? routeDraft
+      : toDraftFromPost(latestRegisteredPost);
 
   useEffect(() => {
     if (mode !== "driver" || !(mainTab === "home" || mainTab === "saved")) {
@@ -161,7 +175,7 @@ export function CommunityHomeScreen({
   useEffect(() => {
     if (
       !isDriverRegistrationPageOpen ||
-      isRouteDraftReady(routeDraft) ||
+      isRouteDraftReady(routeDraft, hasDriverContactMethod) ||
       hasRouteDraftInput(routeDraft) ||
       !latestRegisteredPost
     ) {
@@ -169,7 +183,13 @@ export function CommunityHomeScreen({
     }
 
     onRouteDraftChange(toDraftFromPost(latestRegisteredPost));
-  }, [isDriverRegistrationPageOpen, latestRegisteredPost, onRouteDraftChange, routeDraft]);
+  }, [
+    hasDriverContactMethod,
+    isDriverRegistrationPageOpen,
+    latestRegisteredPost,
+    onRouteDraftChange,
+    routeDraft,
+  ]);
 
   const handleSaveRouteRegistration = async () => {
     const didSave = await onPostRoute();
@@ -264,6 +284,7 @@ export function CommunityHomeScreen({
           savedPostKeys={savedPostKeys}
           vehicleDraft={vehicleDraft}
           savedVehicle={savedVehicle}
+          hasDriverContactMethod={hasDriverContactMethod}
           routeDraft={routeDraft}
           hasVehicle={hasVehicle}
           onSignOut={onSignOut}

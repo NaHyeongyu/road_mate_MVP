@@ -17,21 +17,31 @@ export const buildRoutePost = ({
   currentUserName,
 }: BuildRoutePostArgs): RoutePost => {
   const isOneTime = routeDraft.kind === "one_time";
+  const isOneTimeRoundTrip = isOneTime && routeDraft.oneTimeTripType === "round_trip";
+  const profileContactPhone = savedVehicle.contactPhone.trim();
+  const profileContactLink = savedVehicle.contactLink.trim();
+  const fallbackDraftContactPhone = routeDraft.contactPhone.trim();
+  const fallbackDraftContactLink = routeDraft.contactLink.trim();
 
   return {
     id: `mine-${Date.now()}`,
     kind: routeDraft.kind,
+    oneTimeTripType: isOneTime ? routeDraft.oneTimeTripType : undefined,
     noticeDate: isOneTime ? routeDraft.noticeDate.trim() : undefined,
     from: routeDraft.from.trim(),
     to: routeDraft.to.trim(),
     schedule: routeDraft.schedule.trim(),
-    returnSchedule: isOneTime ? undefined : routeDraft.returnSchedule.trim() || undefined,
+    returnSchedule: isOneTime
+      ? isOneTimeRoundTrip
+        ? routeDraft.returnSchedule.trim() || undefined
+        : undefined
+      : routeDraft.returnSchedule.trim() || undefined,
     availableSeats: isOneTime
       ? 1
       : Math.min(Number.parseInt(String(routeDraft.availableSeats ?? "").trim(), 10) || 0, MAX_SEATS),
     operatingDays: isOneTime ? [] : routeDraft.operatingDays,
-    contactPhone: isOneTime ? undefined : routeDraft.contactPhone.trim() || undefined,
-    contactLink: isOneTime ? undefined : routeDraft.contactLink.trim() || undefined,
+    contactPhone: profileContactPhone || fallbackDraftContactPhone || undefined,
+    contactLink: profileContactLink || fallbackDraftContactLink || undefined,
     note: routeDraft.note.trim(),
     vehicleModel: savedVehicle.model,
     vehiclePlate: savedVehicle.plate,
@@ -59,6 +69,14 @@ export const validateRoutePost = (routePost: RoutePost): string | null => {
     return "Set available seats to at least 1.";
   }
 
+  if (
+    routePost.kind === "one_time" &&
+    routePost.oneTimeTripType === "round_trip" &&
+    (!routePost.returnSchedule || !isRouteTimeValue(routePost.returnSchedule))
+  ) {
+    return "Set return time in HH:MM format (24-hour) for round-trip notice.";
+  }
+
   if (routePost.kind === "regular") {
     if (!routePost.returnSchedule || !isRouteTimeValue(routePost.returnSchedule)) {
       return "Set arrival time in HH:MM format (24-hour).";
@@ -69,7 +87,7 @@ export const validateRoutePost = (routePost: RoutePost): string | null => {
     }
 
     if (!routePost.contactPhone && !routePost.contactLink) {
-      return "Add at least one contact method (phone or Kakao link).";
+      return "Add at least one contact method in driver profile (phone or open chat link).";
     }
   }
 

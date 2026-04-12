@@ -25,6 +25,7 @@ type CommunityTabContentProps = {
   savedPostKeys: string[];
   vehicleDraft: VehicleInfo;
   savedVehicle: VehicleInfo;
+  hasDriverContactMethod: boolean;
   routeDraft: RouteDraft;
   hasVehicle: boolean;
   onSignOut: () => void;
@@ -64,6 +65,7 @@ export function CommunityTabContent({
   savedPostKeys,
   vehicleDraft,
   savedVehicle,
+  hasDriverContactMethod,
   routeDraft,
   hasVehicle,
   onSignOut,
@@ -97,6 +99,7 @@ export function CommunityTabContent({
         myPosts={myPosts}
         savedPostKeys={savedPostKeys}
         routeDraft={routeDraft}
+        hasDriverContactMethod={hasDriverContactMethod}
         currentUserId={currentUserId}
         driverRouteKind={mainTab === "saved" ? "one_time" : "regular"}
         onFilterChange={onFilterChange}
@@ -124,6 +127,7 @@ export function CommunityTabContent({
         myPosts={myPosts}
         savedPostKeys={savedPostKeys}
         routeDraft={routeDraft}
+        hasDriverContactMethod={hasDriverContactMethod}
         currentUserId={currentUserId}
         driverRouteKind="regular"
         onFilterChange={onFilterChange}

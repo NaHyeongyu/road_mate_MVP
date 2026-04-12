@@ -12,6 +12,10 @@ type PostCardRouteStackProps = {
 };
 
 export function PostCardRouteStack({ post, styles, isRegular }: PostCardRouteStackProps) {
+  const isOneTimeRoundTrip =
+    !isRegular && (post.oneTimeTripType === "round_trip" || Boolean(post.returnSchedule));
+  const shouldShowReturnTime = isRegular || isOneTimeRoundTrip;
+
   return (
     <View style={styles.postRouteStack}>
       <Pressable
@@ -39,12 +43,12 @@ export function PostCardRouteStack({ post, styles, isRegular }: PostCardRouteSta
         <View
           style={[
             styles.postRouteDirectionChip,
-            isRegular ? styles.postRouteDirectionChipRegular : styles.postRouteDirectionChipOneTime,
+            shouldShowReturnTime ? styles.postRouteDirectionChipRegular : styles.postRouteDirectionChipOneTime,
           ]}
         >
           <MaterialCommunityIcons
-            color={isRegular ? "#0B0F14" : "#64748B"}
-            name={isRegular ? "swap-vertical" : "arrow-down"}
+            color={shouldShowReturnTime ? "#0B0F14" : "#64748B"}
+            name={shouldShowReturnTime ? "swap-vertical" : "arrow-down"}
             size={16}
             style={styles.postRouteDirectionIcon}
           />
@@ -64,7 +68,7 @@ export function PostCardRouteStack({ post, styles, isRegular }: PostCardRouteSta
             {post.to}
           </Text>
         </View>
-        {isRegular ? (
+        {shouldShowReturnTime ? (
           <View style={styles.postRouteTimeRow}>
             <View style={styles.postRouteLeadIconSlot}>
               <MaterialCommunityIcons name="clock-outline" size={14} color="#64748B" />

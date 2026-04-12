@@ -8,10 +8,12 @@ const EMPTY_NOTICE: AppNotice = { tone: "info", text: "" };
 const EMPTY_REGULAR_ROUTE_DRAFT: RouteDraft = {
   ...EMPTY_ROUTE_DRAFT,
   kind: "regular",
+  oneTimeTripType: "round_trip",
 };
 const EMPTY_ONE_TIME_ROUTE_DRAFT: RouteDraft = {
   ...EMPTY_ROUTE_DRAFT,
   kind: "one_time",
+  oneTimeTripType: "one_way",
   returnSchedule: "",
   operatingDays: [],
   contactPhone: "",

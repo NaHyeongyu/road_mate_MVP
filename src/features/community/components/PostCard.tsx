@@ -6,6 +6,7 @@ import type { AppStyles } from "../../../ui/types";
 import { formatNoticeCountdown, formatNoticeDate, getNoticeDayDelta } from "../utils/storage";
 import { RoutePostDetailModal } from "./RoutePostDetailModal";
 import { PostCardActions } from "./postCard/PostCardActions";
+import { PostCardContactRow } from "./postCard/PostCardContactRow";
 import { PostCardHeader } from "./postCard/PostCardHeader";
 import { PostCardRouteStack } from "./postCard/PostCardRouteStack";
 
@@ -37,6 +38,11 @@ export function PostCard({
   const isRegular = post.kind === "regular";
   const seatsLabel = isRegular ? `${post.availableSeats} seats left` : undefined;
   const noticeDateLabel = isRegular ? undefined : formatNoticeDate(post.noticeDate, post.createdAt);
+  const noticeTripTypeLabel = isRegular
+    ? undefined
+    : post.oneTimeTripType === "round_trip" || Boolean(post.returnSchedule)
+      ? "Round-trip"
+      : "One-way";
   const noticeDayDelta = isRegular ? null : getNoticeDayDelta(post.noticeDate, post.createdAt);
   const noticeCountdownLabel = isRegular ? undefined : formatNoticeCountdown(noticeDayDelta);
   const noticeCountdownTone = isRegular
@@ -74,6 +80,7 @@ export function PostCard({
           isRegular={isRegular}
           seatsLabel={seatsLabel}
           noticeDateLabel={noticeDateLabel}
+          noticeTripTypeLabel={noticeTripTypeLabel}
           noticeCountdownLabel={noticeCountdownLabel}
           noticeCountdownTone={noticeCountdownTone}
         />
@@ -84,6 +91,8 @@ export function PostCard({
             {isRegular ? `Runs ${operatingDaysSummary}` : `Notice for ${noticeDateLabel}`}
           </Text>
         </View>
+
+        <PostCardContactRow post={post} styles={styles} />
 
         {extraContent}
 

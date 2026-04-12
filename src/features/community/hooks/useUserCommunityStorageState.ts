@@ -3,6 +3,11 @@ import { useEffect, useState } from "react";
 import type { AppNotice } from "../../../app/types";
 import { EMPTY_VEHICLE, type VehicleInfo } from "../../../model";
 import {
+  fetchMyDriverProfileFromDb,
+  isDriverProfileRepositoryEnabled,
+  upsertMyDriverProfileInDb,
+} from "../data/driverProfileRepository";
+import {
   clearCommunityStorageForUser,
   loadSavedPostKeysForUser,
   loadVehicleForUser,
@@ -38,13 +43,33 @@ export function useUserCommunityStorageState({
       setIsVehicleLoading(true);
 
       try {
-        const nextVehicle = await loadVehicleForUser(currentUserId);
+        const localVehicle = await loadVehicleForUser(currentUserId);
         if (cancelled) {
           return;
         }
 
-        setSavedVehicle(nextVehicle);
-        setVehicleDraft(nextVehicle);
+        setSavedVehicle(localVehicle);
+        setVehicleDraft(localVehicle);
+
+        if (isDriverProfileRepositoryEnabled()) {
+          try {
+            const remoteVehicle = await fetchMyDriverProfileFromDb(currentUserId);
+            if (cancelled || !remoteVehicle) {
+              return;
+            }
+
+            setSavedVehicle(remoteVehicle);
+            setVehicleDraft(remoteVehicle);
+            await persistVehicleForUser(currentUserId, remoteVehicle);
+          } catch {
+            if (!cancelled) {
+              onLoadError({
+                tone: "error",
+                text: "Driver profile DB load failed. Using saved profile on this device.",
+              });
+            }
+          }
+        }
       } catch {
         if (!cancelled) {
           setSavedVehicle(EMPTY_VEHICLE);
@@ -107,9 +132,21 @@ export function useUserCommunityStorageState({
       return;
     }
 
-    await persistVehicleForUser(currentUserId, nextVehicle);
-    setSavedVehicle(nextVehicle);
-    setVehicleDraft(nextVehicle);
+    let vehicleToPersist = nextVehicle;
+    if (isDriverProfileRepositoryEnabled()) {
+      try {
+        vehicleToPersist = await upsertMyDriverProfileInDb(currentUserId, nextVehicle);
+      } catch {
+        onLoadError({
+          tone: "error",
+          text: "Driver profile DB sync failed. Saved only on this device.",
+        });
+      }
+    }
+
+    await persistVehicleForUser(currentUserId, vehicleToPersist);
+    setSavedVehicle(vehicleToPersist);
+    setVehicleDraft(vehicleToPersist);
   };
 
   const persistSavedPostKeys = async (nextKeys: string[]) => {

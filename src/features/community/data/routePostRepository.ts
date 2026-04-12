@@ -64,6 +64,8 @@ const toRoutePost = (record: Partial<RoutePostRecord>): RoutePost | null => {
   return {
     id,
     kind,
+    oneTimeTripType:
+      kind === "one_time" ? (returnSchedule ? "round_trip" : "one_way") : undefined,
     noticeDate:
       kind === "one_time" ? noticeDateRaw || createdAt.slice(0, 10) || undefined : undefined,
     from,

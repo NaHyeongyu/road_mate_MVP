@@ -35,6 +35,11 @@ export function RoutePostDetailModal({
   const isRegular = post.kind === "regular";
   const seatsLabel = isRegular ? `${post.availableSeats} seats left` : undefined;
   const noticeDateLabel = isRegular ? undefined : formatNoticeDate(post.noticeDate, post.createdAt);
+  const noticeTripTypeLabel = isRegular
+    ? undefined
+    : post.oneTimeTripType === "round_trip" || Boolean(post.returnSchedule)
+      ? "Round-trip"
+      : "One-way";
   const noticeDayDelta = isRegular ? null : getNoticeDayDelta(post.noticeDate, post.createdAt);
   const noticeCountdownLabel = isRegular ? undefined : formatNoticeCountdown(noticeDayDelta);
   const noticeCountdownTone = isRegular
@@ -82,6 +87,7 @@ export function RoutePostDetailModal({
               isRegular={isRegular}
               seatsLabel={seatsLabel}
               noticeDateLabel={noticeDateLabel}
+              noticeTripTypeLabel={noticeTripTypeLabel}
               noticeCountdownLabel={noticeCountdownLabel}
               noticeCountdownTone={noticeCountdownTone}
             />

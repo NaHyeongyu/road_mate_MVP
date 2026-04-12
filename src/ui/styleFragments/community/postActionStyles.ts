@@ -8,7 +8,8 @@ export const createCommunityPostActionStyles = (colors: AppColors) =>
     postActionsRow: {
       flexDirection: "row",
       alignItems: "center",
-      justifyContent: "flex-end",
+      justifyContent: "flex-start",
+      flexWrap: "wrap",
       gap: 8,
       marginTop: 2,
     },
@@ -23,11 +24,13 @@ export const createCommunityPostActionStyles = (colors: AppColors) =>
       backgroundColor: "#EFF6FF",
       minHeight: 36,
       paddingHorizontal: 14,
+      maxWidth: "100%",
     },
     postActionInfoText: {
       color: "#1D4ED8",
       fontSize: 13,
       fontWeight: "700",
+      flexShrink: 1,
     },
     postActionSave: {
       flexDirection: "row",
@@ -40,6 +43,7 @@ export const createCommunityPostActionStyles = (colors: AppColors) =>
       backgroundColor: isDarkPalette(colors) ? "rgba(255,209,102,0.18)" : "#FFF7D6",
       minHeight: 36,
       paddingHorizontal: 16,
+      maxWidth: "100%",
     },
     postActionSaveActive: {
       borderColor: isDarkPalette(colors) ? "#8FA6CB" : "#93C5FD",
@@ -49,6 +53,7 @@ export const createCommunityPostActionStyles = (colors: AppColors) =>
       color: isDarkPalette(colors) ? "#FFE29B" : "#8A5A00",
       fontSize: 13,
       fontWeight: "700",
+      flexShrink: 1,
     },
     postActionSaveTextActive: {
       color: isDarkPalette(colors) ? "#EAF2FF" : "#0D274A",
@@ -64,10 +69,12 @@ export const createCommunityPostActionStyles = (colors: AppColors) =>
       backgroundColor: "#FEF2F2",
       minHeight: 36,
       paddingHorizontal: 14,
+      maxWidth: "100%",
     },
     postActionDangerText: {
       color: "#991B1B",
       fontSize: 13,
       fontWeight: "700",
+      flexShrink: 1,
     },
   }) satisfies StyleMap;

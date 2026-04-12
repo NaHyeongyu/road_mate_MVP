@@ -50,9 +50,17 @@ export function MyPageTabSection({
         <Text style={styles.cardBody}>Active role: {mode === "driver" ? "Driver" : "Rider"}</Text>
         <Text style={styles.cardBody}>My posted routes: {myPostsCount}</Text>
         {mode === "driver" && hasVehicle ? (
-          <Text style={styles.cardBody}>
-            Vehicle: {savedVehicle.model} · {savedVehicle.plate}
-          </Text>
+          <>
+            <Text style={styles.cardBody}>
+              Vehicle: {savedVehicle.model} · {savedVehicle.plate}
+            </Text>
+            {savedVehicle.contactPhone ? (
+              <Text style={styles.cardBody}>Phone: {savedVehicle.contactPhone}</Text>
+            ) : null}
+            {savedVehicle.contactLink ? (
+              <Text style={styles.cardBody}>Open chat: {savedVehicle.contactLink}</Text>
+            ) : null}
+          </>
         ) : null}
       </View>
 

@@ -1,14 +1,18 @@
 export type RouteKind = "regular" | "one_time";
+export type OneTimeTripType = "one_way" | "round_trip";
 
 export type VehicleInfo = {
   model: string;
   plate: string;
   note: string;
+  contactPhone: string;
+  contactLink: string;
 };
 
 export type RoutePost = {
   id: string;
   kind: RouteKind;
+  oneTimeTripType?: OneTimeTripType;
   noticeDate?: string;
   from: string;
   to: string;
@@ -29,6 +33,7 @@ export type RoutePost = {
 
 export type RouteDraft = {
   kind: RouteKind;
+  oneTimeTripType: OneTimeTripType;
   noticeDate: string;
   from: string;
   to: string;
@@ -46,10 +51,13 @@ export const EMPTY_VEHICLE: VehicleInfo = {
   model: "",
   plate: "",
   note: "",
+  contactPhone: "",
+  contactLink: "",
 };
 
 export const EMPTY_ROUTE_DRAFT: RouteDraft = {
   kind: "regular" as RouteKind,
+  oneTimeTripType: "round_trip",
   noticeDate: "",
   from: "",
   to: "",

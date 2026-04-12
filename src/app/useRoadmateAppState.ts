@@ -58,6 +58,9 @@ export function useRoadmateAppState() {
   const currentUserName = deriveDisplayName(authSession);
   const currentUserEmail = String(currentUser?.email ?? "").trim();
   const hasVehicle = Boolean(savedVehicle.model && savedVehicle.plate);
+  const hasDriverContactMethod = Boolean(
+    savedVehicle.contactPhone.trim() || savedVehicle.contactLink.trim()
+  );
   const loading = isSessionLoading || isPostsLoading;
   const activeDriverRouteKind = mode === "driver" && mainTab === "saved" ? "one_time" : "regular";
   const routeDraft = activeDriverRouteKind === "regular" ? regularRouteDraft : oneTimeRouteDraft;
@@ -66,6 +69,7 @@ export function useRoadmateAppState() {
       setRegularRouteDraft({
         ...nextDraft,
         kind: "regular",
+        oneTimeTripType: "round_trip",
       });
       return;
     }
@@ -73,6 +77,7 @@ export function useRoadmateAppState() {
     setOneTimeRouteDraft({
       ...nextDraft,
       kind: "one_time",
+      oneTimeTripType: nextDraft.oneTimeTripType ?? "one_way",
     });
   };
 
@@ -149,6 +154,7 @@ export function useRoadmateAppState() {
     filter,
     fromSearchQuery,
     hasVehicle,
+    hasDriverContactMethod,
     isAuthSubmitting,
     isVehicleLoading,
     loading,

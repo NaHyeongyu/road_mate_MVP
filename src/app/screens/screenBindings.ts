@@ -104,6 +104,7 @@ export function buildCommunityHomeScreenProps({
     savedPostKeys: appState.savedPostKeys,
     vehicleDraft: appState.vehicleDraft,
     savedVehicle: appState.savedVehicle,
+    hasDriverContactMethod: appState.hasDriverContactMethod,
     routeDraft: appState.routeDraft,
     hasVehicle: appState.hasVehicle,
     onSignOut: appState.handleSignOut,

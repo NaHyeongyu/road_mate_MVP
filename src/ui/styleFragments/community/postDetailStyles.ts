@@ -29,6 +29,7 @@ export const createCommunityPostDetailStyles = (colors: AppColors) =>
       borderColor: colors.border,
       backgroundColor: colors.panelAlt,
       paddingHorizontal: 10,
+      maxWidth: "100%",
       flexDirection: "row",
       alignItems: "center",
       justifyContent: "center",
@@ -50,6 +51,7 @@ export const createCommunityPostDetailStyles = (colors: AppColors) =>
       color: colors.subtext,
       fontSize: 12,
       fontWeight: "700",
+      flexShrink: 1,
     },
     postMetaBadgeTextPrimary: {
       color: "#1D4ED8",

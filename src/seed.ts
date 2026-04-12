@@ -431,6 +431,8 @@ const buildSeedPost = (
   return {
     id: `seed-qld-${idSuffix}`,
     kind,
+    oneTimeTripType:
+      kind === "one_time" ? (template.returnSchedule ? "round_trip" : "one_way") : undefined,
     noticeDate: kind === "one_time" ? createdAt.slice(0, 10) : undefined,
     from: template.from,
     to: template.to,

@@ -5,7 +5,7 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Platform, Pressable, Text, TextInput, View } from "react-native";
 
 import type { AppColors } from "../../../../../brandTheme";
-import type { RouteDraft, RouteKind, VehicleInfo } from "../../../../../model";
+import type { OneTimeTripType, RouteDraft, RouteKind, VehicleInfo } from "../../../../../model";
 import type { AppStyles } from "../../../../../ui/types";
 import {
   WEEKDAY_OPTIONS,
@@ -68,6 +68,8 @@ export function DriverRouteComposerSection({
   onPostRoute,
 }: DriverRouteComposerSectionProps) {
   const isOneTimeRoute = activeRouteKind === "one_time";
+  const oneTimeTripType = routeDraft.oneTimeTripType === "round_trip" ? "round_trip" : "one_way";
+  const isOneTimeRoundTrip = isOneTimeRoute && oneTimeTripType === "round_trip";
   const toInputRef = useRef<TextInput>(null);
   const blurTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const phoneInputRef = useRef<TextInput>(null);
@@ -108,6 +110,8 @@ export function DriverRouteComposerSection({
     onRouteDraftChange({
       ...routeDraft,
       kind: activeRouteKind,
+      oneTimeTripType: activeRouteKind === "one_time" ? "one_way" : "round_trip",
+      returnSchedule: activeRouteKind === "one_time" ? "" : routeDraft.returnSchedule,
     });
   }, [activeRouteKind, onRouteDraftChange, routeDraft]);
 
@@ -150,6 +154,14 @@ export function DriverRouteComposerSection({
     setIsDatePickerOpen(true);
   };
 
+  const handleOneTimeTripTypeChange = (nextType: OneTimeTripType) => {
+    onRouteDraftChange({
+      ...routeDraft,
+      oneTimeTripType: nextType,
+      returnSchedule: nextType === "one_way" ? "" : routeDraft.returnSchedule,
+    });
+  };
+
   const applySelectedTime = (field: "schedule" | "returnSchedule", date: Date) => {
     onRouteDraftChange({
       ...routeDraft,
@@ -170,7 +182,11 @@ export function DriverRouteComposerSection({
     const currentField = activeTimeField;
     applySelectedTime(currentField, selectedDate);
 
-    if (!isOneTimeRoute && currentField === "schedule" && !isRouteTimeValue(routeDraft.returnSchedule)) {
+    if (
+      currentField === "schedule" &&
+      !isRouteTimeValue(routeDraft.returnSchedule) &&
+      (!isOneTimeRoute || isOneTimeRoundTrip)
+    ) {
       setIosTimePickerValue(toDateFromRouteTime(routeDraft.returnSchedule));
       setActiveTimeField("returnSchedule");
       return;
@@ -219,7 +235,11 @@ export function DriverRouteComposerSection({
     const currentField = activeTimeField;
     applySelectedTime(currentField, iosTimePickerValue);
 
-    if (!isOneTimeRoute && currentField === "schedule" && !isRouteTimeValue(routeDraft.returnSchedule)) {
+    if (
+      currentField === "schedule" &&
+      !isRouteTimeValue(routeDraft.returnSchedule) &&
+      (!isOneTimeRoute || isOneTimeRoundTrip)
+    ) {
       setIosTimePickerValue(toDateFromRouteTime(routeDraft.returnSchedule));
       setActiveTimeField("returnSchedule");
       return;
@@ -263,10 +283,12 @@ export function DriverRouteComposerSection({
   const hasTo = Boolean(routeDraft.to.trim());
   const hasNoticeDate = isRouteDateValue(routeDraft.noticeDate);
   const hasDepartureTime = isRouteTimeValue(routeDraft.schedule);
-  const hasArrivalTime = isRouteTimeValue(routeDraft.returnSchedule);
+  const hasReturnTime = isRouteTimeValue(routeDraft.returnSchedule);
   const hasSeats = currentSeatCount >= MIN_SEATS;
   const hasOperatingDays = routeDraft.operatingDays.length > 0;
-  const hasContactMethod = Boolean(routeDraft.contactPhone.trim() || routeDraft.contactLink.trim());
+  const hasProfileContactMethod = Boolean(savedVehicle.contactPhone.trim() || savedVehicle.contactLink.trim());
+  const hasDraftContactMethod = Boolean(routeDraft.contactPhone.trim() || routeDraft.contactLink.trim());
+  const hasContactMethod = hasProfileContactMethod || hasDraftContactMethod;
 
   const requiredChecks: RequiredCheck[] = isOneTimeRoute
     ? [
@@ -275,13 +297,14 @@ export function DriverRouteComposerSection({
         { label: "To", done: hasTo },
         { label: "Date", done: hasNoticeDate },
         { label: "Time", done: hasDepartureTime },
+        ...(isOneTimeRoundTrip ? [{ label: "Return time", done: hasReturnTime }] : []),
       ]
     : [
         { label: "Vehicle profile", done: hasVehicle },
         { label: "From", done: hasFrom },
         { label: "To", done: hasTo },
         { label: "Departure time", done: hasDepartureTime },
-        { label: "Arrival time", done: hasArrivalTime },
+        { label: "Arrival time", done: hasReturnTime },
         { label: "Available seats", done: hasSeats },
         { label: "Operating day", done: hasOperatingDays },
         { label: "Contact", done: hasContactMethod },
@@ -435,6 +458,26 @@ export function DriverRouteComposerSection({
         />
       ) : null}
 
+      {isOneTimeRoute ? (
+        <>
+          <Label text="Trip type" styles={styles} />
+          <View style={styles.row}>
+            <ToggleChip
+              label="One-way"
+              active={!isOneTimeRoundTrip}
+              onPress={() => handleOneTimeTripTypeChange("one_way")}
+              styles={styles}
+            />
+            <ToggleChip
+              label="Round-trip"
+              active={isOneTimeRoundTrip}
+              onPress={() => handleOneTimeTripTypeChange("round_trip")}
+              styles={styles}
+            />
+          </View>
+        </>
+      ) : null}
+
       <RouteTimeField
         styles={styles}
         label={isOneTimeRoute ? "Time" : "Departure time"}
@@ -442,12 +485,12 @@ export function DriverRouteComposerSection({
         placeholder={isOneTimeRoute ? "Select time" : "Select departure time"}
         onPress={() => openTimePicker("schedule")}
       />
-      {!isOneTimeRoute ? (
+      {!isOneTimeRoute || isOneTimeRoundTrip ? (
         <RouteTimeField
           styles={styles}
-          label="Arrival time"
+          label={isOneTimeRoute ? "Return time" : "Arrival time"}
           value={routeDraft.returnSchedule}
-          placeholder="Select arrival time"
+          placeholder={isOneTimeRoute ? "Select return time" : "Select arrival time"}
           onPress={() => openTimePicker("returnSchedule")}
         />
       ) : null}
@@ -548,7 +591,7 @@ export function DriverRouteComposerSection({
           <RouteDraftTextField
             colors={colors}
             styles={styles}
-            label="AU phone (or Kakao link)"
+            label="AU phone override"
             optional
             value={routeDraft.contactPhone}
             onChangeText={(value) => onRouteDraftChange({ ...routeDraft, contactPhone: value })}
@@ -562,7 +605,7 @@ export function DriverRouteComposerSection({
           <RouteDraftTextField
             colors={colors}
             styles={styles}
-            label="KakaoTalk link (or phone)"
+            label="Open chat link override"
             optional
             value={routeDraft.contactLink}
             onChangeText={(value) => onRouteDraftChange({ ...routeDraft, contactLink: value })}

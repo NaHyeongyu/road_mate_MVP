@@ -54,7 +54,6 @@ export function RiderFeedSection({
     activeField === "from" && fromSearchQuery.trim().length > 0 && fromSuggestions.length > 0;
   const showToSuggestions =
     activeField === "to" && toSearchQuery.trim().length > 0 && toSuggestions.length > 0;
-  const hasSearchQuery = Boolean(fromSearchQuery.trim() || toSearchQuery.trim());
 
   const clearBlurTimeout = () => {
     if (blurTimeoutRef.current) {
@@ -97,19 +96,6 @@ export function RiderFeedSection({
     Keyboard.dismiss();
   };
 
-  const handleClearSearch = () => {
-    clearBlurTimeout();
-    onFromSearchQueryChange("");
-    onToSearchQueryChange("");
-    setActiveField(null);
-    Keyboard.dismiss();
-  };
-
-  const handleResetToRegularFeed = () => {
-    handleClearSearch();
-    onFilterChange("regular");
-  };
-
   const handleToggleFeedType = () => {
     onFilterChange(isNoticeFilter ? "regular" : "one_time");
   };
@@ -135,6 +121,7 @@ export function RiderFeedSection({
       return dayDelta === null || dayDelta >= 0;
     });
   }, [isNoticeFilter, noticeScope, visiblePosts]);
+  const showViewNoticesAction = !isNoticeFilter;
 
   return (
     <>
@@ -329,33 +316,16 @@ export function RiderFeedSection({
                 ? "No notices match this filter or search."
                 : "No rides match this filter or search."}
           </Text>
-          <View style={styles.postActionsRow}>
-            {isNoticeFilter && noticeScope === "upcoming" && pastNoticeCount > 0 ? (
-              <Pressable style={styles.postActionInfo} onPress={() => setNoticeScope("all")}>
-                <MaterialCommunityIcons name="clock-outline" size={15} color="#1D4ED8" />
-                <Text style={styles.postActionInfoText}>Show past notices</Text>
-              </Pressable>
-            ) : null}
-            {hasSearchQuery ? (
-              <Pressable style={styles.postActionInfo} onPress={handleClearSearch}>
-                <MaterialCommunityIcons name="close-circle-outline" size={15} color="#1D4ED8" />
-                <Text style={styles.postActionInfoText}>Clear search</Text>
-              </Pressable>
-            ) : null}
-            <Pressable
-              style={styles.postActionSave}
-              onPress={hasSearchQuery || isNoticeFilter ? handleResetToRegularFeed : handleToggleFeedType}
-            >
-              <MaterialCommunityIcons
-                name={hasSearchQuery || isNoticeFilter ? "refresh" : "bullhorn-outline"}
-                size={15}
-                color="#8A5A00"
-              />
-              <Text style={styles.postActionSaveText}>
-                {hasSearchQuery || isNoticeFilter ? "Back to regular feed" : "View notices"}
-              </Text>
-            </Pressable>
-          </View>
+          {showViewNoticesAction ? (
+            <View style={styles.postActionsRow}>
+              {showViewNoticesAction ? (
+                <Pressable style={styles.postActionSave} onPress={handleToggleFeedType}>
+                  <MaterialCommunityIcons name="bullhorn-outline" size={15} color="#8A5A00" />
+                  <Text style={styles.postActionSaveText}>View notices</Text>
+                </Pressable>
+              ) : null}
+            </View>
+          ) : null}
         </View>
       ) : (
         feedPosts.map((post) => (

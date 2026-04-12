@@ -54,11 +54,15 @@ export function DriverOverviewSection({
   const previewPost: RoutePost = {
     id: `driver-overview-${driverRouteKind}`,
     kind: driverRouteKind,
+    oneTimeTripType: driverRouteKind === "one_time" ? routeDraft.oneTimeTripType : undefined,
     noticeDate: routeDraft.kind === "one_time" ? routeDraft.noticeDate : undefined,
     from: routeDraft.from,
     to: routeDraft.to,
     schedule: routeDraft.schedule,
-    returnSchedule: routeDraft.returnSchedule,
+    returnSchedule:
+      driverRouteKind === "one_time" && routeDraft.oneTimeTripType !== "round_trip"
+        ? undefined
+        : routeDraft.returnSchedule,
     availableSeats: Number.parseInt(seatsLabel, 10) || 1,
     operatingDays: routeDraft.operatingDays,
     contactPhone: routeDraft.contactPhone || undefined,

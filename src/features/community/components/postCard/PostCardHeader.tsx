@@ -11,6 +11,7 @@ type PostCardHeaderProps = {
   isRegular: boolean;
   seatsLabel?: string;
   noticeDateLabel?: string;
+  noticeTripTypeLabel?: string;
   noticeCountdownLabel?: string;
   noticeCountdownTone?: "upcoming" | "past" | "unknown";
 };
@@ -21,6 +22,7 @@ export function PostCardHeader({
   isRegular,
   seatsLabel,
   noticeDateLabel,
+  noticeTripTypeLabel,
   noticeCountdownLabel,
   noticeCountdownTone = "unknown",
 }: PostCardHeaderProps) {
@@ -62,6 +64,16 @@ export function PostCardHeader({
           <Text style={[styles.postMetaBadgeText, styles.postMetaBadgeTextPrimary]}>
             {noticeDateLabel}
           </Text>
+        </View>
+      ) : null}
+      {!isRegular && noticeTripTypeLabel ? (
+        <View style={styles.postMetaBadge}>
+          <MaterialCommunityIcons
+            name={noticeTripTypeLabel === "Round-trip" ? "swap-horizontal" : "arrow-right"}
+            size={14}
+            color="#64748B"
+          />
+          <Text style={styles.postMetaBadgeText}>{noticeTripTypeLabel}</Text>
         </View>
       ) : null}
       {!isRegular && noticeCountdownLabel ? (

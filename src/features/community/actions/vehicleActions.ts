@@ -15,6 +15,8 @@ export const createCommunityVehicleActions = (context: CommunityActionsContext) 
       model: context.vehicleDraft.model.trim(),
       plate: context.vehicleDraft.plate.trim().toUpperCase(),
       note: context.vehicleDraft.note.trim(),
+      contactPhone: context.vehicleDraft.contactPhone.trim(),
+      contactLink: context.vehicleDraft.contactLink.trim(),
     };
 
     if (!nextVehicle.model || !nextVehicle.plate) {
@@ -28,7 +30,7 @@ export const createCommunityVehicleActions = (context: CommunityActionsContext) 
     await context.persistVehicle(nextVehicle);
     context.onNotice({
       tone: "success",
-      text: "Vehicle info saved on this device for your account.",
+      text: "Driver profile saved.",
     });
   };
 

@@ -29,8 +29,8 @@ export function DriverGarageSection({
       <Text style={styles.cardTitle}>{hasVehicle ? "My car" : "Driver registration"}</Text>
       <Text style={styles.cardBody}>
         {hasVehicle
-          ? "One vehicle profile only. Every route post uses this saved car for the signed-in account."
-          : "Before using driver mode, register your vehicle profile first."}
+          ? "One driver profile only. Vehicle and contact info are auto-applied to regular and one-time posts."
+          : "Before using driver mode, register your vehicle and contact profile first."}
       </Text>
 
       <Label text="Car model" styles={styles} />
@@ -62,6 +62,27 @@ export function DriverGarageSection({
         multiline
       />
 
+      <Label text="Contact phone" optional styles={styles} />
+      <TextInput
+        value={vehicleDraft.contactPhone}
+        onChangeText={(value) => onVehicleDraftChange({ ...vehicleDraft, contactPhone: value })}
+        placeholder="+61 412 345 678"
+        placeholderTextColor={colors.subtext}
+        keyboardType="phone-pad"
+        style={styles.input}
+      />
+
+      <Label text="Open chat link" optional styles={styles} />
+      <TextInput
+        value={vehicleDraft.contactLink}
+        onChangeText={(value) => onVehicleDraftChange({ ...vehicleDraft, contactLink: value })}
+        placeholder="https://open.kakao.com/o/..."
+        placeholderTextColor={colors.subtext}
+        autoCapitalize="none"
+        autoCorrect={false}
+        style={styles.input}
+      />
+
       <Pressable style={styles.primaryButton} onPress={onSaveVehicle}>
         <Text style={styles.primaryButtonText}>{hasVehicle ? "Save vehicle" : "Complete registration"}</Text>
       </Pressable>
@@ -73,6 +94,8 @@ export function DriverGarageSection({
             {savedVehicle.model} · {savedVehicle.plate}
           </Text>
           {savedVehicle.note ? <Text style={styles.savedNote}>{savedVehicle.note}</Text> : null}
+          {savedVehicle.contactPhone ? <Text style={styles.savedNote}>Phone: {savedVehicle.contactPhone}</Text> : null}
+          {savedVehicle.contactLink ? <Text style={styles.savedNote}>Chat: {savedVehicle.contactLink}</Text> : null}
         </View>
       ) : null}
     </View>

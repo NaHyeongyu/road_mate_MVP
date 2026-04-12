@@ -20,6 +20,7 @@ type HomeTabSectionProps = {
   myPosts: RoutePost[];
   savedPostKeys: string[];
   routeDraft: RouteDraft;
+  hasDriverContactMethod: boolean;
   currentUserId: string;
   onFilterChange: (filter: RouteKind) => void;
   onFromSearchQueryChange: (value: string) => void;
@@ -47,6 +48,7 @@ export function HomeTabSection({
   myPosts,
   savedPostKeys,
   routeDraft,
+  hasDriverContactMethod,
   currentUserId,
   onFilterChange,
   onFromSearchQueryChange,
@@ -65,6 +67,7 @@ export function HomeTabSection({
           styles={styles}
           driverRouteKind={driverRouteKind}
           routeDraft={routeDraft}
+          hasDriverContactMethod={hasDriverContactMethod}
           myPosts={myPosts}
           onRouteDraftChange={onRouteDraftChange}
           onSaveRouteQuickSettings={onSaveRouteQuickSettings}

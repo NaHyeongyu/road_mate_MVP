@@ -20,7 +20,8 @@ export const createCommunityPostRouteStyles = (colors: AppColors) =>
     postHeaderRow: {
       flexDirection: "row",
       alignItems: "center",
-      justifyContent: "space-between",
+      justifyContent: "flex-start",
+      flexWrap: "wrap",
       gap: 10,
     },
     postTypePill: {
