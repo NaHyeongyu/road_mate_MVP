@@ -77,6 +77,7 @@ export function DriverRouteComposerSection({
   const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
   const [iosTimePickerValue, setIosTimePickerValue] = useState<Date>(new Date());
   const [iosDatePickerValue, setIosDatePickerValue] = useState<Date>(new Date());
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const fromSuggestions = useMemo(() => getQldPlaceSuggestions(routeDraft.from), [routeDraft.from]);
   const toSuggestions = useMemo(() => getQldPlaceSuggestions(routeDraft.to), [routeDraft.to]);
@@ -290,8 +291,17 @@ export function DriverRouteComposerSection({
   const isWeekdayPresetActive = hasSameDays(routeDraft.operatingDays, WEEKDAY_PRESET);
   const isWeekendPresetActive = hasSameDays(routeDraft.operatingDays, WEEKEND_PRESET);
   const isAllDaysPresetActive = hasSameDays(routeDraft.operatingDays, WEEKDAY_OPTIONS);
-  const handlePressSaveRegistration = () => {
-    void onPostRoute();
+  const handlePressSaveRegistration = async () => {
+    if (isSubmitting || !isReadyToSave) {
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      await onPostRoute();
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -607,12 +617,21 @@ export function DriverRouteComposerSection({
       ) : null}
 
       <Pressable
-        style={[styles.primaryButton, !isReadyToSave ? styles.primaryButtonDisabled : null]}
-        disabled={!isReadyToSave}
-        onPress={handlePressSaveRegistration}
+        style={[
+          styles.primaryButton,
+          !isReadyToSave || isSubmitting ? styles.primaryButtonDisabled : null,
+        ]}
+        disabled={!isReadyToSave || isSubmitting}
+        onPress={() => {
+          void handlePressSaveRegistration();
+        }}
       >
         <Text style={styles.primaryButtonText}>
-          {isReadyToSave
+          {isSubmitting
+            ? isOneTimeRoute
+              ? "Posting one-time notice..."
+              : "Saving registration..."
+            : isReadyToSave
             ? isOneTimeRoute
               ? "Post one-time notice"
               : "Save registration"

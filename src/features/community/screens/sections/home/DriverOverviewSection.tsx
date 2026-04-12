@@ -9,6 +9,10 @@ type DriverOverviewSectionProps = {
   styles: AppStyles;
   driverRouteKind: RouteKind;
   hasRouteRegistration: boolean;
+  hasDraftInput: boolean;
+  isDraftReady: boolean;
+  missingRequiredLabels: string[];
+  isQuickSettingSaving: boolean;
   routeDraft: RouteDraft;
   onOpenRouteRegistration: () => void;
   onAdjustSeats: (delta: number) => void;
@@ -19,6 +23,10 @@ export function DriverOverviewSection({
   styles,
   driverRouteKind,
   hasRouteRegistration,
+  hasDraftInput,
+  isDraftReady,
+  missingRequiredLabels,
+  isQuickSettingSaving,
   routeDraft,
   onOpenRouteRegistration,
   onAdjustSeats,
@@ -28,6 +36,20 @@ export function DriverOverviewSection({
   const isRegular = driverRouteKind === "regular";
   const seats = Number.parseInt(routeDraft.availableSeats, 10);
   const seatsLabel = Number.isFinite(seats) && seats > 0 ? String(seats) : "1";
+  const previewMissingLabels = missingRequiredLabels.slice(0, 3);
+  const remainingMissingCount = Math.max(0, missingRequiredLabels.length - previewMissingLabels.length);
+  const registrationEmptyText = hasDraftInput
+    ? isDraftReady
+      ? "Draft is ready. Save registration to publish this route for riders."
+      : "Draft started. Complete required fields, then save registration to publish."
+    : "No registered information yet. Register once and riders can discover your route.";
+  const draftMissingText =
+    hasDraftInput && !isDraftReady && previewMissingLabels.length
+      ? `Missing: ${previewMissingLabels.join(", ")}${
+          remainingMissingCount > 0 ? ` +${remainingMissingCount} more` : ""
+        }`
+      : "";
+  const registerActionText = hasDraftInput ? (isDraftReady ? "Review & save" : "Continue draft") : "Register now";
 
   const previewPost: RoutePost = {
     id: `driver-overview-${driverRouteKind}`,
@@ -55,7 +77,13 @@ export function DriverOverviewSection({
         <Text style={styles.driverSimpleControlLabel}>Seats</Text>
         <View style={styles.driverControlBadgesRow}>
           <Pressable
-            style={[styles.postMetaBadge, styles.driverControlBadge, styles.driverControlBadgeCompact]}
+            style={[
+              styles.postMetaBadge,
+              styles.driverControlBadge,
+              styles.driverControlBadgeCompact,
+              isQuickSettingSaving ? { opacity: 0.56 } : null,
+            ]}
+            disabled={isQuickSettingSaving}
             onPress={() => onAdjustSeats(-1)}
           >
             <MaterialCommunityIcons name="minus" size={18} color="#64748B" />
@@ -73,7 +101,13 @@ export function DriverOverviewSection({
             </Text>
           </View>
           <Pressable
-            style={[styles.postMetaBadge, styles.driverControlBadge, styles.driverControlBadgeCompact]}
+            style={[
+              styles.postMetaBadge,
+              styles.driverControlBadge,
+              styles.driverControlBadgeCompact,
+              isQuickSettingSaving ? { opacity: 0.56 } : null,
+            ]}
+            disabled={isQuickSettingSaving}
             onPress={() => onAdjustSeats(1)}
           >
             <MaterialCommunityIcons name="plus" size={18} color="#64748B" />
@@ -89,7 +123,9 @@ export function DriverOverviewSection({
               styles.postMetaBadge,
               styles.driverControlBadge,
               routeDraft.isPublic ? styles.postMetaBadgePrimary : null,
+              isQuickSettingSaving ? { opacity: 0.56 } : null,
             ]}
+            disabled={isQuickSettingSaving}
             onPress={() => onRouteVisibilityChange(true)}
           >
             <MaterialCommunityIcons
@@ -112,7 +148,9 @@ export function DriverOverviewSection({
               styles.postMetaBadge,
               styles.driverControlBadge,
               !routeDraft.isPublic ? styles.postMetaBadgePrimary : null,
+              isQuickSettingSaving ? { opacity: 0.56 } : null,
             ]}
+            disabled={isQuickSettingSaving}
             onPress={() => onRouteVisibilityChange(false)}
           >
             <MaterialCommunityIcons
@@ -167,15 +205,14 @@ export function DriverOverviewSection({
           </View>
 
           <View style={styles.postSummaryRow}>
-            <Text style={styles.postSummaryText}>
-              No registered information yet. Register once and riders can discover your route.
-            </Text>
+            <Text style={styles.postSummaryText}>{registrationEmptyText}</Text>
+            {draftMissingText ? <Text style={styles.postNote}>{draftMissingText}</Text> : null}
           </View>
 
           <View style={styles.postActionsRow}>
             <Pressable style={styles.postActionInfo} onPress={onOpenRouteRegistration}>
               <MaterialCommunityIcons name="plus-circle-outline" size={15} color="#1D4ED8" />
-              <Text style={styles.postActionInfoText}>Register now</Text>
+              <Text style={styles.postActionInfoText}>{registerActionText}</Text>
             </Pressable>
           </View>
         </View>

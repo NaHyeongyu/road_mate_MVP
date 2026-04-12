@@ -47,7 +47,11 @@ export type CommunityHomeScreenProps = {
   onSaveVehicle: () => void;
   onRouteDraftChange: (draft: RouteDraft) => void;
   onPostRoute: () => Promise<boolean>;
-  onSaveRouteQuickSettings: (input: { kind: RouteKind; availableSeats: number; isPublic: boolean }) => void;
+  onSaveRouteQuickSettings: (input: {
+    kind: RouteKind;
+    availableSeats: number;
+    isPublic: boolean;
+  }) => Promise<void>;
   onRemoveRoute: (id: string) => void;
   onToggleSavedPost: (post: RoutePost) => void;
 };
@@ -145,7 +149,6 @@ export function CommunityHomeScreen({
     [activeDriverRouteKind, myPosts]
   );
   const latestRegisteredPost = myPostsForActiveKind[0] ?? null;
-  const hasRouteRegistration = isRouteDraftReady(routeDraft) || Boolean(latestRegisteredPost);
   const activeRouteDraft =
     isRouteDraftReady(routeDraft) || !latestRegisteredPost ? routeDraft : toDraftFromPost(latestRegisteredPost);
 
@@ -211,7 +214,7 @@ export function CommunityHomeScreen({
             activeRouteKind={activeDriverRouteKind}
             routeDraft={activeRouteDraft}
             hasVehicle={hasVehicle}
-            showVehicleSetup={!hasRouteRegistration && !hasVehicle}
+            showVehicleSetup={!hasVehicle}
             vehicleDraft={vehicleDraft}
             savedVehicle={savedVehicle}
             onVehicleDraftChange={onVehicleDraftChange}

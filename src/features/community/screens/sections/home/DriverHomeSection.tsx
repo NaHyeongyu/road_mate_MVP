@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import type { RouteDraft, RouteKind, RoutePost } from "../../../../../model";
 import type { AppStyles } from "../../../../../ui/types";
@@ -15,7 +15,7 @@ type DriverHomeSectionProps = {
     kind: RouteKind;
     availableSeats: number;
     isPublic: boolean;
-  }) => void;
+  }) => Promise<void>;
   onOpenRouteRegistrationPage: () => void;
 };
 
@@ -72,6 +72,29 @@ const hasRouteDraftInput = (routeDraft: RouteDraft) =>
       routeDraft.note.trim()
   );
 
+const getMissingRequiredLabels = (routeDraft: RouteDraft): string[] => {
+  if (routeDraft.kind === "one_time") {
+    const checks = [
+      { label: "From", done: Boolean(routeDraft.from.trim()) },
+      { label: "To", done: Boolean(routeDraft.to.trim()) },
+      { label: "Date", done: isRouteDateValue(routeDraft.noticeDate) },
+      { label: "Time", done: isRouteTimeValue(routeDraft.schedule) },
+    ];
+
+    return checks.filter((check) => !check.done).map((check) => check.label);
+  }
+
+  const checks = [
+    { label: "From", done: Boolean(routeDraft.from.trim()) },
+    { label: "To", done: Boolean(routeDraft.to.trim()) },
+    { label: "Departure time", done: isRouteTimeValue(routeDraft.schedule) },
+    { label: "Arrival time", done: isRouteTimeValue(routeDraft.returnSchedule) },
+    { label: "Contact", done: Boolean(routeDraft.contactPhone.trim() || routeDraft.contactLink.trim()) },
+  ];
+
+  return checks.filter((check) => !check.done).map((check) => check.label);
+};
+
 export function DriverHomeSection({
   styles,
   driverRouteKind,
@@ -81,25 +104,29 @@ export function DriverHomeSection({
   onSaveRouteQuickSettings,
   onOpenRouteRegistrationPage,
 }: DriverHomeSectionProps) {
+  const [isQuickSettingSaving, setIsQuickSettingSaving] = useState(false);
+  const hasDraftInput = hasRouteDraftInput(routeDraft);
+  const isDraftReady = isRouteDraftReady(routeDraft);
+  const missingRequiredLabels = useMemo(() => getMissingRequiredLabels(routeDraft), [routeDraft]);
   const myPostsForActiveKind = useMemo(
     () => myPosts.filter((post) => post.kind === driverRouteKind),
     [driverRouteKind, myPosts]
   );
   const latestRegisteredPost = myPostsForActiveKind[0] ?? null;
+  const hasPublishedRoute = Boolean(latestRegisteredPost);
   const activeRouteDraft =
-    isRouteDraftReady(routeDraft) || !latestRegisteredPost ? routeDraft : toDraftFromPost(latestRegisteredPost);
-  const hasRouteRegistration = isRouteDraftReady(routeDraft) || Boolean(latestRegisteredPost);
+    isDraftReady || !latestRegisteredPost ? routeDraft : toDraftFromPost(latestRegisteredPost);
 
   useEffect(() => {
-    if (isRouteDraftReady(routeDraft) || hasRouteDraftInput(routeDraft) || !latestRegisteredPost) {
+    if (isDraftReady || hasDraftInput || !latestRegisteredPost) {
       return;
     }
 
     onRouteDraftChange(toDraftFromPost(latestRegisteredPost));
-  }, [latestRegisteredPost, onRouteDraftChange, routeDraft]);
+  }, [hasDraftInput, isDraftReady, latestRegisteredPost, onRouteDraftChange]);
 
   const handleOpenRouteRegistration = () => {
-    if (!isRouteDraftReady(routeDraft) && !hasRouteDraftInput(routeDraft) && latestRegisteredPost) {
+    if (!isDraftReady && !hasDraftInput && latestRegisteredPost) {
       onRouteDraftChange(toDraftFromPost(latestRegisteredPost));
     }
 
@@ -107,7 +134,7 @@ export function DriverHomeSection({
   };
 
   const handleAdjustSeats = (delta: number) => {
-    if (!hasRouteRegistration) {
+    if (!hasPublishedRoute || isQuickSettingSaving) {
       return;
     }
 
@@ -125,15 +152,22 @@ export function DriverHomeSection({
     };
 
     onRouteDraftChange(nextDraft);
-    onSaveRouteQuickSettings({
+    setIsQuickSettingSaving(true);
+    void onSaveRouteQuickSettings({
       kind: driverRouteKind,
       availableSeats: nextSeats,
       isPublic: nextDraft.isPublic,
-    });
+    })
+      .catch(() => {
+        // Notice is handled in action layer; avoid unhandled rejections here.
+      })
+      .finally(() => {
+        setIsQuickSettingSaving(false);
+      });
   };
 
   const handleRouteVisibilityChange = (isPublic: boolean) => {
-    if (!hasRouteRegistration || activeRouteDraft.isPublic === isPublic) {
+    if (!hasPublishedRoute || isQuickSettingSaving || activeRouteDraft.isPublic === isPublic) {
       return;
     }
 
@@ -144,18 +178,29 @@ export function DriverHomeSection({
     };
 
     onRouteDraftChange(nextDraft);
-    onSaveRouteQuickSettings({
+    setIsQuickSettingSaving(true);
+    void onSaveRouteQuickSettings({
       kind: driverRouteKind,
       availableSeats: normalizeSeats(Number.parseInt(nextDraft.availableSeats, 10) || MIN_SEATS),
       isPublic,
-    });
+    })
+      .catch(() => {
+        // Notice is handled in action layer; avoid unhandled rejections here.
+      })
+      .finally(() => {
+        setIsQuickSettingSaving(false);
+      });
   };
 
   return (
     <DriverOverviewSection
       styles={styles}
       driverRouteKind={driverRouteKind}
-      hasRouteRegistration={hasRouteRegistration}
+      hasRouteRegistration={hasPublishedRoute}
+      hasDraftInput={hasDraftInput}
+      isDraftReady={isDraftReady}
+      missingRequiredLabels={missingRequiredLabels}
+      isQuickSettingSaving={isQuickSettingSaving}
       routeDraft={activeRouteDraft}
       onOpenRouteRegistration={handleOpenRouteRegistration}
       onAdjustSeats={handleAdjustSeats}

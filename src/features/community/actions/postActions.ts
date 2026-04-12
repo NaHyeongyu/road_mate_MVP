@@ -173,6 +173,14 @@ export const createCommunityPostActions = (context: CommunityActionsContext) => 
     const targetPost = context.storedPosts.find(
       (post) => post.ownerUserId === context.currentUserId && post.kind === kind
     );
+    if (!targetPost) {
+      context.onNotice({
+        tone: "info",
+        text: "Save registration first before changing seats or visibility.",
+      });
+      return;
+    }
+
     let nextPosts = context.storedPosts.map((post) => {
       if (post.ownerUserId !== context.currentUserId || post.kind !== kind) {
         return post;
@@ -185,7 +193,7 @@ export const createCommunityPostActions = (context: CommunityActionsContext) => 
       };
     });
 
-    if (targetPost && isRoutePostRepositoryEnabled()) {
+    if (isRoutePostRepositoryEnabled()) {
       try {
         const syncedPost = await updateRouteQuickSettingsInDb({
           routeId: targetPost.id,
@@ -204,7 +212,14 @@ export const createCommunityPostActions = (context: CommunityActionsContext) => 
       }
     }
 
-    await context.persistPosts(nextPosts);
+    try {
+      await context.persistPosts(nextPosts);
+    } catch (error) {
+      context.onNotice({
+        tone: "error",
+        text: `Route quick settings could not be saved locally. (${describeRouteDbError(error)})`,
+      });
+    }
   };
 
   return {

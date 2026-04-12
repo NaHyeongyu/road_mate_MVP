@@ -36,7 +36,11 @@ type CommunityTabContentProps = {
   onSaveVehicle: () => void;
   onRouteDraftChange: (draft: RouteDraft) => void;
   onPostRoute: () => Promise<boolean>;
-  onSaveRouteQuickSettings: (input: { kind: RouteKind; availableSeats: number; isPublic: boolean }) => void;
+  onSaveRouteQuickSettings: (input: {
+    kind: RouteKind;
+    availableSeats: number;
+    isPublic: boolean;
+  }) => Promise<void>;
   onOpenDriverRegistrationPage: () => void;
   onRemoveRoute: (id: string) => void;
   onToggleSavedPost: (post: RoutePost) => void;

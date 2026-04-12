@@ -25,7 +25,11 @@ type HomeTabSectionProps = {
   onFromSearchQueryChange: (value: string) => void;
   onToSearchQueryChange: (value: string) => void;
   onRouteDraftChange: (draft: RouteDraft) => void;
-  onSaveRouteQuickSettings: (input: { kind: RouteKind; availableSeats: number; isPublic: boolean }) => void;
+  onSaveRouteQuickSettings: (input: {
+    kind: RouteKind;
+    availableSeats: number;
+    isPublic: boolean;
+  }) => Promise<void>;
   onOpenDriverRegistrationPage: () => void;
   onToggleSavedPost: (post: RoutePost) => void;
 };
