@@ -288,6 +288,14 @@ export function DriverRouteComposerSection({
       ];
   const remainingRequired = requiredChecks.filter((check) => !check.done).map((check) => check.label);
   const isReadyToSave = remainingRequired.length === 0;
+  const previewRemainingRequired = remainingRequired.slice(0, 4);
+  const hiddenRequiredCount = Math.max(0, remainingRequired.length - previewRemainingRequired.length);
+  const remainingRequiredText =
+    previewRemainingRequired.length > 0
+      ? `Missing: ${previewRemainingRequired.join(", ")}${
+          hiddenRequiredCount > 0 ? ` +${hiddenRequiredCount} more` : ""
+        }`
+      : "";
   const isWeekdayPresetActive = hasSameDays(routeDraft.operatingDays, WEEKDAY_PRESET);
   const isWeekendPresetActive = hasSameDays(routeDraft.operatingDays, WEEKEND_PRESET);
   const isAllDaysPresetActive = hasSameDays(routeDraft.operatingDays, WEEKDAY_OPTIONS);
@@ -609,11 +617,14 @@ export function DriverRouteComposerSection({
       ) : null}
 
       {!isReadyToSave ? (
-        <Text style={styles.cardBody}>
-          {isOneTimeRoute
-            ? "Fill required fields to post this one-time notice."
-            : "Fill all required fields to save this registration."}
-        </Text>
+        <>
+          <Text style={styles.cardBody}>
+            {isOneTimeRoute
+              ? "Fill required fields to post this one-time notice."
+              : "Fill all required fields to save this registration."}
+          </Text>
+          {remainingRequiredText ? <Text style={styles.cardBody}>{remainingRequiredText}</Text> : null}
+        </>
       ) : null}
 
       <Pressable
