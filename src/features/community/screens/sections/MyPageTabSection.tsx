@@ -40,16 +40,44 @@ export function MyPageTabSection({
 }: MyPageTabSectionProps) {
   const [confirmSignOut, setConfirmSignOut] = useState(false);
   const [confirmWithdraw, setConfirmWithdraw] = useState(false);
+  const isDriverMode = mode === "driver";
+  const hasContactMethod = Boolean(
+    savedVehicle.contactPhone.trim() || savedVehicle.contactLink.trim()
+  );
+  const driverProfileStatusText = !isDriverMode
+    ? "Rider mode is active."
+    : hasVehicle
+      ? hasContactMethod
+        ? "Driver profile is ready for posting."
+        : "Driver profile is saved, but contact method is missing."
+      : "Driver profile is not completed yet.";
 
   return (
     <>
       <View style={styles.card}>
-        <Text style={styles.cardTitle}>My page</Text>
+        <Text style={styles.cardTitle}>Account summary</Text>
         <Text style={styles.cardBody}>Name: {currentUserName}</Text>
         <Text style={styles.cardBody}>Email: {currentUserEmail}</Text>
-        <Text style={styles.cardBody}>Active role: {mode === "driver" ? "Driver" : "Rider"}</Text>
-        <Text style={styles.cardBody}>My posted routes: {myPostsCount}</Text>
-        {mode === "driver" && hasVehicle ? (
+        <View style={styles.row}>
+          <View style={styles.chip}>
+            <Text style={styles.chipText}>Role: {isDriverMode ? "Driver" : "Rider"}</Text>
+          </View>
+          <View style={styles.chip}>
+            <Text style={styles.chipText}>My routes: {myPostsCount}</Text>
+          </View>
+        </View>
+      </View>
+
+      <View style={styles.card}>
+        <Text style={styles.cardTitle}>Driver profile status</Text>
+        <Text style={styles.cardBody}>{driverProfileStatusText}</Text>
+        {!isDriverMode ? (
+          <Text style={styles.cardBody}>Switch to driver mode to manage your vehicle profile.</Text>
+        ) : !hasVehicle ? (
+          <Text style={styles.cardBody}>
+            Register vehicle and contact details once to start posting regular or one-time routes.
+          </Text>
+        ) : (
           <>
             <Text style={styles.cardBody}>
               Vehicle: {savedVehicle.model} · {savedVehicle.plate}
@@ -58,13 +86,23 @@ export function MyPageTabSection({
               <Text style={styles.cardBody}>Phone: {savedVehicle.contactPhone}</Text>
             ) : null}
             {savedVehicle.contactLink ? (
-              <Text style={styles.cardBody}>Open chat: {savedVehicle.contactLink}</Text>
+              <Text numberOfLines={1} style={styles.cardBody}>
+                Open chat: {savedVehicle.contactLink}
+              </Text>
+            ) : null}
+            {!savedVehicle.contactPhone && !savedVehicle.contactLink ? (
+              <Text style={styles.cardBody}>Add phone or open chat link to make riders contact you.</Text>
+            ) : null}
+            {savedVehicle.note ? (
+              <Text numberOfLines={2} style={styles.cardBody}>
+                Car note: {savedVehicle.note}
+              </Text>
             ) : null}
           </>
-        ) : null}
+        )}
       </View>
 
-      {mode === "driver" ? (
+      {isDriverMode ? (
         <DriverGarageSection
           colors={colors}
           styles={styles}
@@ -78,10 +116,12 @@ export function MyPageTabSection({
       <View style={styles.card}>
         <Text style={styles.cardTitle}>Account management</Text>
         <Text style={styles.cardBody}>
-          Manage session and withdrawal from here. Withdrawal signs you out and clears your local
-          driver profile.
+          Sign out keeps your account. Withdrawal removes access and clears your local driver profile.
         </Text>
 
+        {confirmSignOut ? (
+          <Text style={styles.cardBody}>Tap sign out once more to confirm.</Text>
+        ) : null}
         <Pressable
           style={styles.primaryButton}
           onPress={() => {
@@ -93,9 +133,7 @@ export function MyPageTabSection({
             setConfirmWithdraw(false);
           }}
         >
-          <Text style={styles.primaryButtonText}>
-            {confirmSignOut ? "Confirm sign out" : "Sign out"}
-          </Text>
+          <Text style={styles.primaryButtonText}>{confirmSignOut ? "Confirm sign out" : "Sign out"}</Text>
         </Pressable>
         {confirmSignOut ? (
           <Pressable style={styles.inlineTextButton} onPress={() => setConfirmSignOut(false)}>
@@ -103,6 +141,9 @@ export function MyPageTabSection({
           </Pressable>
         ) : null}
 
+        {confirmWithdraw ? (
+          <Text style={styles.cardBody}>Tap withdraw once more to confirm account withdrawal.</Text>
+        ) : null}
         <Pressable
           style={styles.dangerButton}
           onPress={() => {
