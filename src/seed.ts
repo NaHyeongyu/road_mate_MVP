@@ -431,6 +431,7 @@ const buildSeedPost = (
   return {
     id: `seed-qld-${idSuffix}`,
     kind,
+    noticeDate: kind === "one_time" ? createdAt.slice(0, 10) : undefined,
     from: template.from,
     to: template.to,
     schedule: template.schedule,

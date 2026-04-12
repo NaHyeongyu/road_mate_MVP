@@ -15,10 +15,11 @@ import { supabase } from "../../lib/supabase";
 import type { AppNotice } from "../types";
 
 type UseStoredPostsStateOptions = {
+  currentUserId: string;
   onLoadError: (notice: AppNotice) => void;
 };
 
-export function useStoredPostsState({ onLoadError }: UseStoredPostsStateOptions) {
+export function useStoredPostsState({ currentUserId, onLoadError }: UseStoredPostsStateOptions) {
   const [storedPosts, setStoredPosts] = useState<RoutePost[]>([]);
   const [isPostsLoading, setIsPostsLoading] = useState(true);
 
@@ -112,7 +113,7 @@ export function useStoredPostsState({ onLoadError }: UseStoredPostsStateOptions)
       cancelled = true;
       releaseRemoteSubscription?.();
     };
-  }, [onLoadError]);
+  }, [currentUserId, onLoadError]);
 
   const persistPosts = async (nextPosts: RoutePost[]) => {
     const normalizedPosts = sortByNewest(nextPosts);

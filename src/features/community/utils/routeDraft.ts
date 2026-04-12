@@ -1,5 +1,5 @@
 import type { RouteDraft, RoutePost, VehicleInfo } from "../../../model";
-import { isRouteTimeValue } from "./routeForm";
+import { isRouteDateValue, isRouteTimeValue } from "./routeForm";
 
 const MAX_SEATS = 8;
 
@@ -21,6 +21,7 @@ export const buildRoutePost = ({
   return {
     id: `mine-${Date.now()}`,
     kind: routeDraft.kind,
+    noticeDate: isOneTime ? routeDraft.noticeDate.trim() : undefined,
     from: routeDraft.from.trim(),
     to: routeDraft.to.trim(),
     schedule: routeDraft.schedule.trim(),
@@ -42,6 +43,10 @@ export const buildRoutePost = ({
 };
 
 export const validateRoutePost = (routePost: RoutePost): string | null => {
+  if (routePost.kind === "one_time" && !isRouteDateValue(routePost.noticeDate ?? "")) {
+    return "Set notice date using calendar picker.";
+  }
+
   if (!routePost.from || !routePost.to) {
     return "Add both from and to before posting.";
   }

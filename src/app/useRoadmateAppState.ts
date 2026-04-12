@@ -34,12 +34,12 @@ export function useRoadmateAppState() {
   const { authSession, isSessionLoading } = useSessionState({
     onLoadError: handleLoadError,
   });
-  const { storedPosts, isPostsLoading, persistPosts } = useStoredPostsState({
-    onLoadError: handleLoadError,
-  });
-
   const currentUser = authSession?.user ?? null;
   const currentUserId = currentUser?.id ?? "";
+  const { storedPosts, isPostsLoading, persistPosts } = useStoredPostsState({
+    currentUserId,
+    onLoadError: handleLoadError,
+  });
 
   const {
     vehicleDraft,

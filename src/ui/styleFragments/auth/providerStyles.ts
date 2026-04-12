@@ -17,6 +17,11 @@ export const createAuthProviderStyles = (colors: AppColors) =>
       paddingHorizontal: 14,
       gap: 10,
     },
+    providerButtonDisabled: {
+      backgroundColor: colors.panelAlt,
+      borderColor: colors.border,
+      opacity: 0.62,
+    },
     emailProviderButton: {
       backgroundColor: colors.brand,
       borderColor: colors.brand,
@@ -65,7 +70,26 @@ export const createAuthProviderStyles = (colors: AppColors) =>
       lineHeight: 18,
       transform: [{ translateY: Platform.OS === "android" ? 1 : 0.5 }],
     },
+    providerButtonTextDisabled: {
+      color: colors.subtext,
+    },
     appleProviderButtonText: {
       color: "#FFFFFF",
+    },
+    providerSoonBadge: {
+      marginLeft: "auto",
+      borderRadius: 999,
+      borderWidth: 1,
+      borderColor: colors.border,
+      backgroundColor: colors.panel,
+      paddingHorizontal: 8,
+      paddingVertical: 2,
+    },
+    providerSoonBadgeText: {
+      color: colors.subtext,
+      fontSize: 10,
+      fontWeight: "700",
+      textTransform: "uppercase",
+      letterSpacing: 0.3,
     },
   }) satisfies StyleMap;

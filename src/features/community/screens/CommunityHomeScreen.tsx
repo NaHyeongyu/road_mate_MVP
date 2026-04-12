@@ -7,7 +7,7 @@ import type { AppColors } from "../../../brandTheme";
 import type { RouteDraft, RouteKind, RoutePost, VehicleInfo } from "../../../model";
 import { APP_BAR_BG } from "../../../ui/styleFragments/layout/constants";
 import type { AppStyles } from "../../../ui/types";
-import { isRouteTimeValue } from "../utils/routeForm";
+import { isRouteDateValue, isRouteTimeValue } from "../utils/routeForm";
 import { NoticeBanner } from "../../shared/components/NoticeBanner";
 import { ScreenHeader } from "../../shared/components/ScreenHeader";
 import type { MainTab, Mode } from "../types";
@@ -55,9 +55,10 @@ export type CommunityHomeScreenProps = {
 const isRouteDraftReady = (routeDraft: RouteDraft) => {
   if (routeDraft.kind === "one_time") {
     return Boolean(
+      isRouteDateValue(routeDraft.noticeDate) &&
       routeDraft.from.trim() &&
-        routeDraft.to.trim() &&
-        isRouteTimeValue(routeDraft.schedule)
+      routeDraft.to.trim() &&
+      isRouteTimeValue(routeDraft.schedule)
     );
   }
 
@@ -74,6 +75,7 @@ const isRouteDraftReady = (routeDraft: RouteDraft) => {
 
 const hasRouteDraftInput = (routeDraft: RouteDraft) =>
   Boolean(
+    routeDraft.noticeDate.trim() ||
     routeDraft.from.trim() ||
       routeDraft.to.trim() ||
       routeDraft.schedule.trim() ||
@@ -85,6 +87,7 @@ const hasRouteDraftInput = (routeDraft: RouteDraft) =>
 
 const toDraftFromPost = (post: RoutePost): RouteDraft => ({
   kind: post.kind,
+  noticeDate: post.noticeDate ?? "",
   from: post.from,
   to: post.to,
   schedule: post.schedule,

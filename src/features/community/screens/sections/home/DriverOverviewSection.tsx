@@ -32,6 +32,7 @@ export function DriverOverviewSection({
   const previewPost: RoutePost = {
     id: `driver-overview-${driverRouteKind}`,
     kind: driverRouteKind,
+    noticeDate: routeDraft.kind === "one_time" ? routeDraft.noticeDate : undefined,
     from: routeDraft.from,
     to: routeDraft.to,
     schedule: routeDraft.schedule,
@@ -53,17 +54,29 @@ export function DriverOverviewSection({
       <View style={styles.driverSimpleControlRow}>
         <Text style={styles.driverSimpleControlLabel}>Seats</Text>
         <View style={styles.driverControlBadgesRow}>
-          <Pressable style={styles.postMetaBadge} onPress={() => onAdjustSeats(-1)}>
-            <MaterialCommunityIcons name="minus" size={14} color="#64748B" />
+          <Pressable
+            style={[styles.postMetaBadge, styles.driverControlBadge, styles.driverControlBadgeCompact]}
+            onPress={() => onAdjustSeats(-1)}
+          >
+            <MaterialCommunityIcons name="minus" size={18} color="#64748B" />
           </Pressable>
-          <View style={[styles.postMetaBadge, styles.postMetaBadgePrimary]}>
-            <MaterialCommunityIcons name="seat-passenger" size={14} color="#1D4ED8" />
-            <Text style={[styles.postMetaBadgeText, styles.postMetaBadgeTextPrimary]}>
+          <View style={[styles.postMetaBadge, styles.postMetaBadgePrimary, styles.driverControlBadge]}>
+            <MaterialCommunityIcons name="seat-passenger" size={18} color="#1D4ED8" />
+            <Text
+              style={[
+                styles.postMetaBadgeText,
+                styles.postMetaBadgeTextPrimary,
+                styles.driverControlBadgeText,
+              ]}
+            >
               {seatsLabel}
             </Text>
           </View>
-          <Pressable style={styles.postMetaBadge} onPress={() => onAdjustSeats(1)}>
-            <MaterialCommunityIcons name="plus" size={14} color="#64748B" />
+          <Pressable
+            style={[styles.postMetaBadge, styles.driverControlBadge, styles.driverControlBadgeCompact]}
+            onPress={() => onAdjustSeats(1)}
+          >
+            <MaterialCommunityIcons name="plus" size={18} color="#64748B" />
           </Pressable>
         </View>
       </View>
@@ -72,17 +85,22 @@ export function DriverOverviewSection({
         <Text style={styles.driverSimpleControlLabel}>Visibility</Text>
         <View style={styles.driverControlBadgesRow}>
           <Pressable
-            style={[styles.postMetaBadge, routeDraft.isPublic ? styles.postMetaBadgePrimary : null]}
+            style={[
+              styles.postMetaBadge,
+              styles.driverControlBadge,
+              routeDraft.isPublic ? styles.postMetaBadgePrimary : null,
+            ]}
             onPress={() => onRouteVisibilityChange(true)}
           >
             <MaterialCommunityIcons
               name="earth"
-              size={14}
+              size={18}
               color={routeDraft.isPublic ? "#1D4ED8" : "#64748B"}
             />
             <Text
               style={[
                 styles.postMetaBadgeText,
+                styles.driverControlBadgeText,
                 routeDraft.isPublic ? styles.postMetaBadgeTextPrimary : null,
               ]}
             >
@@ -90,17 +108,22 @@ export function DriverOverviewSection({
             </Text>
           </Pressable>
           <Pressable
-            style={[styles.postMetaBadge, !routeDraft.isPublic ? styles.postMetaBadgePrimary : null]}
+            style={[
+              styles.postMetaBadge,
+              styles.driverControlBadge,
+              !routeDraft.isPublic ? styles.postMetaBadgePrimary : null,
+            ]}
             onPress={() => onRouteVisibilityChange(false)}
           >
             <MaterialCommunityIcons
               name="lock-outline"
-              size={14}
+              size={18}
               color={!routeDraft.isPublic ? "#1D4ED8" : "#64748B"}
             />
             <Text
               style={[
                 styles.postMetaBadgeText,
+                styles.driverControlBadgeText,
                 !routeDraft.isPublic ? styles.postMetaBadgeTextPrimary : null,
               ]}
             >

@@ -3,6 +3,7 @@ import { Text, View } from "react-native";
 
 import type { RoutePost } from "../../../model";
 import type { AppStyles } from "../../../ui/types";
+import { formatNoticeDate } from "../utils/storage";
 import { RoutePostDetailModal } from "./RoutePostDetailModal";
 import { PostCardActions } from "./postCard/PostCardActions";
 import { PostCardHeader } from "./postCard/PostCardHeader";
@@ -35,6 +36,7 @@ export function PostCard({
 }: PostCardProps) {
   const isRegular = post.kind === "regular";
   const seatsLabel = isRegular ? `${post.availableSeats} seats left` : undefined;
+  const noticeDateLabel = isRegular ? undefined : formatNoticeDate(post.noticeDate, post.createdAt);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const operatingDaysSummary = useMemo(() => {
     if (!post.operatingDays.length) {
@@ -57,12 +59,18 @@ export function PostCard({
   return (
     <>
       <View style={styles.postCard}>
-        <PostCardHeader post={post} styles={styles} isRegular={isRegular} seatsLabel={seatsLabel} />
+        <PostCardHeader
+          post={post}
+          styles={styles}
+          isRegular={isRegular}
+          seatsLabel={seatsLabel}
+          noticeDateLabel={noticeDateLabel}
+        />
         <PostCardRouteStack post={post} styles={styles} isRegular={isRegular} />
 
         <View style={styles.postSummaryRow}>
           <Text numberOfLines={1} style={styles.postSummaryText}>
-            {isRegular ? `Runs ${operatingDaysSummary}` : "One-time notice"}
+            {isRegular ? `Runs ${operatingDaysSummary}` : `Notice for ${noticeDateLabel}`}
           </Text>
         </View>
 

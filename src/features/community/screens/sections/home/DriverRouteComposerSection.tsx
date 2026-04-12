@@ -9,8 +9,11 @@ import type { RouteDraft, RouteKind, VehicleInfo } from "../../../../../model";
 import type { AppStyles } from "../../../../../ui/types";
 import {
   WEEKDAY_OPTIONS,
+  isRouteDateValue,
   isRouteTimeValue,
+  toDateFromRouteDate,
   toDateFromRouteTime,
+  toRouteDateFromDate,
   toRouteTimeFromDate,
 } from "../../../../community/utils/routeForm";
 import { getQldPlaceSuggestions } from "../../../utils/placeQuickSearch";
@@ -18,6 +21,7 @@ import { Label } from "../../../../shared/components/Label";
 import { ToggleChip } from "../../../../shared/components/ToggleChip";
 import { DriverGarageSection } from "./DriverGarageSection";
 import { OperatingDaysChips } from "./OperatingDaysChips";
+import { RouteDateField } from "./RouteDateField";
 import { RouteDraftTextField } from "./RouteDraftTextField";
 import { RouteTimeField } from "./RouteTimeField";
 
@@ -70,7 +74,9 @@ export function DriverRouteComposerSection({
   const linkInputRef = useRef<TextInput>(null);
   const [activePlaceField, setActivePlaceField] = useState<"from" | "to" | null>(null);
   const [activeTimeField, setActiveTimeField] = useState<"schedule" | "returnSchedule" | null>(null);
-  const [iosPickerValue, setIosPickerValue] = useState<Date>(new Date());
+  const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
+  const [iosTimePickerValue, setIosTimePickerValue] = useState<Date>(new Date());
+  const [iosDatePickerValue, setIosDatePickerValue] = useState<Date>(new Date());
 
   const fromSuggestions = useMemo(() => getQldPlaceSuggestions(routeDraft.from), [routeDraft.from]);
   const toSuggestions = useMemo(() => getQldPlaceSuggestions(routeDraft.to), [routeDraft.to]);
@@ -122,13 +128,25 @@ export function DriverRouteComposerSection({
     clearBlurTimeout();
     onRouteDraftChange({ ...routeDraft, to: value });
     setActivePlaceField(null);
+    if (isOneTimeRoute) {
+      openDatePicker();
+      return;
+    }
+
     openTimePicker("schedule");
   };
 
   const openTimePicker = (field: "schedule" | "returnSchedule") => {
+    setIsDatePickerOpen(false);
     const baseValue = toDateFromRouteTime(routeDraft[field]);
-    setIosPickerValue(baseValue);
+    setIosTimePickerValue(baseValue);
     setActiveTimeField(field);
+  };
+
+  const openDatePicker = () => {
+    setActiveTimeField(null);
+    setIosDatePickerValue(toDateFromRouteDate(routeDraft.noticeDate));
+    setIsDatePickerOpen(true);
   };
 
   const applySelectedTime = (field: "schedule" | "returnSchedule", date: Date) => {
@@ -152,7 +170,7 @@ export function DriverRouteComposerSection({
     applySelectedTime(currentField, selectedDate);
 
     if (!isOneTimeRoute && currentField === "schedule" && !isRouteTimeValue(routeDraft.returnSchedule)) {
-      setIosPickerValue(toDateFromRouteTime(routeDraft.returnSchedule));
+      setIosTimePickerValue(toDateFromRouteTime(routeDraft.returnSchedule));
       setActiveTimeField("returnSchedule");
       return;
     }
@@ -162,7 +180,33 @@ export function DriverRouteComposerSection({
 
   const handleIosTimePickerChange = (_event: DateTimePickerEvent, selectedDate?: Date) => {
     if (selectedDate) {
-      setIosPickerValue(selectedDate);
+      setIosTimePickerValue(selectedDate);
+    }
+  };
+
+  const handleAndroidDatePickerChange = (event: DateTimePickerEvent, selectedDate?: Date) => {
+    if (!isDatePickerOpen) {
+      return;
+    }
+
+    if (event.type !== "set" || !selectedDate) {
+      setIsDatePickerOpen(false);
+      return;
+    }
+
+    onRouteDraftChange({
+      ...routeDraft,
+      noticeDate: toRouteDateFromDate(selectedDate),
+    });
+    setIsDatePickerOpen(false);
+    if (!isRouteTimeValue(routeDraft.schedule)) {
+      openTimePicker("schedule");
+    }
+  };
+
+  const handleIosDatePickerChange = (_event: DateTimePickerEvent, selectedDate?: Date) => {
+    if (selectedDate) {
+      setIosDatePickerValue(selectedDate);
     }
   };
 
@@ -172,15 +216,26 @@ export function DriverRouteComposerSection({
     }
 
     const currentField = activeTimeField;
-    applySelectedTime(currentField, iosPickerValue);
+    applySelectedTime(currentField, iosTimePickerValue);
 
     if (!isOneTimeRoute && currentField === "schedule" && !isRouteTimeValue(routeDraft.returnSchedule)) {
-      setIosPickerValue(toDateFromRouteTime(routeDraft.returnSchedule));
+      setIosTimePickerValue(toDateFromRouteTime(routeDraft.returnSchedule));
       setActiveTimeField("returnSchedule");
       return;
     }
 
     setActiveTimeField(null);
+  };
+
+  const handleConfirmIosDate = () => {
+    onRouteDraftChange({
+      ...routeDraft,
+      noticeDate: toRouteDateFromDate(iosDatePickerValue),
+    });
+    setIsDatePickerOpen(false);
+    if (!isRouteTimeValue(routeDraft.schedule)) {
+      openTimePicker("schedule");
+    }
   };
 
   const applyOperatingDays = (days: readonly string[]) => {
@@ -205,6 +260,7 @@ export function DriverRouteComposerSection({
 
   const hasFrom = Boolean(routeDraft.from.trim());
   const hasTo = Boolean(routeDraft.to.trim());
+  const hasNoticeDate = isRouteDateValue(routeDraft.noticeDate);
   const hasDepartureTime = isRouteTimeValue(routeDraft.schedule);
   const hasArrivalTime = isRouteTimeValue(routeDraft.returnSchedule);
   const hasSeats = currentSeatCount >= MIN_SEATS;
@@ -216,6 +272,7 @@ export function DriverRouteComposerSection({
         { label: "Vehicle profile", done: hasVehicle },
         { label: "From", done: hasFrom },
         { label: "To", done: hasTo },
+        { label: "Date", done: hasNoticeDate },
         { label: "Time", done: hasDepartureTime },
       ]
     : [
@@ -317,7 +374,7 @@ export function DriverRouteComposerSection({
             setActivePlaceField("to");
           }}
           onBlur={() => scheduleCloseSuggestions("to")}
-          onSubmitEditing={() => openTimePicker("schedule")}
+          onSubmitEditing={() => (isOneTimeRoute ? openDatePicker() : openTimePicker("schedule"))}
         />
         {routeDraft.to.trim() ? (
           <Pressable
@@ -350,6 +407,16 @@ export function DriverRouteComposerSection({
 
       <View style={styles.routeComposerDivider} />
 
+      {isOneTimeRoute ? (
+        <RouteDateField
+          styles={styles}
+          label="Date"
+          value={routeDraft.noticeDate}
+          placeholder="Select notice date"
+          onPress={openDatePicker}
+        />
+      ) : null}
+
       <RouteTimeField
         styles={styles}
         label={isOneTimeRoute ? "Time" : "Departure time"}
@@ -366,6 +433,28 @@ export function DriverRouteComposerSection({
           onPress={() => openTimePicker("returnSchedule")}
         />
       ) : null}
+      {Platform.OS === "ios" && isDatePickerOpen ? (
+        <View style={styles.timePickerInlineCard}>
+          <View style={styles.timePickerInlineHeader}>
+            <Text style={styles.timePickerInlineTitle}>Notice date</Text>
+            <View style={styles.timePickerInlineActions}>
+              <Pressable style={styles.timePickerInlineActionButton} onPress={() => setIsDatePickerOpen(false)}>
+                <Text style={styles.timePickerInlineActionText}>Cancel</Text>
+              </Pressable>
+              <Pressable style={styles.timePickerInlineActionButton} onPress={handleConfirmIosDate}>
+                <Text style={styles.timePickerInlineActionText}>Done</Text>
+              </Pressable>
+            </View>
+          </View>
+          <DateTimePicker
+            mode="date"
+            value={iosDatePickerValue}
+            display="spinner"
+            onChange={handleIosDatePickerChange}
+          />
+        </View>
+      ) : null}
+
       {Platform.OS === "ios" && activeTimeField ? (
         <View style={styles.timePickerInlineCard}>
           <View style={styles.timePickerInlineHeader}>
@@ -387,7 +476,7 @@ export function DriverRouteComposerSection({
           </View>
           <DateTimePicker
             mode="time"
-            value={iosPickerValue}
+            value={iosTimePickerValue}
             display="spinner"
             onChange={handleIosTimePickerChange}
           />
@@ -539,6 +628,14 @@ export function DriverRouteComposerSection({
           value={toDateFromRouteTime(routeDraft[activeTimeField])}
           display="clock"
           onChange={handleAndroidTimePickerChange}
+        />
+      ) : null}
+      {Platform.OS === "android" && isDatePickerOpen ? (
+        <DateTimePicker
+          mode="date"
+          value={toDateFromRouteDate(routeDraft.noticeDate)}
+          display="calendar"
+          onChange={handleAndroidDatePickerChange}
         />
       ) : null}
     </>

@@ -137,6 +137,7 @@ export function CommunityTabContent({
     return (
       <SavedTabSection
         styles={styles}
+        notice={notice}
         isRiderMode={isRiderMode}
         savedPosts={savedPosts}
         currentUserId={currentUserId}

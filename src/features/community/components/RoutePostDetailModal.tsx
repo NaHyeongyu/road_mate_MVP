@@ -3,6 +3,7 @@ import { Modal, Pressable, Text, View } from "react-native";
 
 import type { RoutePost } from "../../../model";
 import type { AppStyles } from "../../../ui/types";
+import { formatNoticeDate } from "../utils/storage";
 import { PostCardActions } from "./postCard/PostCardActions";
 import { PostCardContactRow } from "./postCard/PostCardContactRow";
 import { PostCardFooter } from "./postCard/PostCardFooter";
@@ -33,6 +34,7 @@ export function RoutePostDetailModal({
 }: RoutePostDetailModalProps) {
   const isRegular = post.kind === "regular";
   const seatsLabel = isRegular ? `${post.availableSeats} seats left` : undefined;
+  const noticeDateLabel = isRegular ? undefined : formatNoticeDate(post.noticeDate, post.createdAt);
 
   const handleDelete = () => {
     onDelete?.();
@@ -55,7 +57,7 @@ export function RoutePostDetailModal({
             <View style={styles.postDetailModalTitleBlock}>
               <Text style={styles.postDetailModalTitle}>Ride details</Text>
               <Text numberOfLines={1} style={styles.postDetailModalSubtitle}>
-                {`${post.from} -> ${post.to}`}
+                {isRegular ? `${post.from} -> ${post.to}` : `Notice for ${noticeDateLabel}`}
               </Text>
             </View>
 
@@ -70,6 +72,7 @@ export function RoutePostDetailModal({
               styles={styles}
               isRegular={isRegular}
               seatsLabel={seatsLabel}
+              noticeDateLabel={noticeDateLabel}
             />
             <PostCardRouteStack post={post} styles={styles} isRegular={isRegular} />
             {isRegular ? <PostCardWeekdayRow post={post} styles={styles} /> : null}

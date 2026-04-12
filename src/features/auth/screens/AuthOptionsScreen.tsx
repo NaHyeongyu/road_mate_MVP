@@ -44,32 +44,46 @@ export function AuthOptionsScreen({
           <Text style={styles.emailProviderButtonText}>Continue with Email</Text>
         </Pressable>
 
-        <Pressable onPress={onPressGoogle} style={[styles.providerButton, styles.googleProviderButton]}>
+        <Pressable
+          disabled
+          onPress={onPressGoogle}
+          style={[styles.providerButton, styles.googleProviderButton, styles.providerButtonDisabled]}
+        >
           <View style={styles.providerIconSlot}>
             <MaterialCommunityIcons
               name="google"
               size={16}
-              color="#FFFFFF"
+              color="#64748B"
               style={[styles.providerIconGlyph, styles.providerIconGlyphTight]}
             />
           </View>
-          <Text style={[styles.providerButtonText, styles.googleProviderButtonText]}>
+          <Text style={[styles.providerButtonText, styles.providerButtonTextDisabled]}>
             Continue with Google
           </Text>
+          <View style={styles.providerSoonBadge}>
+            <Text style={styles.providerSoonBadgeText}>Soon</Text>
+          </View>
         </Pressable>
 
-        <Pressable onPress={onPressApple} style={[styles.providerButton, styles.appleProviderButton]}>
+        <Pressable
+          disabled
+          onPress={onPressApple}
+          style={[styles.providerButton, styles.appleProviderButton, styles.providerButtonDisabled]}
+        >
           <View style={styles.providerIconSlot}>
             <MaterialCommunityIcons
               name="apple"
               size={16}
-              color="#FFFFFF"
+              color="#64748B"
               style={[styles.providerIconGlyph, styles.providerIconGlyphTight]}
             />
           </View>
-          <Text style={[styles.providerButtonText, styles.appleProviderButtonText]}>
+          <Text style={[styles.providerButtonText, styles.providerButtonTextDisabled]}>
             Continue with Apple
           </Text>
+          <View style={styles.providerSoonBadge}>
+            <Text style={styles.providerSoonBadgeText}>Soon</Text>
+          </View>
         </Pressable>
       </View>
 

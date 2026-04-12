@@ -9,6 +9,7 @@ export type VehicleInfo = {
 export type RoutePost = {
   id: string;
   kind: RouteKind;
+  noticeDate?: string;
   from: string;
   to: string;
   schedule: string;
@@ -28,6 +29,7 @@ export type RoutePost = {
 
 export type RouteDraft = {
   kind: RouteKind;
+  noticeDate: string;
   from: string;
   to: string;
   schedule: string;
@@ -48,6 +50,7 @@ export const EMPTY_VEHICLE: VehicleInfo = {
 
 export const EMPTY_ROUTE_DRAFT: RouteDraft = {
   kind: "regular" as RouteKind,
+  noticeDate: "",
   from: "",
   to: "",
   schedule: "",

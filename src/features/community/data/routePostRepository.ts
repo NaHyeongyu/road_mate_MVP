@@ -7,6 +7,7 @@ const ROUTE_POSTS_TABLE = "route_posts";
 type RoutePostRecord = {
   id: string;
   kind: RouteKind;
+  notice_date: string | null;
   from_location: string;
   to_location: string;
   schedule: string;
@@ -58,10 +59,13 @@ const toRoutePost = (record: Partial<RoutePostRecord>): RoutePost | null => {
   const contactLink = String(record.contact_link ?? "").trim();
   const note = String(record.note ?? "").trim();
   const createdAt = String(record.created_at ?? new Date().toISOString()).trim();
+  const noticeDateRaw = String(record.notice_date ?? "").trim();
 
   return {
     id,
     kind,
+    noticeDate:
+      kind === "one_time" ? noticeDateRaw || createdAt.slice(0, 10) || undefined : undefined,
     from,
     to,
     schedule,
@@ -83,6 +87,7 @@ const toRoutePost = (record: Partial<RoutePostRecord>): RoutePost | null => {
 const toRoutePostRecord = (post: RoutePost): RoutePostRecord => ({
   id: post.id,
   kind: post.kind,
+  notice_date: post.kind === "one_time" ? post.noticeDate?.trim() || null : null,
   from_location: post.from.trim(),
   to_location: post.to.trim(),
   schedule: post.schedule.trim(),

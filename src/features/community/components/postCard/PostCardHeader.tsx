@@ -10,9 +10,16 @@ type PostCardHeaderProps = {
   styles: AppStyles;
   isRegular: boolean;
   seatsLabel?: string;
+  noticeDateLabel?: string;
 };
 
-export function PostCardHeader({ post, styles, isRegular, seatsLabel }: PostCardHeaderProps) {
+export function PostCardHeader({
+  post,
+  styles,
+  isRegular,
+  seatsLabel,
+  noticeDateLabel,
+}: PostCardHeaderProps) {
   const typeIconColor = isRegular ? "#0B0F14" : "#475569";
 
   return (
@@ -37,10 +44,18 @@ export function PostCardHeader({ post, styles, isRegular, seatsLabel }: PostCard
           {kindLabel(post.kind)}
         </Text>
       </View>
-      {seatsLabel ? (
+      {isRegular && seatsLabel ? (
         <View style={[styles.postMetaBadge, styles.postMetaBadgePrimary]}>
           <MaterialCommunityIcons name="seat-passenger" size={14} color="#1D4ED8" />
           <Text style={[styles.postMetaBadgeText, styles.postMetaBadgeTextPrimary]}>{seatsLabel}</Text>
+        </View>
+      ) : null}
+      {!isRegular && noticeDateLabel ? (
+        <View style={[styles.postMetaBadge, styles.postMetaBadgePrimary]}>
+          <MaterialCommunityIcons name="calendar-month-outline" size={14} color="#1D4ED8" />
+          <Text style={[styles.postMetaBadgeText, styles.postMetaBadgeTextPrimary]}>
+            {noticeDateLabel}
+          </Text>
         </View>
       ) : null}
     </View>

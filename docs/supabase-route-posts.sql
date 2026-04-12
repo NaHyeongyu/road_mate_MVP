@@ -3,6 +3,7 @@ create extension if not exists pgcrypto;
 create table if not exists public.route_posts (
   id text primary key,
   kind text not null check (kind in ('regular', 'one_time')),
+  notice_date date,
   from_location text not null,
   to_location text not null,
   schedule text not null,
@@ -26,6 +27,9 @@ create unique index if not exists route_posts_owner_kind_key
 
 create index if not exists route_posts_kind_visibility_created_idx
   on public.route_posts (kind, is_public, created_at desc);
+
+create index if not exists route_posts_notice_date_created_idx
+  on public.route_posts (notice_date desc, created_at desc);
 
 create or replace function public.set_route_posts_updated_at()
 returns trigger

@@ -1,12 +1,25 @@
 import { Linking } from "react-native";
 
+const tryOpenUrl = async (url: string) => {
+  try {
+    const canOpen = await Linking.canOpenURL(url);
+    if (!canOpen) {
+      return;
+    }
+
+    await Linking.openURL(url);
+  } catch {
+    // Ignore linking errors to avoid crashing interaction flows.
+  }
+};
+
 export const openPlaceInGoogleMaps = (value: string) => {
   const query = encodeURIComponent(value.trim());
   if (!query) {
     return;
   }
 
-  void Linking.openURL(`https://www.google.com/maps/search/?api=1&query=${query}`);
+  void tryOpenUrl(`https://www.google.com/maps/search/?api=1&query=${query}`);
 };
 
 export const openPhoneDialer = (value: string | undefined) => {
@@ -20,7 +33,7 @@ export const openPhoneDialer = (value: string | undefined) => {
     return;
   }
 
-  void Linking.openURL(`tel:${normalized}`);
+  void tryOpenUrl(`tel:${normalized}`);
 };
 
 export const openContactLink = (value: string | undefined) => {
@@ -30,5 +43,5 @@ export const openContactLink = (value: string | undefined) => {
   }
 
   const normalized = /^https?:\/\//i.test(raw) ? raw : `https://${raw}`;
-  void Linking.openURL(normalized);
+  void tryOpenUrl(normalized);
 };

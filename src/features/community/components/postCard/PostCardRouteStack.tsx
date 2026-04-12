@@ -64,7 +64,7 @@ export function PostCardRouteStack({ post, styles, isRegular }: PostCardRouteSta
             {post.to}
           </Text>
         </View>
-        {isRegular || post.returnSchedule ? (
+        {isRegular ? (
           <View style={styles.postRouteTimeRow}>
             <View style={styles.postRouteLeadIconSlot}>
               <MaterialCommunityIcons name="clock-outline" size={14} color="#64748B" />

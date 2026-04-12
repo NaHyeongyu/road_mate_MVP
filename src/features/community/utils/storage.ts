@@ -9,7 +9,7 @@ export const POSTS_KEY = "roadmate_mvp.posts";
 export const VEHICLE_KEY_PREFIX = "roadmate_mvp.vehicle.";
 export const SAVED_POSTS_KEY_PREFIX = "roadmate_mvp.saved_posts.";
 
-export const kindLabel = (kind: RouteKind) => (kind === "regular" ? "Regular" : "One-time");
+export const kindLabel = (kind: RouteKind) => (kind === "regular" ? "Regular" : "Notice");
 
 export const sortByNewest = (posts: RoutePost[]) =>
   [...posts].sort((left, right) => right.createdAt.localeCompare(left.createdAt));
@@ -72,6 +72,7 @@ export const parsePosts = (raw: string | null): RoutePost[] => {
       const vehicleModel = String(post.vehicleModel ?? "").trim();
       const vehiclePlate = String(post.vehiclePlate ?? "").trim();
       const ownerUserId = String(post.ownerUserId ?? post.ownerEmail ?? "").trim();
+      const noticeDate = String(post.noticeDate ?? "").trim();
       const contactPhone = String(post.contactPhone ?? "").trim();
       const contactLink = String(post.contactLink ?? "").trim();
       const isPublic = typeof post.isPublic === "boolean" ? post.isPublic : true;
@@ -84,6 +85,10 @@ export const parsePosts = (raw: string | null): RoutePost[] => {
         {
           id,
           kind: post.kind === "one_time" ? "one_time" : "regular",
+          noticeDate:
+            post.kind === "one_time"
+              ? noticeDate || String(post.createdAt ?? "").trim().slice(0, 10) || undefined
+              : undefined,
           from,
           to,
           schedule,
@@ -134,6 +139,24 @@ export const formatDate = (value: string) => {
   }
 
   return date.toLocaleDateString("en-AU", {
+    month: "short",
+    day: "numeric",
+  });
+};
+
+export const formatNoticeDate = (value: string | undefined, fallbackCreatedAt?: string) => {
+  const raw = String(value ?? "").trim() || String(fallbackCreatedAt ?? "").trim().slice(0, 10);
+  if (!raw) {
+    return "Date TBD";
+  }
+
+  const date = raw.includes("T") ? new Date(raw) : new Date(`${raw}T00:00:00`);
+  if (Number.isNaN(date.getTime())) {
+    return "Date TBD";
+  }
+
+  return date.toLocaleDateString("en-AU", {
+    weekday: "short",
     month: "short",
     day: "numeric",
   });

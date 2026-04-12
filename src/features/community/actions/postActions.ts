@@ -16,6 +16,9 @@ const describeRouteDbError = (error: unknown) => {
   if (message.includes('relation "route_posts" does not exist')) {
     return "Supabase route_posts table is missing. Run docs/supabase-route-posts.sql.";
   }
+  if (message.includes('column "notice_date" of relation "route_posts" does not exist')) {
+    return "Supabase notice_date column is missing. Apply latest route_posts migration.";
+  }
   if (message.toLowerCase().includes("row-level security")) {
     return "Supabase RLS policy blocked this action. Check route_posts policies.";
   }

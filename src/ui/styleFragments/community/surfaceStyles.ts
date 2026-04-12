@@ -192,15 +192,28 @@ export const createCommunitySurfaceStyles = (colors: AppColors) =>
       marginTop: 4,
     },
     driverSimpleControlRow: {
-      gap: 4,
+      gap: 6,
     },
     driverSimpleControlLabel: {
       color: colors.subtext,
-      fontSize: 12,
+      fontSize: 13,
       fontWeight: "700",
     },
     driverControlBadgesRow: {
       flexDirection: "row",
-      gap: 4,
+      gap: 6,
+      flexWrap: "wrap",
+    },
+    driverControlBadge: {
+      minHeight: 36,
+      paddingHorizontal: 12,
+      gap: 6,
+    },
+    driverControlBadgeCompact: {
+      minWidth: 36,
+      paddingHorizontal: 0,
+    },
+    driverControlBadgeText: {
+      fontSize: 13,
     },
   }) satisfies StyleMap;

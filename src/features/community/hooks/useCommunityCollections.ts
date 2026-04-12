@@ -35,6 +35,22 @@ const matchesTokens = (source: string, tokens: string[]) => {
   return tokens.every((token) => normalizedSource.includes(token));
 };
 
+const toNoticeTimestamp = (post: RoutePost) => {
+  const noticeDate = String(post.noticeDate ?? "").trim();
+  if (!noticeDate) {
+    const createdAt = Date.parse(post.createdAt);
+    return Number.isFinite(createdAt) ? createdAt : 0;
+  }
+
+  const noticeTimestamp = Date.parse(`${noticeDate}T00:00:00`);
+  if (Number.isFinite(noticeTimestamp)) {
+    return noticeTimestamp;
+  }
+
+  const createdAt = Date.parse(post.createdAt);
+  return Number.isFinite(createdAt) ? createdAt : 0;
+};
+
 export function useCommunityCollections({
   currentUserId,
   filter,
@@ -65,8 +81,8 @@ export function useCommunityCollections({
   );
 
   const visiblePosts = useMemo(
-    () =>
-      allPosts.filter((post) => {
+    () => {
+      const filtered = allPosts.filter((post) => {
         if (post.kind !== filter) {
           return false;
         }
@@ -82,8 +98,21 @@ export function useCommunityCollections({
 
         const matchesTo = matchesTokens(post.to, toTokensQuery);
         return matchesTo;
-      }),
-    [allPosts, filter, fromTokens, toTokensQuery]
+      });
+      if (filter !== "one_time") {
+        return filtered;
+      }
+
+      return [...filtered].sort((left, right) => {
+        const timestampDiff = toNoticeTimestamp(right) - toNoticeTimestamp(left);
+        if (timestampDiff !== 0) {
+          return timestampDiff;
+        }
+
+        return right.createdAt.localeCompare(left.createdAt);
+      });
+    },
+    [allPosts, currentUserId, filter, fromTokens, toTokensQuery]
   );
 
   return {
