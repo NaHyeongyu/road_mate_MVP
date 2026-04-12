@@ -97,7 +97,10 @@ export function PostCard({
               isSaved ? styles.postHeaderIconActionActive : null,
               pressed ? styles.postHeaderIconActionPressed : null,
             ]}
-            onPress={onToggleSave}
+            onPress={(event) => {
+              event.stopPropagation();
+              onToggleSave();
+            }}
             hitSlop={6}
           >
             <MaterialCommunityIcons
@@ -113,7 +116,10 @@ export function PostCard({
               styles.postHeaderEditAction,
               pressed ? styles.postHeaderIconActionPressed : null,
             ]}
-            onPress={handleViewDetails}
+            onPress={(event) => {
+              event.stopPropagation();
+              handleViewDetails();
+            }}
             hitSlop={6}
           >
             <MaterialCommunityIcons name="square-edit-outline" size={16} color="#1D4ED8" />
@@ -155,7 +161,6 @@ export function PostCard({
 
         <PostCardActions
           styles={styles}
-          isSaved={isSaved}
           onDelete={onDelete}
         />
       </View>

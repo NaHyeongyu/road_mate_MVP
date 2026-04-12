@@ -148,8 +148,7 @@ export const createCommunityPostActions = (context: CommunityActionsContext) => 
     }
 
     const key = getPostSaveKey(post);
-    const alreadySaved = context.savedPostKeySet.has(key);
-    const nextKeys = alreadySaved
+    const nextKeys = context.savedPostKeySet.has(key)
       ? context.savedPostKeys.filter((value) => value !== key)
       : [key, ...context.savedPostKeys];
 

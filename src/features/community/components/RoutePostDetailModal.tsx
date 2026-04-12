@@ -134,7 +134,6 @@ export function RoutePostDetailModal({
 
             <PostCardActions
               styles={styles}
-              isSaved={isSaved}
               onDelete={onDelete ? handleDelete : undefined}
             />
           </View>

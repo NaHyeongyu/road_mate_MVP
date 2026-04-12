@@ -2,6 +2,11 @@ import { useEffect, useMemo, useState } from "react";
 
 import type { RouteDraft, RouteKind, RoutePost } from "../../../../../model";
 import type { AppStyles } from "../../../../../ui/types";
+import {
+  hasRouteDraftInput,
+  isRouteDraftReady,
+  toDraftFromPost,
+} from "../../../utils/routeDraftState";
 import { isRouteDateValue, isRouteTimeValue } from "../../../utils/routeForm";
 import { DriverOverviewSection } from "./DriverOverviewSection";
 
@@ -23,65 +28,7 @@ type DriverHomeSectionProps = {
 const MIN_SEATS = 1;
 const MAX_SEATS = 8;
 
-const isRouteDraftReady = (routeDraft: RouteDraft, hasDriverContactMethod: boolean) => {
-  if (routeDraft.kind === "one_time") {
-    const hasReturnTime =
-      routeDraft.oneTimeTripType !== "round_trip" || isRouteTimeValue(routeDraft.returnSchedule);
-
-    return Boolean(
-      isRouteDateValue(routeDraft.noticeDate) &&
-      routeDraft.from.trim() &&
-        routeDraft.to.trim() &&
-        isRouteTimeValue(routeDraft.schedule) &&
-        hasReturnTime
-    );
-  }
-
-  const hasContactMethod = Boolean(
-    hasDriverContactMethod || routeDraft.contactPhone.trim() || routeDraft.contactLink.trim()
-  );
-  const hasCoreRouteInfo = Boolean(
-    routeDraft.from.trim() &&
-      routeDraft.to.trim() &&
-      isRouteTimeValue(routeDraft.schedule) &&
-      isRouteTimeValue(routeDraft.returnSchedule)
-  );
-
-  return hasContactMethod && hasCoreRouteInfo;
-};
-
-const toDraftFromPost = (post: RoutePost): RouteDraft => ({
-  kind: post.kind,
-  oneTimeTripType:
-    post.kind === "one_time"
-      ? post.oneTimeTripType ?? (post.returnSchedule ? "round_trip" : "one_way")
-      : "round_trip",
-  noticeDate: post.noticeDate ?? "",
-  from: post.from,
-  to: post.to,
-  schedule: post.schedule,
-  returnSchedule: post.returnSchedule ?? "",
-  availableSeats: String(post.availableSeats),
-  operatingDays: post.operatingDays,
-  contactPhone: post.contactPhone ?? "",
-  contactLink: post.contactLink ?? "",
-  note: post.note,
-  isPublic: post.isPublic,
-});
-
 const normalizeSeats = (value: number) => Math.min(Math.max(value, MIN_SEATS), MAX_SEATS);
-
-const hasRouteDraftInput = (routeDraft: RouteDraft) =>
-  Boolean(
-    routeDraft.noticeDate.trim() ||
-    routeDraft.from.trim() ||
-      routeDraft.to.trim() ||
-      routeDraft.schedule.trim() ||
-      routeDraft.returnSchedule.trim() ||
-      routeDraft.contactPhone.trim() ||
-      routeDraft.contactLink.trim() ||
-      routeDraft.note.trim()
-  );
 
 const getMissingRequiredLabels = (routeDraft: RouteDraft, hasDriverContactMethod: boolean): string[] => {
   if (routeDraft.kind === "one_time") {

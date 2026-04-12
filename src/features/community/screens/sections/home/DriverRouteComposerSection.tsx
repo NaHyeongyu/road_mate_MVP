@@ -24,6 +24,12 @@ import { OperatingDaysChips } from "./OperatingDaysChips";
 import { RouteDateField } from "./RouteDateField";
 import { RouteDraftTextField } from "./RouteDraftTextField";
 import { RouteTimeField } from "./RouteTimeField";
+import {
+  buildRequiredChecks,
+  hasSameDays,
+  normalizeSeatCount,
+  toRemainingRequiredText,
+} from "./driverRouteComposerState";
 
 type DriverRouteComposerSectionProps = {
   colors: AppColors;
@@ -40,18 +46,10 @@ type DriverRouteComposerSectionProps = {
   onPostRoute: () => Promise<boolean>;
 };
 
-type RequiredCheck = {
-  label: string;
-  done: boolean;
-};
-
 const WEEKDAY_PRESET = WEEKDAY_OPTIONS.slice(0, 5);
 const WEEKEND_PRESET = WEEKDAY_OPTIONS.slice(5);
 const MIN_SEATS = 1;
 const MAX_SEATS = 8;
-
-const hasSameDays = (current: string[], target: readonly string[]) =>
-  current.length === target.length && target.every((day) => current.includes(day));
 
 export function DriverRouteComposerSection({
   colors,
@@ -102,13 +100,19 @@ export function DriverRouteComposerSection({
     }, 120);
   };
 
+  const updateRouteDraft = (patch: Partial<RouteDraft>) => {
+    onRouteDraftChange({
+      ...routeDraft,
+      ...patch,
+    });
+  };
+
   useEffect(() => {
     if (routeDraft.kind === activeRouteKind) {
       return;
     }
 
-    onRouteDraftChange({
-      ...routeDraft,
+    updateRouteDraft({
       kind: activeRouteKind,
       oneTimeTripType: activeRouteKind === "one_time" ? "one_way" : "round_trip",
       returnSchedule: activeRouteKind === "one_time" ? "" : routeDraft.returnSchedule,
@@ -124,14 +128,14 @@ export function DriverRouteComposerSection({
 
   const handleSelectFromSuggestion = (value: string) => {
     clearBlurTimeout();
-    onRouteDraftChange({ ...routeDraft, from: value });
+    updateRouteDraft({ from: value });
     setActivePlaceField("to");
     toInputRef.current?.focus();
   };
 
   const handleSelectToSuggestion = (value: string) => {
     clearBlurTimeout();
-    onRouteDraftChange({ ...routeDraft, to: value });
+    updateRouteDraft({ to: value });
     setActivePlaceField(null);
     if (isOneTimeRoute) {
       openDatePicker();
@@ -155,18 +159,26 @@ export function DriverRouteComposerSection({
   };
 
   const handleOneTimeTripTypeChange = (nextType: OneTimeTripType) => {
-    onRouteDraftChange({
-      ...routeDraft,
+    updateRouteDraft({
       oneTimeTripType: nextType,
       returnSchedule: nextType === "one_way" ? "" : routeDraft.returnSchedule,
     });
   };
 
   const applySelectedTime = (field: "schedule" | "returnSchedule", date: Date) => {
-    onRouteDraftChange({
-      ...routeDraft,
+    updateRouteDraft({
       [field]: toRouteTimeFromDate(date),
     });
+  };
+
+  const shouldChainToReturnTime = (field: "schedule" | "returnSchedule") =>
+    field === "schedule" &&
+    !isRouteTimeValue(routeDraft.returnSchedule) &&
+    (!isOneTimeRoute || isOneTimeRoundTrip);
+
+  const openReturnTimePickerStep = () => {
+    setIosTimePickerValue(toDateFromRouteTime(routeDraft.returnSchedule));
+    setActiveTimeField("returnSchedule");
   };
 
   const handleAndroidTimePickerChange = (event: DateTimePickerEvent, selectedDate?: Date) => {
@@ -182,13 +194,8 @@ export function DriverRouteComposerSection({
     const currentField = activeTimeField;
     applySelectedTime(currentField, selectedDate);
 
-    if (
-      currentField === "schedule" &&
-      !isRouteTimeValue(routeDraft.returnSchedule) &&
-      (!isOneTimeRoute || isOneTimeRoundTrip)
-    ) {
-      setIosTimePickerValue(toDateFromRouteTime(routeDraft.returnSchedule));
-      setActiveTimeField("returnSchedule");
+    if (shouldChainToReturnTime(currentField)) {
+      openReturnTimePickerStep();
       return;
     }
 
@@ -211,10 +218,7 @@ export function DriverRouteComposerSection({
       return;
     }
 
-    onRouteDraftChange({
-      ...routeDraft,
-      noticeDate: toRouteDateFromDate(selectedDate),
-    });
+    updateRouteDraft({ noticeDate: toRouteDateFromDate(selectedDate) });
     setIsDatePickerOpen(false);
     if (!isRouteTimeValue(routeDraft.schedule)) {
       openTimePicker("schedule");
@@ -235,13 +239,8 @@ export function DriverRouteComposerSection({
     const currentField = activeTimeField;
     applySelectedTime(currentField, iosTimePickerValue);
 
-    if (
-      currentField === "schedule" &&
-      !isRouteTimeValue(routeDraft.returnSchedule) &&
-      (!isOneTimeRoute || isOneTimeRoundTrip)
-    ) {
-      setIosTimePickerValue(toDateFromRouteTime(routeDraft.returnSchedule));
-      setActiveTimeField("returnSchedule");
+    if (shouldChainToReturnTime(currentField)) {
+      openReturnTimePickerStep();
       return;
     }
 
@@ -249,10 +248,7 @@ export function DriverRouteComposerSection({
   };
 
   const handleConfirmIosDate = () => {
-    onRouteDraftChange({
-      ...routeDraft,
-      noticeDate: toRouteDateFromDate(iosDatePickerValue),
-    });
+    updateRouteDraft({ noticeDate: toRouteDateFromDate(iosDatePickerValue) });
     setIsDatePickerOpen(false);
     if (!isRouteTimeValue(routeDraft.schedule)) {
       openTimePicker("schedule");
@@ -260,23 +256,18 @@ export function DriverRouteComposerSection({
   };
 
   const applyOperatingDays = (days: readonly string[]) => {
-    onRouteDraftChange({
-      ...routeDraft,
-      operatingDays: [...days],
-    });
+    updateRouteDraft({ operatingDays: [...days] });
   };
 
-  const currentSeatCount = Math.min(
-    MAX_SEATS,
-    Math.max(MIN_SEATS, Number.parseInt(routeDraft.availableSeats, 10) || MIN_SEATS)
+  const currentSeatCount = normalizeSeatCount(
+    Number.parseInt(routeDraft.availableSeats, 10) || MIN_SEATS,
+    MIN_SEATS,
+    MAX_SEATS
   );
 
   const updateSeatCount = (nextSeatCount: number) => {
-    const normalized = Math.min(MAX_SEATS, Math.max(MIN_SEATS, nextSeatCount));
-    onRouteDraftChange({
-      ...routeDraft,
-      availableSeats: String(normalized),
-    });
+    const normalized = normalizeSeatCount(nextSeatCount, MIN_SEATS, MAX_SEATS);
+    updateRouteDraft({ availableSeats: String(normalized) });
   };
 
   const hasFrom = Boolean(routeDraft.from.trim());
@@ -290,35 +281,22 @@ export function DriverRouteComposerSection({
   const hasDraftContactMethod = Boolean(routeDraft.contactPhone.trim() || routeDraft.contactLink.trim());
   const hasContactMethod = hasProfileContactMethod || hasDraftContactMethod;
 
-  const requiredChecks: RequiredCheck[] = isOneTimeRoute
-    ? [
-        { label: "Vehicle profile", done: hasVehicle },
-        { label: "From", done: hasFrom },
-        { label: "To", done: hasTo },
-        { label: "Date", done: hasNoticeDate },
-        { label: "Time", done: hasDepartureTime },
-        ...(isOneTimeRoundTrip ? [{ label: "Return time", done: hasReturnTime }] : []),
-      ]
-    : [
-        { label: "Vehicle profile", done: hasVehicle },
-        { label: "From", done: hasFrom },
-        { label: "To", done: hasTo },
-        { label: "Departure time", done: hasDepartureTime },
-        { label: "Arrival time", done: hasReturnTime },
-        { label: "Available seats", done: hasSeats },
-        { label: "Operating day", done: hasOperatingDays },
-        { label: "Contact", done: hasContactMethod },
-      ];
+  const requiredChecks = buildRequiredChecks({
+    isOneTimeRoute,
+    isOneTimeRoundTrip,
+    hasVehicle,
+    hasFrom,
+    hasTo,
+    hasNoticeDate,
+    hasDepartureTime,
+    hasReturnTime,
+    hasSeats,
+    hasOperatingDays,
+    hasContactMethod,
+  });
   const remainingRequired = requiredChecks.filter((check) => !check.done).map((check) => check.label);
   const isReadyToSave = remainingRequired.length === 0;
-  const previewRemainingRequired = remainingRequired.slice(0, 4);
-  const hiddenRequiredCount = Math.max(0, remainingRequired.length - previewRemainingRequired.length);
-  const remainingRequiredText =
-    previewRemainingRequired.length > 0
-      ? `Missing: ${previewRemainingRequired.join(", ")}${
-          hiddenRequiredCount > 0 ? ` +${hiddenRequiredCount} more` : ""
-        }`
-      : "";
+  const remainingRequiredText = toRemainingRequiredText(remainingRequired);
   const isWeekdayPresetActive = hasSameDays(routeDraft.operatingDays, WEEKDAY_PRESET);
   const isWeekendPresetActive = hasSameDays(routeDraft.operatingDays, WEEKEND_PRESET);
   const isAllDaysPresetActive = hasSameDays(routeDraft.operatingDays, WEEKDAY_OPTIONS);
@@ -352,7 +330,7 @@ export function DriverRouteComposerSection({
       <View style={styles.routeSearchInput}>
         <TextInput
           value={routeDraft.from}
-          onChangeText={(value) => onRouteDraftChange({ ...routeDraft, from: value })}
+          onChangeText={(value) => updateRouteDraft({ from: value })}
           placeholder="Brisbane CBD, QLD"
           placeholderTextColor={colors.subtext}
           style={styles.routeSearchInputField}
@@ -371,7 +349,7 @@ export function DriverRouteComposerSection({
           <Pressable
             style={styles.routeSearchClearButton}
             onPress={() => {
-              onRouteDraftChange({ ...routeDraft, from: "" });
+              updateRouteDraft({ from: "" });
               setActivePlaceField("from");
             }}
           >
@@ -401,7 +379,7 @@ export function DriverRouteComposerSection({
         <TextInput
           ref={toInputRef}
           value={routeDraft.to}
-          onChangeText={(value) => onRouteDraftChange({ ...routeDraft, to: value })}
+          onChangeText={(value) => updateRouteDraft({ to: value })}
           placeholder="St Lucia, QLD"
           placeholderTextColor={colors.subtext}
           style={styles.routeSearchInputField}
@@ -420,7 +398,7 @@ export function DriverRouteComposerSection({
           <Pressable
             style={styles.routeSearchClearButton}
             onPress={() => {
-              onRouteDraftChange({ ...routeDraft, to: "" });
+              updateRouteDraft({ to: "" });
               setActivePlaceField("to");
             }}
           >
@@ -593,7 +571,7 @@ export function DriverRouteComposerSection({
             label="AU phone override"
             optional
             value={routeDraft.contactPhone}
-            onChangeText={(value) => onRouteDraftChange({ ...routeDraft, contactPhone: value })}
+            onChangeText={(value) => updateRouteDraft({ contactPhone: value })}
             placeholder="0412 345 678"
             keyboardType="phone-pad"
             returnKeyType="next"
@@ -607,7 +585,7 @@ export function DriverRouteComposerSection({
             label="Open chat link override"
             optional
             value={routeDraft.contactLink}
-            onChangeText={(value) => onRouteDraftChange({ ...routeDraft, contactLink: value })}
+            onChangeText={(value) => updateRouteDraft({ contactLink: value })}
             placeholder="https://open.kakao.com/o/..."
             autoCapitalize="none"
             autoCorrect={false}
@@ -625,7 +603,7 @@ export function DriverRouteComposerSection({
         label="Additional details"
         optional
         value={routeDraft.note}
-        onChangeText={(value) => onRouteDraftChange({ ...routeDraft, note: value })}
+        onChangeText={(value) => updateRouteDraft({ note: value })}
         placeholder={
           isOneTimeRoute
             ? "Write additional details for this one-time notice"
@@ -648,13 +626,13 @@ export function DriverRouteComposerSection({
             <ToggleChip
               label="Public"
               active={routeDraft.isPublic}
-              onPress={() => onRouteDraftChange({ ...routeDraft, isPublic: true })}
+              onPress={() => updateRouteDraft({ isPublic: true })}
               styles={styles}
             />
             <ToggleChip
               label="Private"
               active={!routeDraft.isPublic}
-              onPress={() => onRouteDraftChange({ ...routeDraft, isPublic: false })}
+              onPress={() => updateRouteDraft({ isPublic: false })}
               styles={styles}
             />
           </View>

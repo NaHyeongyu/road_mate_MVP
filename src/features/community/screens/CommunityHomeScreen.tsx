@@ -7,7 +7,7 @@ import type { AppColors } from "../../../brandTheme";
 import type { RouteDraft, RouteKind, RoutePost, VehicleInfo } from "../../../model";
 import { APP_BAR_BG } from "../../../ui/styleFragments/layout/constants";
 import type { AppStyles } from "../../../ui/types";
-import { isRouteDateValue, isRouteTimeValue } from "../utils/routeForm";
+import { hasRouteDraftInput, isRouteDraftReady, toDraftFromPost } from "../utils/routeDraftState";
 import { NoticeBanner } from "../../shared/components/NoticeBanner";
 import { ScreenHeader } from "../../shared/components/ScreenHeader";
 import type { MainTab, Mode } from "../types";
@@ -56,64 +56,6 @@ export type CommunityHomeScreenProps = {
   onRemoveRoute: (id: string) => void;
   onToggleSavedPost: (post: RoutePost) => void;
 };
-
-const isRouteDraftReady = (routeDraft: RouteDraft, hasDriverContactMethod: boolean) => {
-  if (routeDraft.kind === "one_time") {
-    const hasReturnTime =
-      routeDraft.oneTimeTripType !== "round_trip" || isRouteTimeValue(routeDraft.returnSchedule);
-
-    return Boolean(
-      isRouteDateValue(routeDraft.noticeDate) &&
-      routeDraft.from.trim() &&
-      routeDraft.to.trim() &&
-      isRouteTimeValue(routeDraft.schedule) &&
-      hasReturnTime
-    );
-  }
-
-  const hasContactMethod = Boolean(
-    hasDriverContactMethod || routeDraft.contactPhone.trim() || routeDraft.contactLink.trim()
-  );
-  const hasCoreRouteInfo = Boolean(
-    routeDraft.from.trim() &&
-      routeDraft.to.trim() &&
-      isRouteTimeValue(routeDraft.schedule) &&
-      isRouteTimeValue(routeDraft.returnSchedule)
-  );
-
-  return hasContactMethod && hasCoreRouteInfo;
-};
-
-const hasRouteDraftInput = (routeDraft: RouteDraft) =>
-  Boolean(
-    routeDraft.noticeDate.trim() ||
-    routeDraft.from.trim() ||
-      routeDraft.to.trim() ||
-      routeDraft.schedule.trim() ||
-      routeDraft.returnSchedule.trim() ||
-      routeDraft.contactPhone.trim() ||
-      routeDraft.contactLink.trim() ||
-      routeDraft.note.trim()
-  );
-
-const toDraftFromPost = (post: RoutePost): RouteDraft => ({
-  kind: post.kind,
-  oneTimeTripType:
-    post.kind === "one_time"
-      ? post.oneTimeTripType ?? (post.returnSchedule ? "round_trip" : "one_way")
-      : "round_trip",
-  noticeDate: post.noticeDate ?? "",
-  from: post.from,
-  to: post.to,
-  schedule: post.schedule,
-  returnSchedule: post.returnSchedule ?? "",
-  availableSeats: String(post.availableSeats),
-  operatingDays: post.operatingDays,
-  contactPhone: post.contactPhone ?? "",
-  contactLink: post.contactLink ?? "",
-  note: post.note,
-  isPublic: post.isPublic,
-});
 
 export function CommunityHomeScreen({
   colors,

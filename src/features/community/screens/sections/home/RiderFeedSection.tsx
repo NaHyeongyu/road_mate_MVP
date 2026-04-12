@@ -337,7 +337,6 @@ export function RiderFeedSection({
             key={post.id}
             post={post}
             styles={styles}
-            isOwnedByCurrentUser={post.ownerUserId === currentUserId}
             isSaved={savedPostKeySet.has(getPostSaveKey(post))}
             onToggleSave={() => onToggleSavedPost(post)}
           />

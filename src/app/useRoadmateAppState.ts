@@ -5,7 +5,7 @@ import { useCommunityActions } from "../features/community/hooks/useCommunityAct
 import { useCommunityCollections } from "../features/community/hooks/useCommunityCollections";
 import { useCommunityUiState } from "../features/community/hooks/useCommunityUiState";
 import { useUserCommunityStorageState } from "../features/community/hooks/useUserCommunityStorageState";
-import { getPostSaveKey } from "../features/community/utils/storage";
+import { getSavedPostKeysWithoutOwnPosts } from "../features/community/utils/savedPostKeys";
 import { isSupabaseConfigured } from "../lib/supabase";
 import type { RouteDraft } from "../model";
 import { useSessionState } from "./hooks/useSessionState";
@@ -97,16 +97,11 @@ export function useRoadmateAppState() {
       return;
     }
 
-    const ownPostKeys = new Set(
-      storedPosts
-        .filter((post) => post.ownerUserId === currentUserId)
-        .map((post) => getPostSaveKey(post))
-    );
-    if (!ownPostKeys.size) {
-      return;
-    }
-
-    const cleanedSavedPostKeys = savedPostKeys.filter((key) => !ownPostKeys.has(key));
+    const cleanedSavedPostKeys = getSavedPostKeysWithoutOwnPosts({
+      currentUserId,
+      savedPostKeys,
+      storedPosts,
+    });
     if (cleanedSavedPostKeys.length === savedPostKeys.length) {
       return;
     }
