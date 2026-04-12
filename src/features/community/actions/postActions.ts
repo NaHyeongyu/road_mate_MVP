@@ -154,10 +154,6 @@ export const createCommunityPostActions = (context: CommunityActionsContext) => 
       : [key, ...context.savedPostKeys];
 
     await context.persistSavedPostKeys(nextKeys);
-    context.onNotice({
-      tone: "info",
-      text: alreadySaved ? "Ride removed from saved." : "Ride saved.",
-    });
   };
 
   const saveRouteQuickSettings = async ({

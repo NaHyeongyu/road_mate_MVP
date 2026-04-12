@@ -70,7 +70,6 @@ export function MyPageTabSection({
           styles={styles}
           hasVehicle={hasVehicle}
           vehicleDraft={vehicleDraft}
-          savedVehicle={savedVehicle}
           onVehicleDraftChange={onVehicleDraftChange}
           onSaveVehicle={onSaveVehicle}
         />

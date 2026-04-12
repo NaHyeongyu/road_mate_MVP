@@ -343,7 +343,6 @@ export function DriverRouteComposerSection({
           styles={styles}
           hasVehicle={hasVehicle}
           vehicleDraft={vehicleDraft}
-          savedVehicle={savedVehicle}
           onVehicleDraftChange={onVehicleDraftChange}
           onSaveVehicle={onSaveVehicle}
         />
@@ -595,7 +594,7 @@ export function DriverRouteComposerSection({
             optional
             value={routeDraft.contactPhone}
             onChangeText={(value) => onRouteDraftChange({ ...routeDraft, contactPhone: value })}
-            placeholder="+61 412 345 678"
+            placeholder="0412 345 678"
             keyboardType="phone-pad"
             returnKeyType="next"
             blurOnSubmit={false}
@@ -617,17 +616,20 @@ export function DriverRouteComposerSection({
           />
         </>
       ) : null}
+      <Text style={styles.cardBody}>
+        Optional: add extra instructions or pickup notes for riders.
+      </Text>
       <RouteDraftTextField
         colors={colors}
         styles={styles}
-        label={isOneTimeRoute ? "Additional details" : "Post note"}
+        label="Additional details"
         optional
         value={routeDraft.note}
         onChangeText={(value) => onRouteDraftChange({ ...routeDraft, note: value })}
         placeholder={
           isOneTimeRoute
-            ? "Write details for this one-time notice"
-            : "Pickup detail or seat note"
+            ? "Write additional details for this one-time notice"
+            : "Write additional details for this regular registration"
         }
         multiline
       />

@@ -34,6 +34,7 @@ export function DriverOverviewSection({
 }: DriverOverviewSectionProps) {
   const routeKindLabel = driverRouteKind === "regular" ? "Regular" : "One-time";
   const isRegular = driverRouteKind === "regular";
+  const notePreview = routeDraft.note.trim();
   const seats = Number.parseInt(routeDraft.availableSeats, 10);
   const seatsLabel = Number.isFinite(seats) && seats > 0 ? String(seats) : "1";
   const previewMissingLabels = missingRequiredLabels.slice(0, 3);
@@ -176,6 +177,17 @@ export function DriverOverviewSection({
       </View>
     </>
   ) : null;
+  const previewExtraContent = (
+    <>
+      {quickControlContent}
+      {notePreview ? (
+        <View style={styles.postSummaryRow}>
+          <Text style={styles.postSummaryText}>Additional details</Text>
+          <Text style={styles.postNote}>{notePreview}</Text>
+        </View>
+      ) : null}
+    </>
+  );
 
   return (
     <>
@@ -225,10 +237,10 @@ export function DriverOverviewSection({
           post={previewPost}
           styles={styles}
           isOwnedByCurrentUser
-          viewDetailsLabel="Edit registration"
+          viewDetailsLabel="Edit"
           onViewDetails={onOpenRouteRegistration}
           disableDetailModal
-          extraContent={quickControlContent}
+          extraContent={previewExtraContent}
         />
       )}
     </>

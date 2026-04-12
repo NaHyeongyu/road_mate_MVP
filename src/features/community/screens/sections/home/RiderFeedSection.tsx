@@ -41,6 +41,10 @@ export function RiderFeedSection({
   const isNoticeFilter = filter === "one_time";
   const [noticeScope, setNoticeScope] = useState<"upcoming" | "all">("upcoming");
   const savedPostKeySet = useMemo(() => new Set(savedPostKeys), [savedPostKeys]);
+  const riderVisiblePosts = useMemo(
+    () => visiblePosts.filter((post) => post.ownerUserId !== currentUserId),
+    [currentUserId, visiblePosts]
+  );
   const toInputRef = useRef<TextInput>(null);
   const blurTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [activeField, setActiveField] = useState<"from" | "to" | null>(null);
@@ -105,22 +109,22 @@ export function RiderFeedSection({
       return 0;
     }
 
-    return visiblePosts.filter((post) => {
+    return riderVisiblePosts.filter((post) => {
       const dayDelta = getNoticeDayDelta(post.noticeDate, post.createdAt);
       return dayDelta !== null && dayDelta < 0;
     }).length;
-  }, [isNoticeFilter, visiblePosts]);
+  }, [isNoticeFilter, riderVisiblePosts]);
 
   const feedPosts = useMemo(() => {
     if (!isNoticeFilter || noticeScope === "all") {
-      return visiblePosts;
+      return riderVisiblePosts;
     }
 
-    return visiblePosts.filter((post) => {
+    return riderVisiblePosts.filter((post) => {
       const dayDelta = getNoticeDayDelta(post.noticeDate, post.createdAt);
       return dayDelta === null || dayDelta >= 0;
     });
-  }, [isNoticeFilter, noticeScope, visiblePosts]);
+  }, [isNoticeFilter, noticeScope, riderVisiblePosts]);
   const showViewNoticesAction = !isNoticeFilter;
 
   return (

@@ -17,6 +17,56 @@ export const createCommunityPostRouteStyles = (colors: AppColors) =>
       shadowOffset: { width: 0, height: 1 },
       elevation: 1,
     },
+    postCardContentPressable: {
+      gap: 12,
+    },
+    postCardContentPressablePressed: {
+      opacity: 0.84,
+    },
+    postHeaderTopRow: {
+      flexDirection: "row",
+      alignItems: "flex-start",
+      justifyContent: "space-between",
+      gap: 10,
+    },
+    postHeaderTopMain: {
+      flex: 1,
+      minWidth: 0,
+    },
+    postHeaderIconAction: {
+      width: 44,
+      height: 44,
+      borderRadius: 999,
+      borderWidth: 1,
+      borderColor: colors.border,
+      backgroundColor: colors.panelAlt,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    postHeaderIconActionActive: {
+      borderColor: "#93C5FD",
+      backgroundColor: "#DBEAFE",
+    },
+    postHeaderIconActionPressed: {
+      opacity: 0.72,
+    },
+    postHeaderEditAction: {
+      minHeight: 44,
+      borderRadius: 999,
+      borderWidth: 1,
+      borderColor: "#BFDBFE",
+      backgroundColor: "#EFF6FF",
+      paddingHorizontal: 13,
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+      gap: 6,
+    },
+    postHeaderEditActionText: {
+      color: "#1D4ED8",
+      fontSize: 13,
+      fontWeight: "800",
+    },
     postHeaderRow: {
       flexDirection: "row",
       alignItems: "center",

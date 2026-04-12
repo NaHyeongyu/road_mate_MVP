@@ -1,5 +1,6 @@
 import { useMemo, useState, type ReactNode } from "react";
-import { Text, View } from "react-native";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { Pressable, Text, View } from "react-native";
 
 import type { RoutePost } from "../../../model";
 import type { AppStyles } from "../../../ui/types";
@@ -69,40 +70,93 @@ export function PostCard({
       setIsDetailOpen(true);
     }
   };
-  const shouldRenderViewDetailsAction = Boolean(onViewDetails || !disableDetailModal);
+  const canOpenDetails = Boolean(onViewDetails || !disableDetailModal);
+  const shouldShowEditAction = isOwnedByCurrentUser && canOpenDetails && Boolean(onDelete || onViewDetails);
+  const shouldShowSaveAction = !isOwnedByCurrentUser && Boolean(onToggleSave);
+  const editLabel = viewDetailsLabel ?? "Edit";
+
+  const cardBodyContent = (
+    <>
+      <View style={styles.postHeaderTopRow}>
+        <View style={styles.postHeaderTopMain}>
+          <PostCardHeader
+            post={post}
+            styles={styles}
+            isRegular={isRegular}
+            seatsLabel={seatsLabel}
+            noticeDateLabel={noticeDateLabel}
+            noticeTripTypeLabel={noticeTripTypeLabel}
+            noticeCountdownLabel={noticeCountdownLabel}
+            noticeCountdownTone={noticeCountdownTone}
+          />
+        </View>
+        {shouldShowSaveAction && onToggleSave ? (
+          <Pressable
+            style={({ pressed }) => [
+              styles.postHeaderIconAction,
+              isSaved ? styles.postHeaderIconActionActive : null,
+              pressed ? styles.postHeaderIconActionPressed : null,
+            ]}
+            onPress={onToggleSave}
+            hitSlop={6}
+          >
+            <MaterialCommunityIcons
+              name={isSaved ? "bookmark-check" : "bookmark-plus-outline"}
+              size={20}
+              color={isSaved ? "#1D4ED8" : "#64748B"}
+            />
+          </Pressable>
+        ) : null}
+        {shouldShowEditAction ? (
+          <Pressable
+            style={({ pressed }) => [
+              styles.postHeaderEditAction,
+              pressed ? styles.postHeaderIconActionPressed : null,
+            ]}
+            onPress={handleViewDetails}
+            hitSlop={6}
+          >
+            <MaterialCommunityIcons name="square-edit-outline" size={16} color="#1D4ED8" />
+            <Text style={styles.postHeaderEditActionText}>{editLabel}</Text>
+          </Pressable>
+        ) : null}
+      </View>
+
+      <PostCardRouteStack post={post} styles={styles} isRegular={isRegular} />
+
+      <View style={styles.postSummaryRow}>
+        <Text numberOfLines={1} style={styles.postSummaryText}>
+          {isRegular ? `Runs ${operatingDaysSummary}` : `Notice for ${noticeDateLabel}`}
+        </Text>
+      </View>
+
+      <PostCardContactRow post={post} styles={styles} />
+
+      {extraContent}
+    </>
+  );
 
   return (
     <>
       <View style={styles.postCard}>
-        <PostCardHeader
-          post={post}
-          styles={styles}
-          isRegular={isRegular}
-          seatsLabel={seatsLabel}
-          noticeDateLabel={noticeDateLabel}
-          noticeTripTypeLabel={noticeTripTypeLabel}
-          noticeCountdownLabel={noticeCountdownLabel}
-          noticeCountdownTone={noticeCountdownTone}
-        />
-        <PostCardRouteStack post={post} styles={styles} isRegular={isRegular} />
-
-        <View style={styles.postSummaryRow}>
-          <Text numberOfLines={1} style={styles.postSummaryText}>
-            {isRegular ? `Runs ${operatingDaysSummary}` : `Notice for ${noticeDateLabel}`}
-          </Text>
-        </View>
-
-        <PostCardContactRow post={post} styles={styles} />
-
-        {extraContent}
+        {canOpenDetails ? (
+          <Pressable
+            style={({ pressed }) => [
+              styles.postCardContentPressable,
+              pressed ? styles.postCardContentPressablePressed : null,
+            ]}
+            onPress={handleViewDetails}
+          >
+            {cardBodyContent}
+          </Pressable>
+        ) : (
+          <View style={styles.postCardContentPressable}>{cardBodyContent}</View>
+        )}
 
         <PostCardActions
           styles={styles}
           isSaved={isSaved}
-          viewDetailsLabel={viewDetailsLabel}
-          onViewDetails={shouldRenderViewDetailsAction ? handleViewDetails : undefined}
           onDelete={onDelete}
-          onToggleSave={onToggleSave}
         />
       </View>
 

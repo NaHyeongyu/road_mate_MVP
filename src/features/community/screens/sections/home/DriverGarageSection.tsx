@@ -10,7 +10,6 @@ type DriverGarageSectionProps = {
   styles: AppStyles;
   hasVehicle: boolean;
   vehicleDraft: VehicleInfo;
-  savedVehicle: VehicleInfo;
   onVehicleDraftChange: (draft: VehicleInfo) => void;
   onSaveVehicle: () => void;
 };
@@ -20,7 +19,6 @@ export function DriverGarageSection({
   styles,
   hasVehicle,
   vehicleDraft,
-  savedVehicle,
   onVehicleDraftChange,
   onSaveVehicle,
 }: DriverGarageSectionProps) {
@@ -66,7 +64,7 @@ export function DriverGarageSection({
       <TextInput
         value={vehicleDraft.contactPhone}
         onChangeText={(value) => onVehicleDraftChange({ ...vehicleDraft, contactPhone: value })}
-        placeholder="+61 412 345 678"
+        placeholder="0412 345 678"
         placeholderTextColor={colors.subtext}
         keyboardType="phone-pad"
         style={styles.input}
@@ -86,18 +84,6 @@ export function DriverGarageSection({
       <Pressable style={styles.primaryButton} onPress={onSaveVehicle}>
         <Text style={styles.primaryButtonText}>{hasVehicle ? "Save vehicle" : "Complete registration"}</Text>
       </Pressable>
-
-      {hasVehicle ? (
-        <View style={styles.savedBlock}>
-          <Text style={styles.savedTitle}>Saved vehicle</Text>
-          <Text style={styles.savedValue}>
-            {savedVehicle.model} · {savedVehicle.plate}
-          </Text>
-          {savedVehicle.note ? <Text style={styles.savedNote}>{savedVehicle.note}</Text> : null}
-          {savedVehicle.contactPhone ? <Text style={styles.savedNote}>Phone: {savedVehicle.contactPhone}</Text> : null}
-          {savedVehicle.contactLink ? <Text style={styles.savedNote}>Chat: {savedVehicle.contactLink}</Text> : null}
-        </View>
-      ) : null}
     </View>
   );
 }

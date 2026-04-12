@@ -33,6 +33,7 @@ export function RoutePostDetailModal({
   onClose,
 }: RoutePostDetailModalProps) {
   const isRegular = post.kind === "regular";
+  const shouldShowSaveAction = !isOwnedByCurrentUser && Boolean(onToggleSave);
   const seatsLabel = isRegular ? `${post.availableSeats} seats left` : undefined;
   const noticeDateLabel = isRegular ? undefined : formatNoticeDate(post.noticeDate, post.createdAt);
   const noticeTripTypeLabel = isRegular
@@ -49,6 +50,7 @@ export function RoutePostDetailModal({
       : noticeDayDelta < 0
         ? "past"
         : "upcoming";
+  const detailNote = post.note.trim();
 
   const handleDelete = () => {
     onDelete?.();
@@ -75,9 +77,35 @@ export function RoutePostDetailModal({
               </Text>
             </View>
 
-            <Pressable style={styles.postDetailModalCloseButton} onPress={onClose}>
-              <MaterialCommunityIcons name="close" size={18} color="#0B0F14" />
-            </Pressable>
+            <View style={styles.postDetailModalHeaderActions}>
+              {shouldShowSaveAction && onToggleSave ? (
+                <Pressable
+                  style={({ pressed }) => [
+                    styles.postDetailModalBookmarkButton,
+                    isSaved ? styles.postDetailModalBookmarkButtonActive : null,
+                    pressed ? styles.postDetailModalHeaderActionPressed : null,
+                  ]}
+                  onPress={onToggleSave}
+                  hitSlop={6}
+                >
+                  <MaterialCommunityIcons
+                    name={isSaved ? "bookmark-check" : "bookmark-plus-outline"}
+                    size={20}
+                    color={isSaved ? "#1D4ED8" : "#64748B"}
+                  />
+                </Pressable>
+              ) : null}
+
+              <Pressable
+                style={({ pressed }) => [
+                  styles.postDetailModalCloseButton,
+                  pressed ? styles.postDetailModalHeaderActionPressed : null,
+                ]}
+                onPress={onClose}
+              >
+                <MaterialCommunityIcons name="close" size={18} color="#0B0F14" />
+              </Pressable>
+            </View>
           </View>
 
           <View style={styles.postDetailModalContent}>
@@ -96,14 +124,18 @@ export function RoutePostDetailModal({
             <PostCardFooter post={post} styles={styles} />
             <PostCardContactRow post={post} styles={styles} />
 
-            {post.note ? <Text style={styles.postNote}>{post.note}</Text> : null}
+            {detailNote ? (
+              <View style={styles.postSummaryRow}>
+                <Text style={styles.postSummaryText}>Additional details</Text>
+                <Text style={styles.postNote}>{detailNote}</Text>
+              </View>
+            ) : null}
             {isOwnedByCurrentUser ? <Text style={styles.mine}>From my driver profile</Text> : null}
 
             <PostCardActions
               styles={styles}
               isSaved={isSaved}
               onDelete={onDelete ? handleDelete : undefined}
-              onToggleSave={onToggleSave}
             />
           </View>
         </View>

@@ -1,9 +1,11 @@
+import { useEffect } from "react";
 import { deriveDisplayName } from "../features/auth/utils/authHelpers";
 import { useAuthFlow } from "../features/auth/hooks/useAuthFlow";
 import { useCommunityActions } from "../features/community/hooks/useCommunityActions";
 import { useCommunityCollections } from "../features/community/hooks/useCommunityCollections";
 import { useCommunityUiState } from "../features/community/hooks/useCommunityUiState";
 import { useUserCommunityStorageState } from "../features/community/hooks/useUserCommunityStorageState";
+import { getPostSaveKey } from "../features/community/utils/storage";
 import { isSupabaseConfigured } from "../lib/supabase";
 import type { RouteDraft } from "../model";
 import { useSessionState } from "./hooks/useSessionState";
@@ -89,6 +91,30 @@ export function useRoadmateAppState() {
     storedPosts,
     savedPostKeys,
   });
+
+  useEffect(() => {
+    if (!currentUserId || !savedPostKeys.length) {
+      return;
+    }
+
+    const ownPostKeys = new Set(
+      storedPosts
+        .filter((post) => post.ownerUserId === currentUserId)
+        .map((post) => getPostSaveKey(post))
+    );
+    if (!ownPostKeys.size) {
+      return;
+    }
+
+    const cleanedSavedPostKeys = savedPostKeys.filter((key) => !ownPostKeys.has(key));
+    if (cleanedSavedPostKeys.length === savedPostKeys.length) {
+      return;
+    }
+
+    void persistSavedPostKeys(cleanedSavedPostKeys).catch(() => {
+      // Keep cleanup quiet; storage-level load/save failures are handled elsewhere.
+    });
+  }, [currentUserId, persistSavedPostKeys, savedPostKeys, storedPosts]);
 
   const {
     handleModeChange,

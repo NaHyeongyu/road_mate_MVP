@@ -29,6 +29,10 @@ export function SavedTabSection({
 }: SavedTabSectionProps) {
   const [sortMode, setSortMode] = useState<"saved_recent" | "notice_recent">("saved_recent");
   const savedPostKeySet = useMemo(() => new Set(savedPostKeys), [savedPostKeys]);
+  const riderVisibleSavedPosts = useMemo(
+    () => savedPosts.filter((post) => post.ownerUserId !== currentUserId),
+    [currentUserId, savedPosts]
+  );
   const savedPostOrderMap = useMemo(
     () =>
       new Map(
@@ -53,7 +57,7 @@ export function SavedTabSection({
       return rightTimestamp - leftTimestamp;
     };
 
-    return [...savedPosts].sort((left, right) => {
+    return [...riderVisibleSavedPosts].sort((left, right) => {
       if (sortMode === "saved_recent") {
         const leftOrder = savedPostOrderMap.get(getPostSaveKey(left));
         const rightOrder = savedPostOrderMap.get(getPostSaveKey(right));
@@ -73,7 +77,7 @@ export function SavedTabSection({
 
       return left.kind === "one_time" ? byNoticeDateDesc(left, right) : byCreatedAtDesc(left, right);
     });
-  }, [savedPostOrderMap, savedPosts, sortMode]);
+  }, [riderVisibleSavedPosts, savedPostOrderMap, sortMode]);
 
   if (!isRiderMode) {
     return (
@@ -90,7 +94,7 @@ export function SavedTabSection({
 
       <View style={styles.card}>
         <Text style={styles.cardTitle}>Saved rides</Text>
-        <Text style={styles.cardBody}>Total saved: {savedPosts.length}</Text>
+        <Text style={styles.cardBody}>Total saved: {riderVisibleSavedPosts.length}</Text>
         <View style={styles.row}>
           <Pressable
             style={[styles.chip, sortMode === "saved_recent" ? styles.chipActive : null]}

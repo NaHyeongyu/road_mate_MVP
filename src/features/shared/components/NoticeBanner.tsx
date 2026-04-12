@@ -1,11 +1,10 @@
 import { Text, View } from "react-native";
 
+import type { AppNotice } from "../../../app/types";
 import type { AppStyles } from "../../../ui/types";
 
-type NoticeTone = "info" | "success" | "error";
-
 type NoticeBannerProps = {
-  notice: { tone: NoticeTone; text: string };
+  notice: AppNotice;
   styles: AppStyles;
 };
 

@@ -6,8 +6,6 @@ import type { AppStyles } from "../../../../ui/types";
 type PostCardActionsProps = {
   styles: AppStyles;
   isSaved: boolean;
-  viewDetailsLabel?: string;
-  onViewDetails?: () => void;
   onToggleSave?: () => void;
   onDelete?: () => void;
 };
@@ -15,23 +13,15 @@ type PostCardActionsProps = {
 export function PostCardActions({
   styles,
   isSaved,
-  viewDetailsLabel = "Details",
-  onViewDetails,
   onToggleSave,
   onDelete,
 }: PostCardActionsProps) {
-  if (!onDelete && !onToggleSave && !onViewDetails) {
+  if (!onDelete && !onToggleSave) {
     return null;
   }
 
   return (
     <View style={styles.postActionsRow}>
-      {onViewDetails ? (
-        <Pressable style={styles.postActionInfo} onPress={onViewDetails}>
-          <MaterialCommunityIcons name="information-outline" size={15} color="#1D4ED8" />
-          <Text style={styles.postActionInfoText}>{viewDetailsLabel}</Text>
-        </Pressable>
-      ) : null}
       {onDelete ? (
         <Pressable style={styles.postActionDanger} onPress={onDelete}>
           <MaterialCommunityIcons name="trash-can-outline" size={15} color="#991B1B" />

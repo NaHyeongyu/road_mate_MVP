@@ -140,7 +140,7 @@ export const createCommunityPostDetailStyles = (colors: AppColors) =>
     postContactAction: {
       maxWidth: "100%",
       minWidth: 0,
-      minHeight: 32,
+      minHeight: 44,
       borderRadius: 999,
       borderWidth: 1,
       borderColor: "#BFDBFE",
@@ -196,6 +196,11 @@ export const createCommunityPostDetailStyles = (colors: AppColors) =>
       justifyContent: "space-between",
       gap: 10,
     },
+    postDetailModalHeaderActions: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 8,
+    },
     postDetailModalTitleBlock: {
       flex: 1,
       gap: 2,
@@ -212,9 +217,26 @@ export const createCommunityPostDetailStyles = (colors: AppColors) =>
       fontSize: 13,
       fontWeight: "600",
     },
+    postDetailModalBookmarkButton: {
+      width: 44,
+      height: 44,
+      borderRadius: 999,
+      borderWidth: 1,
+      borderColor: colors.border,
+      backgroundColor: colors.panelAlt,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    postDetailModalBookmarkButtonActive: {
+      borderColor: "#93C5FD",
+      backgroundColor: "#DBEAFE",
+    },
+    postDetailModalHeaderActionPressed: {
+      opacity: 0.72,
+    },
     postDetailModalCloseButton: {
-      width: 32,
-      height: 32,
+      width: 44,
+      height: 44,
       borderRadius: 999,
       borderWidth: 1,
       borderColor: colors.border,
