@@ -19,6 +19,7 @@ import { getQldPlaceSuggestions } from "../../../utils/placeQuickSearch";
 import { Label } from "../../../../shared/components/Label";
 import { ToggleChip } from "../../../../shared/components/ToggleChip";
 import { DriverGarageSection } from "./DriverGarageSection";
+import { InlinePickerCard } from "./InlinePickerCard";
 import { OperatingDaysChips } from "./OperatingDaysChips";
 import { RouteDateField } from "./RouteDateField";
 import { RouteDraftTextField } from "./RouteDraftTextField";
@@ -422,53 +423,41 @@ export function DriverRouteComposerSection({
         />
       ) : null}
       {Platform.OS === "ios" && isDatePickerOpen ? (
-        <View style={styles.timePickerInlineCard}>
-          <View style={styles.timePickerInlineHeader}>
-            <Text style={styles.timePickerInlineTitle}>Notice date</Text>
-            <View style={styles.timePickerInlineActions}>
-              <Pressable style={styles.timePickerInlineActionButton} onPress={() => setIsDatePickerOpen(false)}>
-                <Text style={styles.timePickerInlineActionText}>Cancel</Text>
-              </Pressable>
-              <Pressable style={styles.timePickerInlineActionButton} onPress={handleConfirmIosDate}>
-                <Text style={styles.timePickerInlineActionText}>Done</Text>
-              </Pressable>
-            </View>
-          </View>
+        <InlinePickerCard
+          styles={styles}
+          title="Notice date"
+          onCancel={() => setIsDatePickerOpen(false)}
+          onConfirm={handleConfirmIosDate}
+        >
           <DateTimePicker
             mode="date"
             value={iosDatePickerValue}
             display="spinner"
             onChange={handleIosDatePickerChange}
           />
-        </View>
+        </InlinePickerCard>
       ) : null}
 
       {Platform.OS === "ios" && activeTimeField ? (
-        <View style={styles.timePickerInlineCard}>
-          <View style={styles.timePickerInlineHeader}>
-            <Text style={styles.timePickerInlineTitle}>
-              {isOneTimeRoute
-                ? "Time"
-                : activeTimeField === "schedule"
-                  ? "Departure time"
-                  : "Arrival time"}
-            </Text>
-            <View style={styles.timePickerInlineActions}>
-              <Pressable style={styles.timePickerInlineActionButton} onPress={() => setActiveTimeField(null)}>
-                <Text style={styles.timePickerInlineActionText}>Cancel</Text>
-              </Pressable>
-              <Pressable style={styles.timePickerInlineActionButton} onPress={handleConfirmIosTime}>
-                <Text style={styles.timePickerInlineActionText}>Done</Text>
-              </Pressable>
-            </View>
-          </View>
+        <InlinePickerCard
+          styles={styles}
+          title={
+            isOneTimeRoute
+              ? "Time"
+              : activeTimeField === "schedule"
+                ? "Departure time"
+                : "Arrival time"
+          }
+          onCancel={() => setActiveTimeField(null)}
+          onConfirm={handleConfirmIosTime}
+        >
           <DateTimePicker
             mode="time"
             value={iosTimePickerValue}
             display="spinner"
             onChange={handleIosTimePickerChange}
           />
-        </View>
+        </InlinePickerCard>
       ) : null}
 
       {!isOneTimeRoute ? (
