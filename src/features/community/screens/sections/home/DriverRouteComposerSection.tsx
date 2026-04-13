@@ -1,5 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
-import type { DateTimePickerEvent } from "@react-native-community/datetimepicker";
+import { useEffect, useRef, useState } from "react";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { Platform, Text, TextInput, View } from "react-native";
 
@@ -11,10 +10,7 @@ import {
   isRouteTimeValue,
   toDateFromRouteDate,
   toDateFromRouteTime,
-  toRouteDateFromDate,
-  toRouteTimeFromDate,
 } from "../../../../community/utils/routeForm";
-import { getQldPlaceSuggestions } from "../../../utils/placeQuickSearch";
 import { DriverGarageSection } from "./DriverGarageSection";
 import { InlinePickerCard } from "./InlinePickerCard";
 import { RegularRouteSettingsSection } from "./RegularRouteSettingsSection";
@@ -22,6 +18,8 @@ import { RouteDraftTextField } from "./RouteDraftTextField";
 import { RoutePlaceField } from "./RoutePlaceField";
 import { RouteSaveActionSection } from "./RouteSaveActionSection";
 import { RouteScheduleSection } from "./RouteScheduleSection";
+import { useRouteComposerPickers } from "./useRouteComposerPickers";
+import { useRouteComposerPlaces } from "./useRouteComposerPlaces";
 import {
   buildRequiredChecks,
   normalizeSeatCount,
@@ -64,34 +62,7 @@ export function DriverRouteComposerSection({
   const oneTimeTripType = routeDraft.oneTimeTripType === "round_trip" ? "round_trip" : "one_way";
   const isOneTimeRoundTrip = isOneTimeRoute && oneTimeTripType === "round_trip";
   const toInputRef = useRef<TextInput>(null);
-  const blurTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const [activePlaceField, setActivePlaceField] = useState<"from" | "to" | null>(null);
-  const [activeTimeField, setActiveTimeField] = useState<"schedule" | "returnSchedule" | null>(null);
-  const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
-  const [iosTimePickerValue, setIosTimePickerValue] = useState<Date>(new Date());
-  const [iosDatePickerValue, setIosDatePickerValue] = useState<Date>(new Date());
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const fromSuggestions = useMemo(() => getQldPlaceSuggestions(routeDraft.from), [routeDraft.from]);
-  const toSuggestions = useMemo(() => getQldPlaceSuggestions(routeDraft.to), [routeDraft.to]);
-  const showFromSuggestions =
-    activePlaceField === "from" && routeDraft.from.trim().length > 0 && fromSuggestions.length > 0;
-  const showToSuggestions =
-    activePlaceField === "to" && routeDraft.to.trim().length > 0 && toSuggestions.length > 0;
-
-  const clearBlurTimeout = () => {
-    if (blurTimeoutRef.current) {
-      clearTimeout(blurTimeoutRef.current);
-      blurTimeoutRef.current = null;
-    }
-  };
-
-  const scheduleCloseSuggestions = (field: "from" | "to") => {
-    clearBlurTimeout();
-    blurTimeoutRef.current = setTimeout(() => {
-      setActivePlaceField((prev) => (prev === field ? null : prev));
-    }, 120);
-  };
 
   const updateRouteDraft = (patch: Partial<RouteDraft>) => {
     onRouteDraftChange({
@@ -112,24 +83,36 @@ export function DriverRouteComposerSection({
     });
   }, [activeRouteKind, onRouteDraftChange, routeDraft]);
 
-  useEffect(
-    () => () => {
-      clearBlurTimeout();
-    },
-    []
-  );
-
-  const handleSelectFromSuggestion = (value: string) => {
-    clearBlurTimeout();
-    updateRouteDraft({ from: value });
-    setActivePlaceField("to");
-    toInputRef.current?.focus();
+  const handleOneTimeTripTypeChange = (nextType: OneTimeTripType) => {
+    updateRouteDraft({
+      oneTimeTripType: nextType,
+      returnSchedule: nextType === "one_way" ? "" : routeDraft.returnSchedule,
+    });
   };
 
-  const handleSelectToSuggestion = (value: string) => {
-    clearBlurTimeout();
-    updateRouteDraft({ to: value });
-    setActivePlaceField(null);
+  const {
+    activeTimeField,
+    isDatePickerOpen,
+    iosTimePickerValue,
+    iosDatePickerValue,
+    openTimePicker,
+    openDatePicker,
+    closeTimePicker,
+    closeDatePicker,
+    handleAndroidTimePickerChange,
+    handleIosTimePickerChange,
+    handleAndroidDatePickerChange,
+    handleIosDatePickerChange,
+    handleConfirmIosTime,
+    handleConfirmIosDate,
+  } = useRouteComposerPickers({
+    routeDraft,
+    isOneTimeRoute,
+    isOneTimeRoundTrip,
+    onPatchDraft: updateRouteDraft,
+  });
+
+  const handleCompleteDestination = () => {
     if (isOneTimeRoute) {
       openDatePicker();
       return;
@@ -138,115 +121,25 @@ export function DriverRouteComposerSection({
     openTimePicker("schedule");
   };
 
-  const openTimePicker = (field: "schedule" | "returnSchedule") => {
-    setIsDatePickerOpen(false);
-    const baseValue = toDateFromRouteTime(routeDraft[field]);
-    setIosTimePickerValue(baseValue);
-    setActiveTimeField(field);
-  };
-
-  const openDatePicker = () => {
-    setActiveTimeField(null);
-    setIosDatePickerValue(toDateFromRouteDate(routeDraft.noticeDate));
-    setIsDatePickerOpen(true);
-  };
-
-  const handleOneTimeTripTypeChange = (nextType: OneTimeTripType) => {
-    updateRouteDraft({
-      oneTimeTripType: nextType,
-      returnSchedule: nextType === "one_way" ? "" : routeDraft.returnSchedule,
-    });
-  };
-
-  const applySelectedTime = (field: "schedule" | "returnSchedule", date: Date) => {
-    updateRouteDraft({
-      [field]: toRouteTimeFromDate(date),
-    });
-  };
-
-  const shouldChainToReturnTime = (field: "schedule" | "returnSchedule") =>
-    field === "schedule" &&
-    !isRouteTimeValue(routeDraft.returnSchedule) &&
-    (!isOneTimeRoute || isOneTimeRoundTrip);
-
-  const openReturnTimePickerStep = () => {
-    setIosTimePickerValue(toDateFromRouteTime(routeDraft.returnSchedule));
-    setActiveTimeField("returnSchedule");
-  };
-
-  const handleAndroidTimePickerChange = (event: DateTimePickerEvent, selectedDate?: Date) => {
-    if (!activeTimeField) {
-      return;
-    }
-
-    if (event.type !== "set" || !selectedDate) {
-      setActiveTimeField(null);
-      return;
-    }
-
-    const currentField = activeTimeField;
-    applySelectedTime(currentField, selectedDate);
-
-    if (shouldChainToReturnTime(currentField)) {
-      openReturnTimePickerStep();
-      return;
-    }
-
-    setActiveTimeField(null);
-  };
-
-  const handleIosTimePickerChange = (_event: DateTimePickerEvent, selectedDate?: Date) => {
-    if (selectedDate) {
-      setIosTimePickerValue(selectedDate);
-    }
-  };
-
-  const handleAndroidDatePickerChange = (event: DateTimePickerEvent, selectedDate?: Date) => {
-    if (!isDatePickerOpen) {
-      return;
-    }
-
-    if (event.type !== "set" || !selectedDate) {
-      setIsDatePickerOpen(false);
-      return;
-    }
-
-    updateRouteDraft({ noticeDate: toRouteDateFromDate(selectedDate) });
-    setIsDatePickerOpen(false);
-    if (!isRouteTimeValue(routeDraft.schedule)) {
-      openTimePicker("schedule");
-    }
-  };
-
-  const handleIosDatePickerChange = (_event: DateTimePickerEvent, selectedDate?: Date) => {
-    if (selectedDate) {
-      setIosDatePickerValue(selectedDate);
-    }
-  };
-
-  const handleConfirmIosTime = () => {
-    if (!activeTimeField) {
-      return;
-    }
-
-    const currentField = activeTimeField;
-    applySelectedTime(currentField, iosTimePickerValue);
-
-    if (shouldChainToReturnTime(currentField)) {
-      openReturnTimePickerStep();
-      return;
-    }
-
-    setActiveTimeField(null);
-  };
-
-  const handleConfirmIosDate = () => {
-    updateRouteDraft({ noticeDate: toRouteDateFromDate(iosDatePickerValue) });
-    setIsDatePickerOpen(false);
-    if (!isRouteTimeValue(routeDraft.schedule)) {
-      openTimePicker("schedule");
-    }
-  };
+  const {
+    fromSuggestions,
+    toSuggestions,
+    showFromSuggestions,
+    showToSuggestions,
+    handleFromFocus,
+    handleToFocus,
+    handleFromBlur,
+    handleToBlur,
+    handleClearFrom,
+    handleClearTo,
+    handleSelectFromSuggestion,
+    handleSelectToSuggestion,
+  } = useRouteComposerPlaces({
+    routeDraft,
+    toInputRef,
+    onPatchDraft: updateRouteDraft,
+    onCompleteDestination: handleCompleteDestination,
+  });
 
   const applyOperatingDays = (days: readonly string[]) => {
     updateRouteDraft({ operatingDays: [...days] });
@@ -326,16 +219,10 @@ export function DriverRouteComposerSection({
         showSuggestions={showFromSuggestions}
         returnKeyType="next"
         onChangeText={(value) => updateRouteDraft({ from: value })}
-        onFocus={() => {
-          clearBlurTimeout();
-          setActivePlaceField("from");
-        }}
-        onBlur={() => scheduleCloseSuggestions("from")}
+        onFocus={handleFromFocus}
+        onBlur={handleFromBlur}
         onSubmitEditing={() => toInputRef.current?.focus()}
-        onClear={() => {
-          updateRouteDraft({ from: "" });
-          setActivePlaceField("from");
-        }}
+        onClear={handleClearFrom}
         onSelectSuggestion={handleSelectFromSuggestion}
       />
 
@@ -350,16 +237,10 @@ export function DriverRouteComposerSection({
         inputRef={toInputRef}
         returnKeyType="done"
         onChangeText={(value) => updateRouteDraft({ to: value })}
-        onFocus={() => {
-          clearBlurTimeout();
-          setActivePlaceField("to");
-        }}
-        onBlur={() => scheduleCloseSuggestions("to")}
-        onSubmitEditing={() => (isOneTimeRoute ? openDatePicker() : openTimePicker("schedule"))}
-        onClear={() => {
-          updateRouteDraft({ to: "" });
-          setActivePlaceField("to");
-        }}
+        onFocus={handleToFocus}
+        onBlur={handleToBlur}
+        onSubmitEditing={handleCompleteDestination}
+        onClear={handleClearTo}
         onSelectSuggestion={handleSelectToSuggestion}
       />
 
@@ -379,7 +260,7 @@ export function DriverRouteComposerSection({
         <InlinePickerCard
           styles={styles}
           title="Notice date"
-          onCancel={() => setIsDatePickerOpen(false)}
+          onCancel={closeDatePicker}
           onConfirm={handleConfirmIosDate}
         >
           <DateTimePicker
@@ -401,7 +282,7 @@ export function DriverRouteComposerSection({
                 ? "Departure time"
                 : "Arrival time"
           }
-          onCancel={() => setActiveTimeField(null)}
+          onCancel={closeTimePicker}
           onConfirm={handleConfirmIosTime}
         >
           <DateTimePicker
