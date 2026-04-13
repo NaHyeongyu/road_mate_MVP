@@ -83,9 +83,10 @@ export function CommunityTabContent({
   onToggleSavedPost,
 }: CommunityTabContentProps) {
   const isRiderMode = mode === "rider";
-  const isDriverRouteTab = mode === "driver" && (mainTab === "home" || mainTab === "saved");
+  const shouldRenderHomeTab = mainTab === "home" || (mode === "driver" && mainTab === "saved");
+  const driverRouteKind = mode === "driver" && mainTab === "saved" ? "one_time" : "regular";
 
-  if (isDriverRouteTab) {
+  if (shouldRenderHomeTab) {
     return (
       <HomeTabSection
         colors={colors}
@@ -101,35 +102,7 @@ export function CommunityTabContent({
         routeDraft={routeDraft}
         hasDriverContactMethod={hasDriverContactMethod}
         currentUserId={currentUserId}
-        driverRouteKind={mainTab === "saved" ? "one_time" : "regular"}
-        onFilterChange={onFilterChange}
-        onFromSearchQueryChange={onFromSearchQueryChange}
-        onToSearchQueryChange={onToSearchQueryChange}
-        onRouteDraftChange={onRouteDraftChange}
-        onSaveRouteQuickSettings={onSaveRouteQuickSettings}
-        onOpenDriverRegistrationPage={onOpenDriverRegistrationPage}
-        onToggleSavedPost={onToggleSavedPost}
-      />
-    );
-  }
-
-  if (mainTab === "home") {
-    return (
-      <HomeTabSection
-        colors={colors}
-        styles={styles}
-        notice={notice}
-        mode={mode}
-        filter={filter}
-        fromSearchQuery={fromSearchQuery}
-        toSearchQuery={toSearchQuery}
-        visiblePosts={visiblePosts}
-        myPosts={myPosts}
-        savedPostKeys={savedPostKeys}
-        routeDraft={routeDraft}
-        hasDriverContactMethod={hasDriverContactMethod}
-        currentUserId={currentUserId}
-        driverRouteKind="regular"
+        driverRouteKind={driverRouteKind}
         onFilterChange={onFilterChange}
         onFromSearchQueryChange={onFromSearchQueryChange}
         onToSearchQueryChange={onToSearchQueryChange}

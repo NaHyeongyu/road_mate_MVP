@@ -1,4 +1,3 @@
-import { useEffect, useMemo, useState } from "react";
 import { ScrollView, StatusBar, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -7,11 +6,11 @@ import type { AppColors } from "../../../brandTheme";
 import type { RouteDraft, RouteKind, RoutePost, VehicleInfo } from "../../../model";
 import { APP_BAR_BG } from "../../../ui/styleFragments/layout/constants";
 import type { AppStyles } from "../../../ui/types";
-import { hasRouteDraftInput, isRouteDraftReady, toDraftFromPost } from "../utils/routeDraftState";
 import { NoticeBanner } from "../../shared/components/NoticeBanner";
 import { ScreenHeader } from "../../shared/components/ScreenHeader";
 import type { MainTab, Mode } from "../types";
 import { RoleModeToggle } from "../components/RoleModeToggle";
+import { useDriverRegistrationPageState } from "./useDriverRegistrationPageState";
 import { CommunityBottomBar } from "./sections/CommunityBottomBar";
 import { CommunityTabContent } from "./sections/CommunityTabContent";
 import { DriverRouteComposerSection } from "./sections/home/DriverRouteComposerSection";
@@ -96,54 +95,24 @@ export function CommunityHomeScreen({
   const insets = useSafeAreaInsets();
   const bottomInset = Math.max(insets.bottom, 8);
   const isRiderMode = mode === "rider";
-  const [isDriverRegistrationPageOpen, setIsDriverRegistrationPageOpen] = useState(false);
-  const activeDriverRouteKind = mode === "driver" && mainTab === "saved" ? "one_time" : "regular";
-  const myPostsForActiveKind = useMemo(
-    () => myPosts.filter((post) => post.kind === activeDriverRouteKind),
-    [activeDriverRouteKind, myPosts]
-  );
-  const latestRegisteredPost = myPostsForActiveKind[0] ?? null;
-  const activeRouteDraft =
-    isRouteDraftReady(routeDraft, hasDriverContactMethod) || !latestRegisteredPost
-      ? routeDraft
-      : toDraftFromPost(latestRegisteredPost);
-
-  useEffect(() => {
-    if (mode !== "driver" || !(mainTab === "home" || mainTab === "saved")) {
-      setIsDriverRegistrationPageOpen(false);
-    }
-  }, [mainTab, mode]);
-
-  useEffect(() => {
-    if (
-      !isDriverRegistrationPageOpen ||
-      isRouteDraftReady(routeDraft, hasDriverContactMethod) ||
-      hasRouteDraftInput(routeDraft) ||
-      !latestRegisteredPost
-    ) {
-      return;
-    }
-
-    onRouteDraftChange(toDraftFromPost(latestRegisteredPost));
-  }, [
-    hasDriverContactMethod,
-    isDriverRegistrationPageOpen,
-    latestRegisteredPost,
-    onRouteDraftChange,
+  const {
+    isDriverRegistrationPageVisible,
+    activeDriverRouteKind,
+    activeRouteDraft,
+    openDriverRegistrationPage,
+    closeDriverRegistrationPage,
+    handleSaveRouteRegistration,
+  } = useDriverRegistrationPageState({
+    mode,
+    mainTab,
+    myPosts,
     routeDraft,
-  ]);
+    hasDriverContactMethod,
+    onRouteDraftChange,
+    onPostRoute,
+  });
 
-  const handleSaveRouteRegistration = async () => {
-    const didSave = await onPostRoute();
-    if (!didSave) {
-      return false;
-    }
-
-    setIsDriverRegistrationPageOpen(false);
-    return true;
-  };
-
-  if (isDriverRegistrationPageOpen && mode === "driver") {
+  if (isDriverRegistrationPageVisible) {
     return (
       <View style={styles.screen}>
         <StatusBar barStyle="dark-content" backgroundColor={APP_BAR_BG} translucent={false} />
@@ -159,7 +128,7 @@ export function CommunityHomeScreen({
             title={activeDriverRouteKind === "regular" ? "Regular registration" : "One-time registration"}
             leftActionType="back"
             leftActionLabel="Back"
-            onLeftActionPress={() => setIsDriverRegistrationPageOpen(false)}
+            onLeftActionPress={closeDriverRegistrationPage}
             styles={styles}
           />
         </View>
@@ -239,7 +208,7 @@ export function CommunityHomeScreen({
           onRouteDraftChange={onRouteDraftChange}
           onPostRoute={onPostRoute}
           onSaveRouteQuickSettings={onSaveRouteQuickSettings}
-          onOpenDriverRegistrationPage={() => setIsDriverRegistrationPageOpen(true)}
+          onOpenDriverRegistrationPage={openDriverRegistrationPage}
           onRemoveRoute={onRemoveRoute}
           onToggleSavedPost={onToggleSavedPost}
         />
