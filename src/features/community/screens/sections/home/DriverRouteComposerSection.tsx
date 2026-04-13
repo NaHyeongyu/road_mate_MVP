@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { Platform, Text, TextInput, View } from "react-native";
 
@@ -6,8 +6,6 @@ import type { AppColors } from "../../../../../brandTheme";
 import type { OneTimeTripType, RouteDraft, RouteKind, VehicleInfo } from "../../../../../model";
 import type { AppStyles } from "../../../../../ui/types";
 import {
-  isRouteDateValue,
-  isRouteTimeValue,
   toDateFromRouteDate,
   toDateFromRouteTime,
 } from "../../../../community/utils/routeForm";
@@ -18,13 +16,9 @@ import { RouteDraftTextField } from "./RouteDraftTextField";
 import { RoutePlaceField } from "./RoutePlaceField";
 import { RouteSaveActionSection } from "./RouteSaveActionSection";
 import { RouteScheduleSection } from "./RouteScheduleSection";
+import { useDriverComposerSubmitState } from "./useDriverComposerSubmitState";
 import { useRouteComposerPickers } from "./useRouteComposerPickers";
 import { useRouteComposerPlaces } from "./useRouteComposerPlaces";
-import {
-  buildRequiredChecks,
-  normalizeSeatCount,
-  toRemainingRequiredText,
-} from "./driverRouteComposerState";
 
 type DriverRouteComposerSectionProps = {
   colors: AppColors;
@@ -62,7 +56,6 @@ export function DriverRouteComposerSection({
   const oneTimeTripType = routeDraft.oneTimeTripType === "round_trip" ? "round_trip" : "one_way";
   const isOneTimeRoundTrip = isOneTimeRoute && oneTimeTripType === "round_trip";
   const toInputRef = useRef<TextInput>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const updateRouteDraft = (patch: Partial<RouteDraft>) => {
     onRouteDraftChange({
@@ -140,61 +133,26 @@ export function DriverRouteComposerSection({
     onPatchDraft: updateRouteDraft,
     onCompleteDestination: handleCompleteDestination,
   });
-
-  const applyOperatingDays = (days: readonly string[]) => {
-    updateRouteDraft({ operatingDays: [...days] });
-  };
-
-  const currentSeatCount = normalizeSeatCount(
-    Number.parseInt(routeDraft.availableSeats, 10) || MIN_SEATS,
-    MIN_SEATS,
-    MAX_SEATS
-  );
-
-  const updateSeatCount = (nextSeatCount: number) => {
-    const normalized = normalizeSeatCount(nextSeatCount, MIN_SEATS, MAX_SEATS);
-    updateRouteDraft({ availableSeats: String(normalized) });
-  };
-
-  const hasFrom = Boolean(routeDraft.from.trim());
-  const hasTo = Boolean(routeDraft.to.trim());
-  const hasNoticeDate = isRouteDateValue(routeDraft.noticeDate);
-  const hasDepartureTime = isRouteTimeValue(routeDraft.schedule);
-  const hasReturnTime = isRouteTimeValue(routeDraft.returnSchedule);
-  const hasSeats = currentSeatCount >= MIN_SEATS;
-  const hasOperatingDays = routeDraft.operatingDays.length > 0;
-  const hasProfileContactMethod = Boolean(savedVehicle.contactPhone.trim() || savedVehicle.contactLink.trim());
-  const hasDraftContactMethod = Boolean(routeDraft.contactPhone.trim() || routeDraft.contactLink.trim());
-  const hasContactMethod = hasProfileContactMethod || hasDraftContactMethod;
-
-  const requiredChecks = buildRequiredChecks({
+  const {
+    currentSeatCount,
+    updateSeatCount,
+    applyOperatingDays,
+    isSubmitting,
+    isReadyToSave,
+    remainingRequired,
+    remainingRequiredText,
+    handlePressSaveRegistration,
+  } = useDriverComposerSubmitState({
+    routeDraft,
+    savedVehicle,
+    hasVehicle,
     isOneTimeRoute,
     isOneTimeRoundTrip,
-    hasVehicle,
-    hasFrom,
-    hasTo,
-    hasNoticeDate,
-    hasDepartureTime,
-    hasReturnTime,
-    hasSeats,
-    hasOperatingDays,
-    hasContactMethod,
+    minSeats: MIN_SEATS,
+    maxSeats: MAX_SEATS,
+    onPatchDraft: updateRouteDraft,
+    onPostRoute,
   });
-  const remainingRequired = requiredChecks.filter((check) => !check.done).map((check) => check.label);
-  const isReadyToSave = remainingRequired.length === 0;
-  const remainingRequiredText = toRemainingRequiredText(remainingRequired);
-  const handlePressSaveRegistration = async () => {
-    if (isSubmitting || !isReadyToSave) {
-      return;
-    }
-
-    setIsSubmitting(true);
-    try {
-      await onPostRoute();
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
 
   return (
     <>
