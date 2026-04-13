@@ -1,13 +1,12 @@
-import { useEffect } from "react";
 import { deriveDisplayName } from "../features/auth/utils/authHelpers";
 import { useAuthFlow } from "../features/auth/hooks/useAuthFlow";
 import { useCommunityActions } from "../features/community/hooks/useCommunityActions";
 import { useCommunityCollections } from "../features/community/hooks/useCommunityCollections";
 import { useCommunityUiState } from "../features/community/hooks/useCommunityUiState";
 import { useUserCommunityStorageState } from "../features/community/hooks/useUserCommunityStorageState";
-import { getSavedPostKeysWithoutOwnPosts } from "../features/community/utils/savedPostKeys";
 import { isSupabaseConfigured } from "../lib/supabase";
-import type { RouteDraft } from "../model";
+import { useDriverRouteDraftState } from "./hooks/useDriverRouteDraftState";
+import { useSavedPostKeysCleanup } from "./hooks/useSavedPostKeysCleanup";
 import { useSessionState } from "./hooks/useSessionState";
 import { useStoredPostsState } from "./hooks/useStoredPostsState";
 
@@ -64,24 +63,14 @@ export function useRoadmateAppState() {
     savedVehicle.contactPhone.trim() || savedVehicle.contactLink.trim()
   );
   const loading = isSessionLoading || isPostsLoading;
-  const activeDriverRouteKind = mode === "driver" && mainTab === "saved" ? "one_time" : "regular";
-  const routeDraft = activeDriverRouteKind === "regular" ? regularRouteDraft : oneTimeRouteDraft;
-  const setRouteDraft = (nextDraft: RouteDraft) => {
-    if (activeDriverRouteKind === "regular") {
-      setRegularRouteDraft({
-        ...nextDraft,
-        kind: "regular",
-        oneTimeTripType: "round_trip",
-      });
-      return;
-    }
-
-    setOneTimeRouteDraft({
-      ...nextDraft,
-      kind: "one_time",
-      oneTimeTripType: nextDraft.oneTimeTripType ?? "one_way",
-    });
-  };
+  const { routeDraft, setRouteDraft } = useDriverRouteDraftState({
+    mode,
+    mainTab,
+    regularRouteDraft,
+    oneTimeRouteDraft,
+    setRegularRouteDraft,
+    setOneTimeRouteDraft,
+  });
 
   const { myPosts, savedPostKeySet, savedPosts, visiblePosts } = useCommunityCollections({
     currentUserId,
@@ -92,24 +81,12 @@ export function useRoadmateAppState() {
     savedPostKeys,
   });
 
-  useEffect(() => {
-    if (!currentUserId || !savedPostKeys.length) {
-      return;
-    }
-
-    const cleanedSavedPostKeys = getSavedPostKeysWithoutOwnPosts({
-      currentUserId,
-      savedPostKeys,
-      storedPosts,
-    });
-    if (cleanedSavedPostKeys.length === savedPostKeys.length) {
-      return;
-    }
-
-    void persistSavedPostKeys(cleanedSavedPostKeys).catch(() => {
-      // Keep cleanup quiet; storage-level load/save failures are handled elsewhere.
-    });
-  }, [currentUserId, persistSavedPostKeys, savedPostKeys, storedPosts]);
+  useSavedPostKeysCleanup({
+    currentUserId,
+    savedPostKeys,
+    storedPosts,
+    persistSavedPostKeys,
+  });
 
   const {
     handleModeChange,

@@ -1,13 +1,12 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { DateTimePickerEvent } from "@react-native-community/datetimepicker";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import { Platform, Pressable, Text, TextInput, View } from "react-native";
+import { Platform, Text, TextInput, View } from "react-native";
 
 import type { AppColors } from "../../../../../brandTheme";
 import type { OneTimeTripType, RouteDraft, RouteKind, VehicleInfo } from "../../../../../model";
 import type { AppStyles } from "../../../../../ui/types";
 import {
-  WEEKDAY_OPTIONS,
   isRouteDateValue,
   isRouteTimeValue,
   toDateFromRouteDate,
@@ -16,18 +15,15 @@ import {
   toRouteTimeFromDate,
 } from "../../../../community/utils/routeForm";
 import { getQldPlaceSuggestions } from "../../../utils/placeQuickSearch";
-import { Label } from "../../../../shared/components/Label";
-import { ToggleChip } from "../../../../shared/components/ToggleChip";
 import { DriverGarageSection } from "./DriverGarageSection";
 import { InlinePickerCard } from "./InlinePickerCard";
-import { OperatingDaysChips } from "./OperatingDaysChips";
-import { RouteDateField } from "./RouteDateField";
+import { RegularRouteSettingsSection } from "./RegularRouteSettingsSection";
 import { RouteDraftTextField } from "./RouteDraftTextField";
 import { RoutePlaceField } from "./RoutePlaceField";
-import { RouteTimeField } from "./RouteTimeField";
+import { RouteSaveActionSection } from "./RouteSaveActionSection";
+import { RouteScheduleSection } from "./RouteScheduleSection";
 import {
   buildRequiredChecks,
-  hasSameDays,
   normalizeSeatCount,
   toRemainingRequiredText,
 } from "./driverRouteComposerState";
@@ -47,8 +43,6 @@ type DriverRouteComposerSectionProps = {
   onPostRoute: () => Promise<boolean>;
 };
 
-const WEEKDAY_PRESET = WEEKDAY_OPTIONS.slice(0, 5);
-const WEEKEND_PRESET = WEEKDAY_OPTIONS.slice(5);
 const MIN_SEATS = 1;
 const MAX_SEATS = 8;
 
@@ -71,8 +65,6 @@ export function DriverRouteComposerSection({
   const isOneTimeRoundTrip = isOneTimeRoute && oneTimeTripType === "round_trip";
   const toInputRef = useRef<TextInput>(null);
   const blurTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const phoneInputRef = useRef<TextInput>(null);
-  const linkInputRef = useRef<TextInput>(null);
   const [activePlaceField, setActivePlaceField] = useState<"from" | "to" | null>(null);
   const [activeTimeField, setActiveTimeField] = useState<"schedule" | "returnSchedule" | null>(null);
   const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
@@ -298,9 +290,6 @@ export function DriverRouteComposerSection({
   const remainingRequired = requiredChecks.filter((check) => !check.done).map((check) => check.label);
   const isReadyToSave = remainingRequired.length === 0;
   const remainingRequiredText = toRemainingRequiredText(remainingRequired);
-  const isWeekdayPresetActive = hasSameDays(routeDraft.operatingDays, WEEKDAY_PRESET);
-  const isWeekendPresetActive = hasSameDays(routeDraft.operatingDays, WEEKEND_PRESET);
-  const isAllDaysPresetActive = hasSameDays(routeDraft.operatingDays, WEEKDAY_OPTIONS);
   const handlePressSaveRegistration = async () => {
     if (isSubmitting || !isReadyToSave) {
       return;
@@ -376,52 +365,16 @@ export function DriverRouteComposerSection({
 
       <View style={styles.routeComposerDivider} />
 
-      {isOneTimeRoute ? (
-        <RouteDateField
-          styles={styles}
-          label="Date"
-          value={routeDraft.noticeDate}
-          placeholder="Select notice date"
-          onPress={openDatePicker}
-        />
-      ) : null}
-
-      {isOneTimeRoute ? (
-        <>
-          <Label text="Trip type" styles={styles} />
-          <View style={styles.row}>
-            <ToggleChip
-              label="One-way"
-              active={!isOneTimeRoundTrip}
-              onPress={() => handleOneTimeTripTypeChange("one_way")}
-              styles={styles}
-            />
-            <ToggleChip
-              label="Round-trip"
-              active={isOneTimeRoundTrip}
-              onPress={() => handleOneTimeTripTypeChange("round_trip")}
-              styles={styles}
-            />
-          </View>
-        </>
-      ) : null}
-
-      <RouteTimeField
+      <RouteScheduleSection
         styles={styles}
-        label={isOneTimeRoute ? "Time" : "Departure time"}
-        value={routeDraft.schedule}
-        placeholder={isOneTimeRoute ? "Select time" : "Select departure time"}
-        onPress={() => openTimePicker("schedule")}
+        routeDraft={routeDraft}
+        isOneTimeRoute={isOneTimeRoute}
+        isOneTimeRoundTrip={isOneTimeRoundTrip}
+        onPressDate={openDatePicker}
+        onChangeOneTimeTripType={handleOneTimeTripTypeChange}
+        onPressScheduleTime={() => openTimePicker("schedule")}
+        onPressReturnTime={() => openTimePicker("returnSchedule")}
       />
-      {!isOneTimeRoute || isOneTimeRoundTrip ? (
-        <RouteTimeField
-          styles={styles}
-          label={isOneTimeRoute ? "Return time" : "Arrival time"}
-          value={routeDraft.returnSchedule}
-          placeholder={isOneTimeRoute ? "Select return time" : "Select arrival time"}
-          onPress={() => openTimePicker("returnSchedule")}
-        />
-      ) : null}
       {Platform.OS === "ios" && isDatePickerOpen ? (
         <InlinePickerCard
           styles={styles}
@@ -461,77 +414,19 @@ export function DriverRouteComposerSection({
       ) : null}
 
       {!isOneTimeRoute ? (
-        <>
-          <Label text="Available seats" styles={styles} />
-          <View style={styles.row}>
-            <Pressable style={styles.chip} onPress={() => updateSeatCount(currentSeatCount - 1)}>
-              <Text style={styles.chipText}>-</Text>
-            </Pressable>
-            <View style={styles.chip}>
-              <Text style={styles.chipText}>{currentSeatCount}</Text>
-            </View>
-            <Pressable style={styles.chip} onPress={() => updateSeatCount(currentSeatCount + 1)}>
-              <Text style={styles.chipText}>+</Text>
-            </Pressable>
-          </View>
-
-          <View style={styles.routeComposerDivider} />
-
-          <Label text="Operating days" styles={styles} />
-          <View style={styles.row}>
-            <ToggleChip
-              label="Weekdays"
-              active={isWeekdayPresetActive}
-              onPress={() => applyOperatingDays(WEEKDAY_PRESET)}
-              styles={styles}
-            />
-            <ToggleChip
-              label="Weekend"
-              active={isWeekendPresetActive}
-              onPress={() => applyOperatingDays(WEEKEND_PRESET)}
-              styles={styles}
-            />
-            <ToggleChip
-              label="All week"
-              active={isAllDaysPresetActive}
-              onPress={() => applyOperatingDays(WEEKDAY_OPTIONS)}
-              styles={styles}
-            />
-          </View>
-          <OperatingDaysChips
-            styles={styles}
-            routeDraft={routeDraft}
-            onRouteDraftChange={onRouteDraftChange}
-          />
-
-          <RouteDraftTextField
-            colors={colors}
-            styles={styles}
-            label="AU phone override"
-            optional
-            value={routeDraft.contactPhone}
-            onChangeText={(value) => updateRouteDraft({ contactPhone: value })}
-            placeholder="0412 345 678"
-            keyboardType="phone-pad"
-            returnKeyType="next"
-            blurOnSubmit={false}
-            inputRef={phoneInputRef}
-            onSubmitEditing={() => linkInputRef.current?.focus()}
-          />
-          <RouteDraftTextField
-            colors={colors}
-            styles={styles}
-            label="Open chat link override"
-            optional
-            value={routeDraft.contactLink}
-            onChangeText={(value) => updateRouteDraft({ contactLink: value })}
-            placeholder="https://open.kakao.com/o/..."
-            autoCapitalize="none"
-            autoCorrect={false}
-            returnKeyType="done"
-            inputRef={linkInputRef}
-          />
-        </>
+        <RegularRouteSettingsSection
+          colors={colors}
+          styles={styles}
+          routeDraft={routeDraft}
+          currentSeatCount={currentSeatCount}
+          onDecreaseSeats={() => updateSeatCount(currentSeatCount - 1)}
+          onIncreaseSeats={() => updateSeatCount(currentSeatCount + 1)}
+          onApplyOperatingDays={applyOperatingDays}
+          onRouteDraftChange={onRouteDraftChange}
+          onChangeContactPhone={(value) => updateRouteDraft({ contactPhone: value })}
+          onChangeContactLink={(value) => updateRouteDraft({ contactLink: value })}
+          onSetVisibility={(isPublic) => updateRouteDraft({ isPublic })}
+        />
       ) : null}
       <Text style={styles.cardBody}>
         Optional: add extra instructions or pickup notes for riders.
@@ -551,68 +446,17 @@ export function DriverRouteComposerSection({
         multiline
       />
 
-      {!isOneTimeRoute ? (
-        <>
-          <View style={styles.routeComposerDivider} />
-
-          <Label text="Visibility" styles={styles} />
-          <Text style={styles.cardBody}>
-            {routeDraft.isPublic
-              ? "Public: riders can discover this route."
-              : "Private: hidden from rider search and visible only to you."}
-          </Text>
-          <View style={styles.row}>
-            <ToggleChip
-              label="Public"
-              active={routeDraft.isPublic}
-              onPress={() => updateRouteDraft({ isPublic: true })}
-              styles={styles}
-            />
-            <ToggleChip
-              label="Private"
-              active={!routeDraft.isPublic}
-              onPress={() => updateRouteDraft({ isPublic: false })}
-              styles={styles}
-            />
-          </View>
-        </>
-      ) : null}
-
-      {!isReadyToSave ? (
-        <>
-          <Text style={styles.cardBody}>
-            {isOneTimeRoute
-              ? "Fill required fields to post this one-time notice."
-              : "Fill all required fields to save this registration."}
-          </Text>
-          {remainingRequiredText ? <Text style={styles.cardBody}>{remainingRequiredText}</Text> : null}
-        </>
-      ) : null}
-
-      <Pressable
-        style={[
-          styles.primaryButton,
-          !isReadyToSave || isSubmitting ? styles.primaryButtonDisabled : null,
-        ]}
-        disabled={!isReadyToSave || isSubmitting}
+      <RouteSaveActionSection
+        styles={styles}
+        isOneTimeRoute={isOneTimeRoute}
+        isReadyToSave={isReadyToSave}
+        isSubmitting={isSubmitting}
+        remainingRequiredCount={remainingRequired.length}
+        remainingRequiredText={remainingRequiredText}
         onPress={() => {
           void handlePressSaveRegistration();
         }}
-      >
-        <Text style={styles.primaryButtonText}>
-          {isSubmitting
-            ? isOneTimeRoute
-              ? "Posting one-time notice..."
-              : "Saving registration..."
-            : isReadyToSave
-            ? isOneTimeRoute
-              ? "Post one-time notice"
-              : "Save registration"
-            : `Complete ${remainingRequired.length} required item${
-                remainingRequired.length > 1 ? "s" : ""
-              }`}
-        </Text>
-      </Pressable>
+      />
 
       {Platform.OS === "android" && activeTimeField ? (
         <DateTimePicker
