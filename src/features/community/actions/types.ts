@@ -1,6 +1,6 @@
 import type { AppNotice } from "../../../app/types";
 import type { RouteDraft, RouteKind, RoutePost, VehicleInfo } from "../../../model";
-import type { Filter, MainTab, Mode } from "../types";
+import type { Filter, MainTab, Mode, StateFilter } from "../types";
 
 export type CommunityActionsContext = {
   currentUserId: string;
@@ -15,6 +15,7 @@ export type CommunityActionsContext = {
   vehicleDraft: VehicleInfo;
   setMode: (value: Mode) => void;
   setFilter: (value: Filter) => void;
+  setStateFilter: (value: StateFilter) => void;
   setMainTab: (value: MainTab) => void;
   setRouteDraft: (value: RouteDraft) => void;
   resetAllRouteDrafts: () => void;

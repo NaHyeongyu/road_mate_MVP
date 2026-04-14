@@ -6,7 +6,7 @@ Last updated: 2026-04-13
 - Rider feed/search/detail/save flow
 - Driver regular registration flow
 - Driver one-time notice flow (one-way and round-trip)
-- Driver profile contact propagation (phone/open chat)
+- Driver profile contact propagation (phone/chat link)
 - Visibility and quick settings behavior
 
 ## Preconditions
@@ -18,8 +18,9 @@ Last updated: 2026-04-13
 ## Rider Flow
 - [ ] Rider home defaults to regular feed
 - [ ] Rider can switch between Regular and Notices tabs
-- [ ] Rider search From field shows QLD suggestions and applies selected value
-- [ ] Rider search To field shows QLD suggestions and applies selected value
+- [ ] Rider can filter feed by Australian state selector (QLD/NSW/VIC/WA/SA/TAS/NT/ACT)
+- [ ] Rider search From field shows AU suggestions (QLD/WA/NSW/VIC) and applies selected value
+- [ ] Rider search To field shows AU suggestions (QLD/WA/NSW/VIC) and applies selected value
 - [ ] Rider search clear button resets each field independently
 - [ ] Rider cannot see their own posts in the feed
 - [ ] Rider can open post detail and see route information
@@ -31,11 +32,11 @@ Last updated: 2026-04-13
 
 ## Driver Profile & Contact
 - [ ] Driver profile supports phone number input
-- [ ] Driver profile supports open chat link input
+- [ ] Driver profile supports chat link input (WhatsApp/Kakao/Telegram)
 - [ ] Driver profile save persists after app restart
 - [ ] Profile phone/link is reflected in regular registration preview/card/detail
 - [ ] Profile phone/link is reflected in one-time notice preview/card/detail
-- [ ] Registration save is blocked when both phone and open chat link are empty
+- [ ] Registration save is blocked when both phone and chat link are empty
 
 ## Driver Regular Registration
 - [ ] Driver regular draft requires From, To, departure, arrival, operating days, and contact

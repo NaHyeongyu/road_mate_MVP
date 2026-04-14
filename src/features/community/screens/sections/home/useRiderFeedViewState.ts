@@ -9,14 +9,12 @@ type UseRiderFeedViewStateOptions = {
   filter: RouteKind;
   visiblePosts: RoutePost[];
   currentUserId: string;
-  onFilterChange: (filter: RouteKind) => void;
 };
 
 export function useRiderFeedViewState({
   filter,
   visiblePosts,
   currentUserId,
-  onFilterChange,
 }: UseRiderFeedViewStateOptions) {
   const isNoticeFilter = filter === "one_time";
   const [noticeScope, setNoticeScope] = useState<NoticeScope>("upcoming");
@@ -31,10 +29,6 @@ export function useRiderFeedViewState({
       setNoticeScope("upcoming");
     }
   }, [isNoticeFilter]);
-
-  const handleToggleFeedType = () => {
-    onFilterChange(isNoticeFilter ? "regular" : "one_time");
-  };
 
   const pastNoticeCount = useMemo(() => {
     if (!isNoticeFilter) {
@@ -63,8 +57,6 @@ export function useRiderFeedViewState({
     noticeScope,
     feedPosts,
     pastNoticeCount,
-    showViewNoticesAction: !isNoticeFilter,
     setNoticeScope,
-    handleToggleFeedType,
   };
 }

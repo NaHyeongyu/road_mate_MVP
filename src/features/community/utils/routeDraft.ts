@@ -87,7 +87,7 @@ export const validateRoutePost = (routePost: RoutePost): string | null => {
     }
 
     if (!routePost.contactPhone && !routePost.contactLink) {
-      return "Add at least one contact method in driver profile (phone or open chat link).";
+      return "Add at least one contact method in driver profile (phone or chat link).";
     }
   }
 

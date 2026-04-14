@@ -72,6 +72,7 @@ const createContext = (
   clearCurrentUserStorageMock: ReturnType<typeof vi.fn>;
   setModeMock: ReturnType<typeof vi.fn>;
   setFilterMock: ReturnType<typeof vi.fn>;
+  setStateFilterMock: ReturnType<typeof vi.fn>;
   setMainTabMock: ReturnType<typeof vi.fn>;
   resetAllRouteDraftsMock: ReturnType<typeof vi.fn>;
 } => {
@@ -80,6 +81,7 @@ const createContext = (
   const clearCurrentUserStorageMock = vi.fn(async () => undefined);
   const setModeMock = vi.fn();
   const setFilterMock = vi.fn();
+  const setStateFilterMock = vi.fn();
   const setMainTabMock = vi.fn();
   const resetAllRouteDraftsMock = vi.fn();
 
@@ -96,6 +98,7 @@ const createContext = (
     vehicleDraft: EMPTY_VEHICLE,
     setMode: setModeMock,
     setFilter: setFilterMock,
+    setStateFilter: setStateFilterMock,
     setMainTab: setMainTabMock,
     setRouteDraft: vi.fn(),
     resetAllRouteDrafts: resetAllRouteDraftsMock,
@@ -114,6 +117,7 @@ const createContext = (
     clearCurrentUserStorageMock,
     setModeMock,
     setFilterMock,
+    setStateFilterMock,
     setMainTabMock,
     resetAllRouteDraftsMock,
   };
@@ -195,6 +199,7 @@ describe("createCommunityAccountActions", () => {
 
     expect(ctx.setModeMock).toHaveBeenCalledWith("rider");
     expect(ctx.setFilterMock).toHaveBeenCalledWith("regular");
+    expect(ctx.setStateFilterMock).toHaveBeenCalledWith("ALL");
     expect(ctx.setMainTabMock).toHaveBeenCalledWith("home");
     expect(ctx.resetAllRouteDraftsMock).toHaveBeenCalledTimes(1);
 

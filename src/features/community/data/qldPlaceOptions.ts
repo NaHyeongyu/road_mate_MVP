@@ -264,7 +264,91 @@ const HUB_OPTIONS = [
   "Toowoomba Wellcamp Airport, QLD",
 ];
 
-const QLD_PLACE_OPTIONS_RAW = [
+const WESTERN_AUSTRALIA_OPTIONS = [
+  "Perth CBD, WA",
+  "Northbridge, WA",
+  "East Perth, WA",
+  "West Perth, WA",
+  "Subiaco, WA",
+  "Nedlands, WA",
+  "Crawley, WA",
+  "UWA Crawley, WA",
+  "Leederville, WA",
+  "Mount Lawley, WA",
+  "Victoria Park, WA",
+  "Burswood, WA",
+  "Belmont, WA",
+  "Cannington, WA",
+  "Fremantle, WA",
+  "Joondalup, WA",
+  "Scarborough, WA",
+  "Cottesloe, WA",
+  "Morley, WA",
+  "Midland, WA",
+  "Perth Airport, WA",
+  "Rockingham, WA",
+  "Mandurah, WA",
+];
+
+const SYDNEY_NEW_SOUTH_WALES_OPTIONS = [
+  "Sydney CBD, NSW",
+  "North Sydney, NSW",
+  "Parramatta, NSW",
+  "Chatswood, NSW",
+  "Macquarie Park, NSW",
+  "Epping, NSW",
+  "Ryde, NSW",
+  "Burwood, NSW",
+  "Strathfield, NSW",
+  "Ashfield, NSW",
+  "Newtown, NSW",
+  "Redfern, NSW",
+  "Surry Hills, NSW",
+  "Bondi Junction, NSW",
+  "Bondi Beach, NSW",
+  "Randwick, NSW",
+  "Kingsford, NSW",
+  "Mascot, NSW",
+  "Sydney Airport, NSW",
+  "Hurstville, NSW",
+  "Kogarah, NSW",
+  "Bankstown, NSW",
+  "Liverpool, NSW",
+  "Blacktown, NSW",
+  "Sydney Olympic Park, NSW",
+  "Manly, NSW",
+  "Cronulla, NSW",
+];
+
+const MELBOURNE_VICTORIA_OPTIONS = [
+  "Melbourne CBD, VIC",
+  "Docklands, VIC",
+  "Southbank, VIC",
+  "South Melbourne, VIC",
+  "Carlton, VIC",
+  "Fitzroy, VIC",
+  "Richmond, VIC",
+  "South Yarra, VIC",
+  "St Kilda, VIC",
+  "Footscray, VIC",
+  "Sunshine, VIC",
+  "Moonee Ponds, VIC",
+  "Brunswick, VIC",
+  "Coburg, VIC",
+  "Northcote, VIC",
+  "Preston, VIC",
+  "Box Hill, VIC",
+  "Glen Waverley, VIC",
+  "Clayton, VIC",
+  "Monash University Clayton, VIC",
+  "Dandenong, VIC",
+  "Werribee, VIC",
+  "Frankston, VIC",
+  "Melbourne Airport, VIC",
+  "Geelong, VIC",
+];
+
+const AU_PLACE_OPTIONS_RAW = [
   ...BRISBANE_INNER_OPTIONS,
   ...BRISBANE_OUTER_OPTIONS,
   ...LOGAN_IPSWICH_MORETON_OPTIONS,
@@ -274,8 +358,13 @@ const QLD_PLACE_OPTIONS_RAW = [
   ...CENTRAL_WIDE_BAY_OPTIONS,
   ...NORTH_FAR_NORTH_OPTIONS,
   ...HUB_OPTIONS,
+  ...WESTERN_AUSTRALIA_OPTIONS,
+  ...SYDNEY_NEW_SOUTH_WALES_OPTIONS,
+  ...MELBOURNE_VICTORIA_OPTIONS,
 ];
 
-export const QLD_PLACE_OPTIONS = Array.from(new Set(QLD_PLACE_OPTIONS_RAW)).sort((left, right) =>
+export const AU_PLACE_OPTIONS = Array.from(new Set(AU_PLACE_OPTIONS_RAW)).sort((left, right) =>
   left.localeCompare(right, "en-AU")
 );
+
+export const QLD_PLACE_OPTIONS = AU_PLACE_OPTIONS;

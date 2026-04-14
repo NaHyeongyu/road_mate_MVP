@@ -2,7 +2,7 @@ import { useCallback, useState } from "react";
 
 import type { AppNotice } from "../../../app/types";
 import { EMPTY_ROUTE_DRAFT, type RouteDraft } from "../../../model";
-import type { Filter, MainTab, Mode } from "../types";
+import type { Filter, MainTab, Mode, StateFilter } from "../types";
 
 const EMPTY_NOTICE: AppNotice = { tone: "info", text: "" };
 const EMPTY_REGULAR_ROUTE_DRAFT: RouteDraft = {
@@ -23,6 +23,7 @@ const EMPTY_ONE_TIME_ROUTE_DRAFT: RouteDraft = {
 export function useCommunityUiState() {
   const [mode, setMode] = useState<Mode>("rider");
   const [filter, setFilter] = useState<Filter>("regular");
+  const [stateFilter, setStateFilter] = useState<StateFilter>("ALL");
   const [mainTab, setMainTab] = useState<MainTab>("home");
   const [fromSearchQuery, setFromSearchQuery] = useState("");
   const [toSearchQuery, setToSearchQuery] = useState("");
@@ -44,6 +45,8 @@ export function useCommunityUiState() {
     setMode,
     filter,
     setFilter,
+    stateFilter,
+    setStateFilter,
     mainTab,
     setMainTab,
     fromSearchQuery,

@@ -1,13 +1,15 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { RefObject } from "react";
 import { Keyboard } from "react-native";
 import type { TextInput } from "react-native";
 
-import { getQldPlaceSuggestions } from "../../../utils/placeQuickSearch";
+import { usePlaceSuggestions } from "../../../hooks/usePlaceSuggestions";
+import type { StateFilter } from "../../../types";
 
 type SearchField = "from" | "to";
 
 type UseRiderSearchSuggestionsOptions = {
+  stateFilter: StateFilter;
   fromSearchQuery: string;
   toSearchQuery: string;
   toInputRef: RefObject<TextInput | null>;
@@ -16,6 +18,7 @@ type UseRiderSearchSuggestionsOptions = {
 };
 
 export function useRiderSearchSuggestions({
+  stateFilter,
   fromSearchQuery,
   toSearchQuery,
   toInputRef,
@@ -25,11 +28,8 @@ export function useRiderSearchSuggestions({
   const blurTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [activeField, setActiveField] = useState<SearchField | null>(null);
 
-  const fromSuggestions = useMemo(
-    () => getQldPlaceSuggestions(fromSearchQuery),
-    [fromSearchQuery]
-  );
-  const toSuggestions = useMemo(() => getQldPlaceSuggestions(toSearchQuery), [toSearchQuery]);
+  const fromSuggestions = usePlaceSuggestions(fromSearchQuery, 8, stateFilter);
+  const toSuggestions = usePlaceSuggestions(toSearchQuery, 8, stateFilter);
 
   const showFromSuggestions =
     activeField === "from" && fromSearchQuery.trim().length > 0 && fromSuggestions.length > 0;

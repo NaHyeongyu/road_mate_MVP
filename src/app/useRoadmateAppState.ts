@@ -1,9 +1,11 @@
+import { useMemo } from "react";
 import { deriveDisplayName } from "../features/auth/utils/authHelpers";
 import { useAuthFlow } from "../features/auth/hooks/useAuthFlow";
 import { useCommunityActions } from "../features/community/hooks/useCommunityActions";
 import { useCommunityCollections } from "../features/community/hooks/useCommunityCollections";
 import { useCommunityUiState } from "../features/community/hooks/useCommunityUiState";
 import { useUserCommunityStorageState } from "../features/community/hooks/useUserCommunityStorageState";
+import type { FetchRoutePostsQuery } from "../features/community/data/routePostRepository";
 import { isSupabaseConfigured } from "../lib/supabase";
 import { useDriverRouteDraftState } from "./hooks/useDriverRouteDraftState";
 import { useSavedPostKeysCleanup } from "./hooks/useSavedPostKeysCleanup";
@@ -16,6 +18,8 @@ export function useRoadmateAppState() {
     setMode,
     filter,
     setFilter,
+    stateFilter,
+    setStateFilter,
     mainTab,
     setMainTab,
     fromSearchQuery,
@@ -37,8 +41,26 @@ export function useRoadmateAppState() {
   });
   const currentUser = authSession?.user ?? null;
   const currentUserId = currentUser?.id ?? "";
+  const isRiderSearchReady = Boolean(
+    (fromSearchQuery.trim() && toSearchQuery.trim()) || stateFilter !== "ALL"
+  );
+  const remoteQuery = useMemo<FetchRoutePostsQuery | undefined>(() => {
+    if (mode !== "rider" || mainTab !== "home" || !isRiderSearchReady) {
+      return undefined;
+    }
+
+    return {
+      kind: filter,
+      stateFilter,
+      fromQuery: fromSearchQuery,
+      toQuery: toSearchQuery,
+    };
+  }, [filter, fromSearchQuery, isRiderSearchReady, mainTab, mode, stateFilter, toSearchQuery]);
+  const shouldSyncRemotePosts = mode === "driver" || isRiderSearchReady;
   const { storedPosts, isPostsLoading, persistPosts } = useStoredPostsState({
     currentUserId,
+    shouldSyncRemotePosts,
+    remoteQuery,
     onLoadError: handleLoadError,
   });
 
@@ -75,6 +97,7 @@ export function useRoadmateAppState() {
   const { myPosts, savedPostKeySet, savedPosts, visiblePosts } = useCommunityCollections({
     currentUserId,
     filter,
+    stateFilter,
     fromSearchQuery,
     toSearchQuery,
     storedPosts,
@@ -110,6 +133,7 @@ export function useRoadmateAppState() {
     vehicleDraft,
     setMode,
     setFilter,
+    setStateFilter,
     setMainTab,
     setRouteDraft,
     resetAllRouteDrafts,
@@ -150,6 +174,7 @@ export function useRoadmateAppState() {
     currentUserId,
     currentUserName,
     filter,
+    stateFilter,
     fromSearchQuery,
     hasVehicle,
     hasDriverContactMethod,
@@ -180,6 +205,7 @@ export function useRoadmateAppState() {
     setAuthPassword,
     setAuthDisplayName,
     setFilter,
+    setStateFilter,
     setFromSearchQuery,
     setMainTab,
     setNotice,

@@ -1,3 +1,4 @@
+import { useCallback, useEffect, useState } from "react";
 import { ScrollView, StatusBar, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -8,7 +9,7 @@ import { APP_BAR_BG } from "../../../ui/styleFragments/layout/constants";
 import type { AppStyles } from "../../../ui/types";
 import { NoticeBanner } from "../../shared/components/NoticeBanner";
 import { ScreenHeader } from "../../shared/components/ScreenHeader";
-import type { MainTab, Mode } from "../types";
+import type { MainTab, Mode, StateFilter } from "../types";
 import { RoleModeToggle } from "../components/RoleModeToggle";
 import { useDriverRegistrationPageState } from "./useDriverRegistrationPageState";
 import { CommunityBottomBar } from "./sections/CommunityBottomBar";
@@ -25,6 +26,7 @@ export type CommunityHomeScreenProps = {
   mainTab: MainTab;
   mode: Mode;
   filter: RouteKind;
+  stateFilter: StateFilter;
   fromSearchQuery: string;
   toSearchQuery: string;
   visiblePosts: RoutePost[];
@@ -41,6 +43,7 @@ export type CommunityHomeScreenProps = {
   onMainTabChange: (tab: MainTab) => void;
   onModeChange: (mode: Mode) => void;
   onFilterChange: (filter: RouteKind) => void;
+  onStateFilterChange: (value: StateFilter) => void;
   onFromSearchQueryChange: (value: string) => void;
   onToSearchQueryChange: (value: string) => void;
   onVehicleDraftChange: (draft: VehicleInfo) => void;
@@ -66,6 +69,7 @@ export function CommunityHomeScreen({
   mainTab,
   mode,
   filter,
+  stateFilter,
   fromSearchQuery,
   toSearchQuery,
   visiblePosts,
@@ -82,6 +86,7 @@ export function CommunityHomeScreen({
   onMainTabChange,
   onModeChange,
   onFilterChange,
+  onStateFilterChange,
   onFromSearchQueryChange,
   onToSearchQueryChange,
   onVehicleDraftChange,
@@ -95,6 +100,15 @@ export function CommunityHomeScreen({
   const insets = useSafeAreaInsets();
   const bottomInset = Math.max(insets.bottom, 8);
   const isRiderMode = mode === "rider";
+  const [isRiderSearchResultsPageVisible, setIsRiderSearchResultsPageVisible] = useState(false);
+  const openRiderSearchResultsPage = useCallback(() => {
+    setIsRiderSearchResultsPageVisible(true);
+  }, []);
+  const closeRiderSearchResultsPage = useCallback(() => {
+    setIsRiderSearchResultsPageVisible(false);
+  }, []);
+  const isSearchDetailScreen =
+    isRiderMode && mainTab === "home" && isRiderSearchResultsPageVisible;
   const {
     isDriverRegistrationPageVisible,
     activeDriverRouteKind,
@@ -111,6 +125,12 @@ export function CommunityHomeScreen({
     onRouteDraftChange,
     onPostRoute,
   });
+
+  useEffect(() => {
+    if (!isRiderMode || mainTab !== "home") {
+      closeRiderSearchResultsPage();
+    }
+  }, [closeRiderSearchResultsPage, isRiderMode, mainTab]);
 
   if (isDriverRegistrationPageVisible) {
     return (
@@ -161,16 +181,35 @@ export function CommunityHomeScreen({
   return (
     <View style={styles.screen}>
       <StatusBar barStyle="dark-content" backgroundColor={colors.panelAlt} translucent={false} />
-      <View
-        style={[
-          styles.roleToggleTop,
-          {
-            paddingTop: insets.top + 10,
-          },
-        ]}
-      >
-        <RoleModeToggle mode={mode} onChangeMode={onModeChange} styles={styles} />
-      </View>
+      {isSearchDetailScreen ? (
+        <View
+          style={[
+            styles.headerDock,
+            {
+              paddingTop: insets.top + 6,
+            },
+          ]}
+        >
+          <ScreenHeader
+            title="Search results"
+            leftActionType="back"
+            leftActionLabel="Back"
+            onLeftActionPress={closeRiderSearchResultsPage}
+            styles={styles}
+          />
+        </View>
+      ) : (
+        <View
+          style={[
+            styles.roleToggleTop,
+            {
+              paddingTop: insets.top + 10,
+            },
+          ]}
+        >
+          <RoleModeToggle mode={mode} onChangeMode={onModeChange} styles={styles} />
+        </View>
+      )}
 
       <ScrollView
         style={styles.screenScroll}
@@ -187,6 +226,7 @@ export function CommunityHomeScreen({
           mainTab={mainTab}
           mode={mode}
           filter={filter}
+          stateFilter={stateFilter}
           fromSearchQuery={fromSearchQuery}
           toSearchQuery={toSearchQuery}
           visiblePosts={visiblePosts}
@@ -201,6 +241,7 @@ export function CommunityHomeScreen({
           onSignOut={onSignOut}
           onWithdrawAccount={onWithdrawAccount}
           onFilterChange={onFilterChange}
+          onStateFilterChange={onStateFilterChange}
           onFromSearchQueryChange={onFromSearchQueryChange}
           onToSearchQueryChange={onToSearchQueryChange}
           onVehicleDraftChange={onVehicleDraftChange}
@@ -211,17 +252,22 @@ export function CommunityHomeScreen({
           onOpenDriverRegistrationPage={openDriverRegistrationPage}
           onRemoveRoute={onRemoveRoute}
           onToggleSavedPost={onToggleSavedPost}
+          isRiderSearchResultsPageVisible={isRiderSearchResultsPageVisible}
+          onOpenRiderSearchResultsPage={openRiderSearchResultsPage}
+          onCloseRiderSearchResultsPage={closeRiderSearchResultsPage}
         />
       </ScrollView>
 
-      <CommunityBottomBar
-        colors={colors}
-        styles={styles}
-        mainTab={mainTab}
-        isRiderMode={isRiderMode}
-        bottomInset={bottomInset}
-        onMainTabChange={onMainTabChange}
-      />
+      {!isSearchDetailScreen ? (
+        <CommunityBottomBar
+          colors={colors}
+          styles={styles}
+          mainTab={mainTab}
+          isRiderMode={isRiderMode}
+          bottomInset={bottomInset}
+          onMainTabChange={onMainTabChange}
+        />
+      ) : null}
     </View>
   );
 }

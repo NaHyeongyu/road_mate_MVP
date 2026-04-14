@@ -126,7 +126,7 @@ export function RoutePostDetailModal({
 
             {detailNote ? (
               <View style={styles.postSummaryRow}>
-                <Text style={styles.postSummaryText}>Additional details</Text>
+                <Text style={styles.postSummaryText}>Note</Text>
                 <Text style={styles.postNote}>{detailNote}</Text>
               </View>
             ) : null}

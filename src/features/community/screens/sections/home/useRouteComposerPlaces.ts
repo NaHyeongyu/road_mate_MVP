@@ -1,9 +1,9 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { RefObject } from "react";
 import type { TextInput } from "react-native";
 
 import type { RouteDraft } from "../../../../../model";
-import { getQldPlaceSuggestions } from "../../../utils/placeQuickSearch";
+import { usePlaceSuggestions } from "../../../hooks/usePlaceSuggestions";
 
 type PlaceField = "from" | "to";
 
@@ -23,8 +23,8 @@ export function useRouteComposerPlaces({
   const blurTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [activePlaceField, setActivePlaceField] = useState<PlaceField | null>(null);
 
-  const fromSuggestions = useMemo(() => getQldPlaceSuggestions(routeDraft.from), [routeDraft.from]);
-  const toSuggestions = useMemo(() => getQldPlaceSuggestions(routeDraft.to), [routeDraft.to]);
+  const fromSuggestions = usePlaceSuggestions(routeDraft.from);
+  const toSuggestions = usePlaceSuggestions(routeDraft.to);
 
   const showFromSuggestions =
     activePlaceField === "from" && routeDraft.from.trim().length > 0 && fromSuggestions.length > 0;

@@ -20,6 +20,39 @@ type RouteTemplate = {
 
 const BASE_CREATED_AT = Date.parse("2026-03-10T05:00:00.000Z");
 const REGULAR_WAVE_OFFSETS = [0, 8, 16];
+const REGULAR_PICKUP_NOTES = [
+  "Pickup is handled at marked public meeting points only.",
+  "Driver waits up to 5 minutes at the first pickup before departure.",
+  "Best boarding point is usually near the main station entrance.",
+  "Short stop windows keep this route close to the planned timetable.",
+  "Message 10 minutes early if your boarding point needs confirmation.",
+  "Priority is given to riders with fixed weekday commute schedules.",
+];
+const REGULAR_LUGGAGE_NOTES = [
+  "Cabin-size luggage and backpacks are welcome.",
+  "Foldable items are preferred on busy weekdays.",
+  "Large luggage should be coordinated in advance.",
+  "One medium bag per rider keeps loading smooth.",
+  "Sports gear is fine when noted before departure.",
+  "Extra cargo requests are accepted when seats remain available.",
+];
+const REGULAR_WAVE_DETAILS = [
+  "Wave 1 keeps the base schedule for consistent repeat riders.",
+  "Wave 2 targets station transfer windows with slightly shifted timing.",
+  "Wave 3 adds a small buffer for late platform arrivals.",
+];
+
+const buildRegularMockDescription = (
+  templateNote: string,
+  templateIndex: number,
+  waveIndex: number
+) => {
+  const pickupNote = REGULAR_PICKUP_NOTES[templateIndex % REGULAR_PICKUP_NOTES.length];
+  const luggageNote =
+    REGULAR_LUGGAGE_NOTES[(templateIndex + waveIndex) % REGULAR_LUGGAGE_NOTES.length];
+  const waveNote = REGULAR_WAVE_DETAILS[waveIndex] ?? `Wave ${waveIndex + 1} timing profile.`;
+  return `${templateNote} ${pickupNote} ${luggageNote} ${waveNote}`;
+};
 
 const QLD_DRIVERS: SeedDriver[] = [
   {
@@ -459,7 +492,7 @@ const regularSeedPosts = QLD_REGULAR_TEMPLATES.flatMap((template, templateIndex)
       ...template,
       schedule: shiftTime(template.schedule, offsetMinutes),
       returnSchedule: shiftTime(template.returnSchedule, offsetMinutes),
-      note: `${template.note} Wave ${waveIndex + 1}.`,
+      note: buildRegularMockDescription(template.note, templateIndex, waveIndex),
     };
 
     return buildSeedPost(

@@ -3,11 +3,13 @@ import { useMemo } from "react";
 import type { RoutePost } from "../../../model";
 import { SEED_POSTS } from "../../../seed";
 import { getPostSaveKey, sortByNewest } from "../utils/storage";
-import type { Filter } from "../types";
+import { matchesRoutePostStateFilter } from "../utils/stateFilter";
+import type { Filter, StateFilter } from "../types";
 
 type UseCommunityCollectionsArgs = {
   currentUserId: string;
   filter: Filter;
+  stateFilter: StateFilter;
   fromSearchQuery: string;
   toSearchQuery: string;
   storedPosts: RoutePost[];
@@ -51,9 +53,41 @@ const toNoticeTimestamp = (post: RoutePost) => {
   return Number.isFinite(createdAt) ? createdAt : 0;
 };
 
+const toLocationPriority = ({
+  post,
+  normalizedFromQuery,
+  normalizedToQuery,
+}: {
+  post: RoutePost;
+  normalizedFromQuery: string;
+  normalizedToQuery: string;
+}) => {
+  const fromQueryExists = Boolean(normalizedFromQuery);
+  const toQueryExists = Boolean(normalizedToQuery);
+  const normalizedPostFrom = normalizeQuery(post.from);
+  const normalizedPostTo = normalizeQuery(post.to);
+  const isFromExact = fromQueryExists && normalizedPostFrom === normalizedFromQuery;
+  const isToExact = toQueryExists && normalizedPostTo === normalizedToQuery;
+
+  if (isFromExact && isToExact) {
+    return 0;
+  }
+
+  if (isFromExact) {
+    return 1;
+  }
+
+  if (isToExact) {
+    return 2;
+  }
+
+  return 3;
+};
+
 export function useCommunityCollections({
   currentUserId,
   filter,
+  stateFilter,
   fromSearchQuery,
   toSearchQuery,
   storedPosts,
@@ -71,6 +105,11 @@ export function useCommunityCollections({
   const savedPostKeySet = useMemo(() => new Set(savedPostKeys), [savedPostKeys]);
   const fromTokens = useMemo(() => toTokens(fromSearchQuery), [fromSearchQuery]);
   const toTokensQuery = useMemo(() => toTokens(toSearchQuery), [toSearchQuery]);
+  const normalizedFromQuery = useMemo(() => normalizeQuery(fromSearchQuery), [fromSearchQuery]);
+  const normalizedToQuery = useMemo(() => normalizeQuery(toSearchQuery), [toSearchQuery]);
+  const hasPairSearch = fromTokens.length > 0 && toTokensQuery.length > 0;
+  const hasStateFilter = stateFilter !== "ALL";
+  const isSearchReady = hasPairSearch || hasStateFilter;
 
   const savedPosts = useMemo(
     () =>
@@ -82,12 +121,20 @@ export function useCommunityCollections({
 
   const visiblePosts = useMemo(
     () => {
+      if (!isSearchReady) {
+        return [];
+      }
+
       const filtered = allPosts.filter((post) => {
         if (post.kind !== filter) {
           return false;
         }
 
         if (!isVisibleToUser(post, currentUserId)) {
+          return false;
+        }
+
+        if (!matchesRoutePostStateFilter(post, stateFilter)) {
           return false;
         }
 
@@ -99,20 +146,45 @@ export function useCommunityCollections({
         const matchesTo = matchesTokens(post.to, toTokensQuery);
         return matchesTo;
       });
-      if (filter !== "one_time") {
-        return filtered;
-      }
-
       return [...filtered].sort((left, right) => {
-        const timestampDiff = toNoticeTimestamp(right) - toNoticeTimestamp(left);
-        if (timestampDiff !== 0) {
-          return timestampDiff;
+        const leftPriority = toLocationPriority({
+          post: left,
+          normalizedFromQuery,
+          normalizedToQuery,
+        });
+        const rightPriority = toLocationPriority({
+          post: right,
+          normalizedFromQuery,
+          normalizedToQuery,
+        });
+        const priorityDiff = leftPriority - rightPriority;
+        if (priorityDiff !== 0) {
+          return priorityDiff;
         }
 
-        return right.createdAt.localeCompare(left.createdAt);
+        if (filter === "one_time") {
+          const timestampDiff = toNoticeTimestamp(right) - toNoticeTimestamp(left);
+          if (timestampDiff !== 0) {
+            return timestampDiff;
+          }
+
+          return right.createdAt.localeCompare(left.createdAt);
+        }
+
+        return 0;
       });
     },
-    [allPosts, currentUserId, filter, fromTokens, toTokensQuery]
+    [
+      allPosts,
+      currentUserId,
+      filter,
+      fromTokens,
+      isSearchReady,
+      normalizedFromQuery,
+      normalizedToQuery,
+      stateFilter,
+      toTokensQuery,
+    ]
   );
 
   return {

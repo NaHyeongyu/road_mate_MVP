@@ -45,7 +45,7 @@ export function DriverGarageSection({
         value={vehicleDraft.plate}
         onChangeText={(value) => onVehicleDraftChange({ ...vehicleDraft, plate: value })}
         autoCapitalize="characters"
-        placeholder="QLD 123AB"
+        placeholder="NSW 123AB"
         placeholderTextColor={colors.subtext}
         style={styles.input}
       />
@@ -70,11 +70,11 @@ export function DriverGarageSection({
         style={styles.input}
       />
 
-      <Label text="Open chat link" optional styles={styles} />
+      <Label text="Chat link (WhatsApp/Kakao/Telegram)" optional styles={styles} />
       <TextInput
         value={vehicleDraft.contactLink}
         onChangeText={(value) => onVehicleDraftChange({ ...vehicleDraft, contactLink: value })}
-        placeholder="https://open.kakao.com/o/..."
+        placeholder="https://wa.me/61412345678"
         placeholderTextColor={colors.subtext}
         autoCapitalize="none"
         autoCorrect={false}

@@ -1,31 +1,36 @@
 import { isSupabaseConfigured, supabase } from "../../../lib/supabase";
+import type { Database } from "../../../lib/database.types";
 import type { RouteKind, RoutePost } from "../../../model";
+import { STATE_SEARCH_ALIASES } from "./australianStates";
+import type { StateFilter } from "../types";
 import { sortByNewest } from "../utils/storage";
 
 const ROUTE_POSTS_TABLE = "route_posts";
+const ROUTE_POSTS_SELECT =
+  "id,kind,notice_date,from_location,to_location,schedule,return_schedule,available_seats,operating_days,contact_phone,contact_link,note,vehicle_model,vehicle_plate,owner_user_id,owner_name,is_public,created_at";
 
-type RoutePostRecord = {
-  id: string;
-  kind: RouteKind;
-  notice_date: string | null;
-  from_location: string;
-  to_location: string;
-  schedule: string;
-  return_schedule: string | null;
-  available_seats: number;
-  operating_days: string[];
-  contact_phone: string | null;
-  contact_link: string | null;
-  note: string;
-  vehicle_model: string;
-  vehicle_plate: string;
-  owner_user_id: string;
-  owner_name: string;
-  is_public: boolean;
-  created_at: string;
+type RoutePostRecord = Database["public"]["Tables"]["route_posts"]["Row"];
+type RoutePostRecordInsert = Database["public"]["Tables"]["route_posts"]["Insert"];
+
+export type FetchRoutePostsQuery = {
+  kind?: RouteKind;
+  stateFilter?: StateFilter;
+  fromQuery?: string;
+  toQuery?: string;
 };
 
 const MAX_SEATS = 8;
+
+const normalizeQuery = (value: string) =>
+  value
+    .toLowerCase()
+    .replace(/[^a-z0-9\s]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+
+const tokenizeQuery = (value: string) => normalizeQuery(value).split(" ").filter(Boolean);
+
+const escapeLikeToken = (value: string) => value.replace(/[%_]/g, "\\$&");
 
 const normalizeOperatingDays = (value: unknown) =>
   Array.isArray(value)
@@ -86,7 +91,7 @@ const toRoutePost = (record: Partial<RoutePostRecord>): RoutePost | null => {
   };
 };
 
-const toRoutePostRecord = (post: RoutePost): RoutePostRecord => ({
+const toRoutePostRecord = (post: RoutePost): RoutePostRecordInsert => ({
   id: post.id,
   kind: post.kind,
   notice_date: post.kind === "one_time" ? post.noticeDate?.trim() || null : null,
@@ -107,29 +112,69 @@ const toRoutePostRecord = (post: RoutePost): RoutePostRecord => ({
   created_at: post.createdAt,
 });
 
+const hasRemoteFilterQuery = (query: FetchRoutePostsQuery) =>
+  Boolean(
+    query.kind ||
+      (query.stateFilter && query.stateFilter !== "ALL") ||
+      query.fromQuery?.trim() ||
+      query.toQuery?.trim()
+  );
+
 export const isRoutePostRepositoryEnabled = () => isSupabaseConfigured && Boolean(supabase);
 
 export const getDefaultRoutePostId = (ownerUserId: string, kind: RouteKind) =>
   `${ownerUserId}:${kind}`;
 
-export const fetchRoutePostsFromDb = async (): Promise<RoutePost[]> => {
+export const fetchRoutePostsFromDb = async (
+  query: FetchRoutePostsQuery = {}
+): Promise<RoutePost[]> => {
   if (!supabase) {
     return [];
   }
 
-  const { data, error } = await supabase
+  let dbQuery = supabase
     .from(ROUTE_POSTS_TABLE)
-    .select("*")
+    .select(ROUTE_POSTS_SELECT)
     .order("created_at", { ascending: false });
+
+  if (query.kind) {
+    dbQuery = dbQuery.eq("kind", query.kind);
+  }
+
+  if (query.stateFilter && query.stateFilter !== "ALL") {
+    const aliases = STATE_SEARCH_ALIASES[query.stateFilter];
+    const stateConditions = aliases
+      .flatMap((alias) => {
+        const token = escapeLikeToken(alias);
+        return [`from_location.ilike.%${token}%`, `to_location.ilike.%${token}%`];
+      })
+      .join(",");
+    dbQuery = dbQuery.or(stateConditions);
+  }
+
+  const fromTokens = tokenizeQuery(query.fromQuery ?? "");
+  for (const token of fromTokens) {
+    dbQuery = dbQuery.ilike("from_location", `%${escapeLikeToken(token)}%`);
+  }
+
+  const toTokens = tokenizeQuery(query.toQuery ?? "");
+  for (const token of toTokens) {
+    dbQuery = dbQuery.ilike("to_location", `%${escapeLikeToken(token)}%`);
+  }
+
+  const { data, error } = await dbQuery;
   if (error) {
     throw error;
   }
 
   return sortByNewest((data ?? []).flatMap((record) => {
-    const mapped = toRoutePost(record as Partial<RoutePostRecord>);
+    const mapped = toRoutePost(record);
     return mapped ? [mapped] : [];
   }));
 };
+
+export const shouldSkipRoutePostsCacheWrite = (query: FetchRoutePostsQuery = {}) =>
+  hasRemoteFilterQuery(query);
 
 export const upsertRoutePostInDb = async (post: RoutePost): Promise<RoutePost> => {
   if (!supabase) {
@@ -140,13 +185,13 @@ export const upsertRoutePostInDb = async (post: RoutePost): Promise<RoutePost> =
   const { data, error } = await supabase
     .from(ROUTE_POSTS_TABLE)
     .upsert(record, { onConflict: "owner_user_id,kind" })
-    .select("*")
+    .select(ROUTE_POSTS_SELECT)
     .single();
   if (error) {
     throw error;
   }
 
-  const mapped = toRoutePost(data as Partial<RoutePostRecord>);
+  const mapped = toRoutePost(data);
   return mapped ?? post;
 };
 
@@ -190,7 +235,7 @@ export const updateRouteQuickSettingsInDb = async ({
     })
     .eq("id", routeId)
     .eq("owner_user_id", ownerUserId)
-    .select("*")
+    .select(ROUTE_POSTS_SELECT)
     .maybeSingle();
   if (error) {
     throw error;
@@ -200,7 +245,7 @@ export const updateRouteQuickSettingsInDb = async ({
     return null;
   }
 
-  return toRoutePost(data as Partial<RoutePostRecord>);
+  return toRoutePost(data);
 };
 
 export const deleteMyRoutePostsInDb = async (ownerUserId: string) => {

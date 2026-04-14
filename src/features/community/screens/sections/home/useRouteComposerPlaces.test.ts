@@ -44,7 +44,7 @@ describe("useRouteComposerPlaces", () => {
 
     const { result } = renderHook(() =>
       useRouteComposerPlaces({
-        routeDraft: createDraft({ from: "bris" }),
+        routeDraft: createDraft({ from: "syd" }),
         toInputRef,
         onPatchDraft,
         onCompleteDestination,
@@ -69,7 +69,7 @@ describe("useRouteComposerPlaces", () => {
 
     const { result } = renderHook(() =>
       useRouteComposerPlaces({
-        routeDraft: createDraft({ from: "bris" }),
+        routeDraft: createDraft({ from: "syd" }),
         toInputRef,
         onPatchDraft,
         onCompleteDestination,
@@ -77,10 +77,10 @@ describe("useRouteComposerPlaces", () => {
     );
 
     act(() => {
-      result.current.handleSelectFromSuggestion("Brisbane CBD, QLD");
+      result.current.handleSelectFromSuggestion("Sydney CBD, NSW");
     });
 
-    expect(onPatchDraft).toHaveBeenCalledWith({ from: "Brisbane CBD, QLD" });
+    expect(onPatchDraft).toHaveBeenCalledWith({ from: "Sydney CBD, NSW" });
     expect(focus).toHaveBeenCalledTimes(1);
   });
 
@@ -91,7 +91,7 @@ describe("useRouteComposerPlaces", () => {
 
     const { result } = renderHook(() =>
       useRouteComposerPlaces({
-        routeDraft: createDraft({ from: "bris" }),
+        routeDraft: createDraft({ from: "syd" }),
         toInputRef,
         onPatchDraft,
         onCompleteDestination,
@@ -118,7 +118,7 @@ describe("useRouteComposerPlaces", () => {
 
     const { result } = renderHook(() =>
       useRouteComposerPlaces({
-        routeDraft: createDraft({ to: "st" }),
+        routeDraft: createDraft({ to: "melb" }),
         toInputRef,
         onPatchDraft,
         onCompleteDestination,
@@ -127,10 +127,10 @@ describe("useRouteComposerPlaces", () => {
 
     act(() => {
       result.current.handleToFocus();
-      result.current.handleSelectToSuggestion("St Lucia, QLD");
+      result.current.handleSelectToSuggestion("Melbourne CBD, VIC");
     });
 
-    expect(onPatchDraft).toHaveBeenCalledWith({ to: "St Lucia, QLD" });
+    expect(onPatchDraft).toHaveBeenCalledWith({ to: "Melbourne CBD, VIC" });
     expect(onCompleteDestination).toHaveBeenCalledTimes(1);
     expect(result.current.showToSuggestions).toBe(false);
   });

@@ -2,8 +2,10 @@ import { useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import {
+  type FetchRoutePostsQuery,
   fetchRoutePostsFromDb,
   isRoutePostRepositoryEnabled,
+  shouldSkipRoutePostsCacheWrite,
 } from "../../features/community/data/routePostRepository";
 import {
   POSTS_KEY,
@@ -16,10 +18,17 @@ import type { AppNotice } from "../types";
 
 type UseStoredPostsStateOptions = {
   currentUserId: string;
+  shouldSyncRemotePosts: boolean;
+  remoteQuery?: FetchRoutePostsQuery;
   onLoadError: (notice: AppNotice) => void;
 };
 
-export function useStoredPostsState({ currentUserId, onLoadError }: UseStoredPostsStateOptions) {
+export function useStoredPostsState({
+  currentUserId,
+  shouldSyncRemotePosts,
+  remoteQuery,
+  onLoadError,
+}: UseStoredPostsStateOptions) {
   const [storedPosts, setStoredPosts] = useState<RoutePost[]>([]);
   const [isPostsLoading, setIsPostsLoading] = useState(true);
 
@@ -49,13 +58,15 @@ export function useStoredPostsState({ currentUserId, onLoadError }: UseStoredPos
       }
 
       try {
-        const remotePosts = await fetchRoutePostsFromDb();
+        const remotePosts = await fetchRoutePostsFromDb(remoteQuery);
         if (cancelled) {
           return true;
         }
 
         setStoredPosts(remotePosts);
-        await syncCache(remotePosts);
+        if (!shouldSkipRoutePostsCacheWrite(remoteQuery)) {
+          await syncCache(remotePosts);
+        }
         return true;
       } catch (error) {
         if (!cancelled && showErrorNotice) {
@@ -71,6 +82,10 @@ export function useStoredPostsState({ currentUserId, onLoadError }: UseStoredPos
     const hydratePosts = async () => {
       try {
         await hydrateLocalPosts();
+        if (!shouldSyncRemotePosts) {
+          return;
+        }
+
         const didSyncRemote = await refreshRemotePosts(true);
         if (didSyncRemote && supabase) {
           const supabaseClient = supabase;
@@ -113,7 +128,7 @@ export function useStoredPostsState({ currentUserId, onLoadError }: UseStoredPos
       cancelled = true;
       releaseRemoteSubscription?.();
     };
-  }, [currentUserId, onLoadError]);
+  }, [currentUserId, onLoadError, remoteQuery, shouldSyncRemotePosts]);
 
   const persistPosts = async (nextPosts: RoutePost[]) => {
     const normalizedPosts = sortByNewest(nextPosts);

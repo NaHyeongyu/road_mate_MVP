@@ -1,5 +1,5 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import type { RefObject } from "react";
+import type { ComponentProps, RefObject } from "react";
 import { Pressable, Text, TextInput, View } from "react-native";
 
 import type { AppColors } from "../../../../../brandTheme";
@@ -9,6 +9,7 @@ type RiderSearchFieldProps = {
   colors: AppColors;
   styles: AppStyles;
   label: string;
+  leadingIconName?: ComponentProps<typeof MaterialCommunityIcons>["name"];
   value: string;
   placeholder: string;
   suggestions: readonly string[];
@@ -28,6 +29,7 @@ export function RiderSearchField({
   colors,
   styles,
   label,
+  leadingIconName,
   value,
   placeholder,
   suggestions,
@@ -45,7 +47,12 @@ export function RiderSearchField({
   return (
     <View style={styles.routeSearchField}>
       <Text style={styles.routeSearchLabel}>{label}</Text>
-      <View style={styles.routeSearchInput}>
+      <View style={[styles.routeSearchInput, showSuggestions ? styles.routeSearchInputActive : null]}>
+        {leadingIconName ? (
+          <View style={styles.routeSearchInputLeadingIcon}>
+            <MaterialCommunityIcons name={leadingIconName} size={16} color={colors.subtext} />
+          </View>
+        ) : null}
         <TextInput
           ref={inputRef}
           value={value}
@@ -63,7 +70,7 @@ export function RiderSearchField({
         />
         {value.trim() ? (
           <Pressable style={styles.routeSearchClearButton} onPress={onClear}>
-            <MaterialCommunityIcons name="close-circle" size={18} color="#64748B" />
+            <MaterialCommunityIcons name="close-circle" size={18} color={colors.subtext} />
           </Pressable>
         ) : null}
       </View>
@@ -78,7 +85,10 @@ export function RiderSearchField({
                 pressed ? styles.routeSuggestionItemPressed : null,
               ]}
             >
-              <Text style={styles.routeSuggestionText}>{suggestion}</Text>
+              <View style={styles.routeSuggestionRow}>
+                <MaterialCommunityIcons name="map-marker-outline" size={16} color={colors.subtext} />
+                <Text style={styles.routeSuggestionText}>{suggestion}</Text>
+              </View>
             </Pressable>
           ))}
         </View>

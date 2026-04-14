@@ -90,6 +90,7 @@ const createContext = (
     vehicleDraft: createSavedVehicle(),
     setMode: vi.fn(),
     setFilter: vi.fn(),
+    setStateFilter: vi.fn(),
     setMainTab: vi.fn(),
     setRouteDraft: vi.fn(),
     resetAllRouteDrafts: vi.fn(),

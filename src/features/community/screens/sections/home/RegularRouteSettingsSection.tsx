@@ -104,11 +104,11 @@ export function RegularRouteSettingsSection({
       <RouteDraftTextField
         colors={colors}
         styles={styles}
-        label="Open chat link override"
+        label="Chat link override (WhatsApp/Kakao/Telegram)"
         optional
         value={routeDraft.contactLink}
         onChangeText={onChangeContactLink}
-        placeholder="https://open.kakao.com/o/..."
+        placeholder="https://wa.me/61412345678"
         autoCapitalize="none"
         autoCorrect={false}
         returnKeyType="done"

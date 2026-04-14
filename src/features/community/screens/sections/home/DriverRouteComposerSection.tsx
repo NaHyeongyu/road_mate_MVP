@@ -19,6 +19,7 @@ import { RouteScheduleSection } from "./RouteScheduleSection";
 import { useDriverComposerSubmitState } from "./useDriverComposerSubmitState";
 import { useRouteComposerPickers } from "./useRouteComposerPickers";
 import { useRouteComposerPlaces } from "./useRouteComposerPlaces";
+import { normalizeEnglishPlaceInput } from "../../../utils/placeInput";
 
 type DriverRouteComposerSectionProps = {
   colors: AppColors;
@@ -172,11 +173,11 @@ export function DriverRouteComposerSection({
         styles={styles}
         label="From"
         value={routeDraft.from}
-        placeholder="Brisbane CBD, QLD"
+        placeholder="Collingwood, VIC 3066"
         suggestions={fromSuggestions}
         showSuggestions={showFromSuggestions}
         returnKeyType="next"
-        onChangeText={(value) => updateRouteDraft({ from: value })}
+        onChangeText={(value) => updateRouteDraft({ from: normalizeEnglishPlaceInput(value) })}
         onFocus={handleFromFocus}
         onBlur={handleFromBlur}
         onSubmitEditing={() => toInputRef.current?.focus()}
@@ -189,12 +190,12 @@ export function DriverRouteComposerSection({
         styles={styles}
         label="To"
         value={routeDraft.to}
-        placeholder="St Lucia, QLD"
+        placeholder="Sydney, NSW 2000"
         suggestions={toSuggestions}
         showSuggestions={showToSuggestions}
         inputRef={toInputRef}
         returnKeyType="done"
-        onChangeText={(value) => updateRouteDraft({ to: value })}
+        onChangeText={(value) => updateRouteDraft({ to: normalizeEnglishPlaceInput(value) })}
         onFocus={handleToFocus}
         onBlur={handleToBlur}
         onSubmitEditing={handleCompleteDestination}

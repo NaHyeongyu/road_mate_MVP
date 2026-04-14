@@ -1,4 +1,4 @@
-import { QLD_PLACE_OPTIONS } from "../data/qldPlaceOptions";
+import { AU_PLACE_OPTIONS } from "../data/qldPlaceOptions";
 
 const normalizePlaceText = (value: string) =>
   value
@@ -43,13 +43,13 @@ const scorePlaceMatch = (place: string, query: string) => {
   return 3;
 };
 
-export const getQldPlaceSuggestions = (query: string, limit = 8) => {
+export const getPlaceSuggestions = (query: string, limit = 8) => {
   const trimmedQuery = query.trim();
   if (!trimmedQuery) {
     return [];
   }
 
-  const scored = QLD_PLACE_OPTIONS.flatMap((place): ScoredPlace[] => {
+  const scored = AU_PLACE_OPTIONS.flatMap((place): ScoredPlace[] => {
     const score = scorePlaceMatch(place, trimmedQuery);
     if (score === null) {
       return [];
@@ -69,3 +69,5 @@ export const getQldPlaceSuggestions = (query: string, limit = 8) => {
     .slice(0, limit)
     .map((item) => item.label);
 };
+
+export const getQldPlaceSuggestions = getPlaceSuggestions;

@@ -5,6 +5,7 @@ import type { AppColors } from "../../../../brandTheme";
 import type { VehicleInfo } from "../../../../model";
 import type { AppStyles } from "../../../../ui/types";
 import type { Mode } from "../../types";
+import { toContactLinkLabel } from "../../utils/contactLink";
 import { DriverGarageSection } from "./home/DriverGarageSection";
 
 type MyPageTabSectionProps = {
@@ -87,11 +88,13 @@ export function MyPageTabSection({
             ) : null}
             {savedVehicle.contactLink ? (
               <Text numberOfLines={1} style={styles.cardBody}>
-                Open chat: {savedVehicle.contactLink}
+                {toContactLinkLabel(savedVehicle.contactLink)}: {savedVehicle.contactLink}
               </Text>
             ) : null}
             {!savedVehicle.contactPhone && !savedVehicle.contactLink ? (
-              <Text style={styles.cardBody}>Add phone or open chat link to make riders contact you.</Text>
+              <Text style={styles.cardBody}>
+                Add phone or chat link (WhatsApp/Kakao/Telegram) to make riders contact you.
+              </Text>
             ) : null}
             {savedVehicle.note ? (
               <Text numberOfLines={2} style={styles.cardBody}>

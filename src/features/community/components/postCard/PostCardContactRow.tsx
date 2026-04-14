@@ -3,6 +3,7 @@ import { Pressable, Text, View } from "react-native";
 
 import type { RoutePost } from "../../../../model";
 import type { AppStyles } from "../../../../ui/types";
+import { toContactLinkLabel } from "../../utils/contactLink";
 import { openContactLink, openPhoneDialer } from "./linking";
 
 type PostCardContactRowProps = {
@@ -29,7 +30,7 @@ export function PostCardContactRow({ post, styles }: PostCardContactRowProps) {
         <Pressable style={styles.postContactAction} onPress={() => openContactLink(post.contactLink)}>
           <MaterialCommunityIcons name="chat-outline" size={14} color="#1D4ED8" />
           <Text numberOfLines={1} style={styles.postContactActionText}>
-            KakaoTalk
+            {toContactLinkLabel(post.contactLink)}
           </Text>
         </Pressable>
       ) : null}

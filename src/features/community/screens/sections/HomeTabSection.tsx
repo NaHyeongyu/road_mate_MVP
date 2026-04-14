@@ -3,7 +3,7 @@ import type { AppColors } from "../../../../brandTheme";
 import type { RouteDraft, RouteKind, RoutePost } from "../../../../model";
 import type { AppStyles } from "../../../../ui/types";
 import { NoticeBanner } from "../../../shared/components/NoticeBanner";
-import type { Mode } from "../../types";
+import type { Mode, StateFilter } from "../../types";
 import { DriverHomeSection } from "./home/DriverHomeSection";
 import { RiderFeedSection } from "./home/RiderFeedSection";
 
@@ -13,6 +13,7 @@ type HomeTabSectionProps = {
   notice: AppNotice;
   mode: Mode;
   filter: RouteKind;
+  stateFilter: StateFilter;
   driverRouteKind: RouteKind;
   fromSearchQuery: string;
   toSearchQuery: string;
@@ -23,6 +24,7 @@ type HomeTabSectionProps = {
   hasDriverContactMethod: boolean;
   currentUserId: string;
   onFilterChange: (filter: RouteKind) => void;
+  onStateFilterChange: (value: StateFilter) => void;
   onFromSearchQueryChange: (value: string) => void;
   onToSearchQueryChange: (value: string) => void;
   onRouteDraftChange: (draft: RouteDraft) => void;
@@ -33,6 +35,9 @@ type HomeTabSectionProps = {
   }) => Promise<void>;
   onOpenDriverRegistrationPage: () => void;
   onToggleSavedPost: (post: RoutePost) => void;
+  isRiderSearchResultsPageVisible: boolean;
+  onOpenRiderSearchResultsPage: () => void;
+  onCloseRiderSearchResultsPage: () => void;
 };
 
 export function HomeTabSection({
@@ -41,6 +46,7 @@ export function HomeTabSection({
   notice,
   mode,
   filter,
+  stateFilter,
   driverRouteKind,
   fromSearchQuery,
   toSearchQuery,
@@ -51,12 +57,16 @@ export function HomeTabSection({
   hasDriverContactMethod,
   currentUserId,
   onFilterChange,
+  onStateFilterChange,
   onFromSearchQueryChange,
   onToSearchQueryChange,
   onRouteDraftChange,
   onSaveRouteQuickSettings,
   onOpenDriverRegistrationPage,
   onToggleSavedPost,
+  isRiderSearchResultsPageVisible,
+  onOpenRiderSearchResultsPage,
+  onCloseRiderSearchResultsPage,
 }: HomeTabSectionProps) {
   return (
     <>
@@ -78,15 +88,20 @@ export function HomeTabSection({
           colors={colors}
           styles={styles}
           filter={filter}
+          stateFilter={stateFilter}
           fromSearchQuery={fromSearchQuery}
           toSearchQuery={toSearchQuery}
           visiblePosts={visiblePosts}
           currentUserId={currentUserId}
           savedPostKeys={savedPostKeys}
           onFilterChange={onFilterChange}
+          onStateFilterChange={onStateFilterChange}
           onFromSearchQueryChange={onFromSearchQueryChange}
           onToSearchQueryChange={onToSearchQueryChange}
           onToggleSavedPost={onToggleSavedPost}
+          isSearchResultsPageVisible={isRiderSearchResultsPageVisible}
+          onOpenSearchResultsPage={onOpenRiderSearchResultsPage}
+          onCloseSearchResultsPage={onCloseRiderSearchResultsPage}
         />
       )}
     </>

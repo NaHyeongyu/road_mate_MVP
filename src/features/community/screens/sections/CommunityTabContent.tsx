@@ -2,7 +2,7 @@ import type { AppNotice } from "../../../../app/types";
 import type { AppColors } from "../../../../brandTheme";
 import type { RouteDraft, RouteKind, RoutePost, VehicleInfo } from "../../../../model";
 import type { AppStyles } from "../../../../ui/types";
-import type { MainTab, Mode } from "../../types";
+import type { MainTab, Mode, StateFilter } from "../../types";
 import { HomeTabSection } from "./HomeTabSection";
 import { MyPageTabSection } from "./MyPageTabSection";
 import { SavedTabSection } from "./SavedTabSection";
@@ -17,6 +17,7 @@ type CommunityTabContentProps = {
   mainTab: MainTab;
   mode: Mode;
   filter: RouteKind;
+  stateFilter: StateFilter;
   fromSearchQuery: string;
   toSearchQuery: string;
   visiblePosts: RoutePost[];
@@ -31,6 +32,7 @@ type CommunityTabContentProps = {
   onSignOut: () => void;
   onWithdrawAccount: () => void;
   onFilterChange: (filter: RouteKind) => void;
+  onStateFilterChange: (value: StateFilter) => void;
   onFromSearchQueryChange: (value: string) => void;
   onToSearchQueryChange: (value: string) => void;
   onVehicleDraftChange: (draft: VehicleInfo) => void;
@@ -45,6 +47,9 @@ type CommunityTabContentProps = {
   onOpenDriverRegistrationPage: () => void;
   onRemoveRoute: (id: string) => void;
   onToggleSavedPost: (post: RoutePost) => void;
+  isRiderSearchResultsPageVisible: boolean;
+  onOpenRiderSearchResultsPage: () => void;
+  onCloseRiderSearchResultsPage: () => void;
 };
 
 export function CommunityTabContent({
@@ -57,6 +62,7 @@ export function CommunityTabContent({
   mainTab,
   mode,
   filter,
+  stateFilter,
   fromSearchQuery,
   toSearchQuery,
   visiblePosts,
@@ -71,6 +77,7 @@ export function CommunityTabContent({
   onSignOut,
   onWithdrawAccount,
   onFilterChange,
+  onStateFilterChange,
   onFromSearchQueryChange,
   onToSearchQueryChange,
   onVehicleDraftChange,
@@ -81,6 +88,9 @@ export function CommunityTabContent({
   onOpenDriverRegistrationPage,
   onRemoveRoute,
   onToggleSavedPost,
+  isRiderSearchResultsPageVisible,
+  onOpenRiderSearchResultsPage,
+  onCloseRiderSearchResultsPage,
 }: CommunityTabContentProps) {
   const isRiderMode = mode === "rider";
   const shouldRenderHomeTab = mainTab === "home" || (mode === "driver" && mainTab === "saved");
@@ -91,6 +101,7 @@ export function CommunityTabContent({
     notice,
     mode,
     filter,
+    stateFilter,
     fromSearchQuery,
     toSearchQuery,
     visiblePosts,
@@ -101,12 +112,16 @@ export function CommunityTabContent({
     currentUserId,
     driverRouteKind,
     onFilterChange,
+    onStateFilterChange,
     onFromSearchQueryChange,
     onToSearchQueryChange,
     onRouteDraftChange,
     onSaveRouteQuickSettings,
     onOpenDriverRegistrationPage,
     onToggleSavedPost,
+    isRiderSearchResultsPageVisible,
+    onOpenRiderSearchResultsPage,
+    onCloseRiderSearchResultsPage,
   } as const;
 
   if (shouldRenderHomeTab) {

@@ -1,18 +1,13 @@
 import { isSupabaseConfigured, supabase } from "../../../lib/supabase";
+import type { Database } from "../../../lib/database.types";
 import { EMPTY_VEHICLE, type VehicleInfo } from "../../../model";
 
 const DRIVER_PROFILES_TABLE = "driver_profiles";
+const DRIVER_PROFILES_SELECT =
+  "owner_user_id,vehicle_model,vehicle_plate,vehicle_note,contact_phone,contact_link,created_at,updated_at";
 
-type DriverProfileRecord = {
-  owner_user_id: string;
-  vehicle_model: string;
-  vehicle_plate: string;
-  vehicle_note: string;
-  contact_phone: string | null;
-  contact_link: string | null;
-  created_at: string;
-  updated_at: string;
-};
+type DriverProfileRecord = Database["public"]["Tables"]["driver_profiles"]["Row"];
+type DriverProfileRecordInsert = Database["public"]["Tables"]["driver_profiles"]["Insert"];
 
 const toVehicleFromRecord = (record: Partial<DriverProfileRecord>): VehicleInfo => ({
   model: String(record.vehicle_model ?? "").trim(),
@@ -22,7 +17,10 @@ const toVehicleFromRecord = (record: Partial<DriverProfileRecord>): VehicleInfo 
   contactLink: String(record.contact_link ?? "").trim(),
 });
 
-const toRecordFromVehicle = (ownerUserId: string, vehicle: VehicleInfo) => ({
+const toRecordFromVehicle = (
+  ownerUserId: string,
+  vehicle: VehicleInfo
+): DriverProfileRecordInsert => ({
   owner_user_id: ownerUserId,
   vehicle_model: vehicle.model.trim(),
   vehicle_plate: vehicle.plate.trim(),
@@ -40,7 +38,7 @@ export const fetchMyDriverProfileFromDb = async (ownerUserId: string): Promise<V
 
   const { data, error } = await supabase
     .from(DRIVER_PROFILES_TABLE)
-    .select("*")
+    .select(DRIVER_PROFILES_SELECT)
     .eq("owner_user_id", ownerUserId)
     .maybeSingle();
   if (error) {
@@ -51,7 +49,7 @@ export const fetchMyDriverProfileFromDb = async (ownerUserId: string): Promise<V
     return null;
   }
 
-  return toVehicleFromRecord(data as Partial<DriverProfileRecord>);
+  return toVehicleFromRecord(data);
 };
 
 export const upsertMyDriverProfileInDb = async (
@@ -68,13 +66,13 @@ export const upsertMyDriverProfileInDb = async (
   const { data, error } = await supabase
     .from(DRIVER_PROFILES_TABLE)
     .upsert(toRecordFromVehicle(ownerUserId, vehicle), { onConflict: "owner_user_id" })
-    .select("*")
+    .select(DRIVER_PROFILES_SELECT)
     .single();
   if (error) {
     throw error;
   }
 
-  return toVehicleFromRecord(data as Partial<DriverProfileRecord>);
+  return toVehicleFromRecord(data);
 };
 
 export const deleteMyDriverProfileInDb = async (ownerUserId: string) => {

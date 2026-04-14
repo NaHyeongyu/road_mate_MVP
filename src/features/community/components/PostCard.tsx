@@ -1,4 +1,4 @@
-import { useMemo, useState, type ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Pressable, Text, View } from "react-native";
 
@@ -10,6 +10,7 @@ import { PostCardActions } from "./postCard/PostCardActions";
 import { PostCardContactRow } from "./postCard/PostCardContactRow";
 import { PostCardHeader } from "./postCard/PostCardHeader";
 import { PostCardRouteStack } from "./postCard/PostCardRouteStack";
+import { PostCardWeekdayRow } from "./postCard/PostCardWeekdayRow";
 
 type PostCardProps = {
   post: RoutePost;
@@ -54,12 +55,6 @@ export function PostCard({
         ? "past"
         : "upcoming";
   const [isDetailOpen, setIsDetailOpen] = useState(false);
-  const operatingDaysSummary = useMemo(() => {
-    if (!post.operatingDays.length) {
-      return "Operating day info not set";
-    }
-    return post.operatingDays.join(" · ");
-  }, [post.operatingDays]);
   const handleViewDetails = () => {
     if (onViewDetails) {
       onViewDetails();
@@ -130,15 +125,19 @@ export function PostCard({
 
       <PostCardRouteStack post={post} styles={styles} isRegular={isRegular} />
 
-      <View style={styles.postSummaryRow}>
-        <Text numberOfLines={1} style={styles.postSummaryText}>
-          {isRegular ? `Runs ${operatingDaysSummary}` : `Notice for ${noticeDateLabel}`}
-        </Text>
-      </View>
-
-      <PostCardContactRow post={post} styles={styles} />
+      {isRegular ? (
+        <PostCardWeekdayRow post={post} styles={styles} />
+      ) : (
+        <View style={styles.postSummaryRow}>
+          <Text numberOfLines={1} style={styles.postSummaryText}>
+            {`Notice for ${noticeDateLabel}`}
+          </Text>
+        </View>
+      )}
 
       {extraContent}
+
+      <PostCardContactRow post={post} styles={styles} />
     </>
   );
 

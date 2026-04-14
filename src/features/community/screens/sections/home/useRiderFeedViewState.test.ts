@@ -1,5 +1,5 @@
 import { act, renderHook } from "@testing-library/react";
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it } from "vitest";
 
 import type { RouteKind, RoutePost } from "../../../../../model";
 import { useRiderFeedViewState } from "./useRiderFeedViewState";
@@ -41,12 +41,10 @@ const renderViewState = ({
   filter,
   visiblePosts,
   currentUserId = "rider-1",
-  onFilterChange = vi.fn(),
 }: {
   filter: RouteKind;
   visiblePosts: RoutePost[];
   currentUserId?: string;
-  onFilterChange?: (filter: RouteKind) => void;
 }) => {
   const hook = renderHook(
     (props: { filter: RouteKind }) =>
@@ -54,14 +52,13 @@ const renderViewState = ({
         filter: props.filter,
         visiblePosts,
         currentUserId,
-        onFilterChange,
       }),
     {
       initialProps: { filter },
     }
   );
 
-  return { ...hook, onFilterChange };
+  return hook;
 };
 
 describe("useRiderFeedViewState", () => {
@@ -75,23 +72,7 @@ describe("useRiderFeedViewState", () => {
     });
 
     expect(result.current.isNoticeFilter).toBe(false);
-    expect(result.current.showViewNoticesAction).toBe(true);
     expect(result.current.feedPosts.map((post) => post.id)).toEqual(["other"]);
-  });
-
-  it("toggles regular feed to notice feed", () => {
-    const onFilterChange = vi.fn();
-    const { result } = renderViewState({
-      filter: "regular",
-      visiblePosts: [createPost({ id: "other", ownerUserId: "driver-2" })],
-      onFilterChange,
-    });
-
-    act(() => {
-      result.current.handleToggleFeedType();
-    });
-
-    expect(onFilterChange).toHaveBeenCalledWith("one_time");
   });
 
   it("hides past notices in upcoming scope and shows them in all scope", () => {

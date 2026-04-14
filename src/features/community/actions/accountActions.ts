@@ -22,6 +22,7 @@ export const createCommunityAccountActions = (
   const resetSignedInExperience = () => {
     context.setMode("rider");
     context.setFilter("regular");
+    context.setStateFilter("ALL");
     context.setMainTab("home");
     context.resetAllRouteDrafts();
   };
