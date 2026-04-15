@@ -43,6 +43,7 @@ export function buildAuthOptionsScreenProps({
     },
     onPressGoogle: () => void appState.handleOAuthSignIn("google"),
     onPressApple: () => void appState.handleOAuthSignIn("apple"),
+    onPressFacebook: () => void appState.handleOAuthSignIn("facebook"),
   };
 }
 

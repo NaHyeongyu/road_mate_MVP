@@ -9,10 +9,11 @@ export type AuthOptionsScreenProps = {
   logoSource: unknown;
   styles: AppStyles;
   notice: { tone: "info" | "success" | "error"; text: string };
-  oauthProviderPending: "google" | "apple" | null;
+  oauthProviderPending: "google" | "apple" | "facebook" | null;
   onPressEmail: () => void;
   onPressGoogle: () => void;
   onPressApple: () => void;
+  onPressFacebook: () => void;
 };
 
 export function AuthOptionsScreen({
@@ -23,6 +24,7 @@ export function AuthOptionsScreen({
   onPressEmail,
   onPressGoogle,
   onPressApple,
+  onPressFacebook,
 }: AuthOptionsScreenProps) {
   const isOAuthSubmitting = Boolean(oauthProviderPending);
 
@@ -33,20 +35,11 @@ export function AuthOptionsScreen({
           <BrandLogo source={logoSource} width={188} height={188} />
         </View>
         <Text style={styles.authSimpleTitle}>Get Started with Roadmate</Text>
+        <Text style={styles.authSimpleSubtitle}>Choose a quick login method to continue.</Text>
       </View>
 
       <View style={styles.authChooserCard}>
-        <Pressable onPress={onPressEmail} style={[styles.providerButton, styles.emailProviderButton]}>
-          <View style={styles.providerIconSlot}>
-            <MaterialCommunityIcons
-              name="email-outline"
-              size={16}
-              color="#0B0F14"
-              style={styles.providerIconGlyph}
-            />
-          </View>
-          <Text style={styles.emailProviderButtonText}>Continue with Email</Text>
-        </Pressable>
+        <Text style={styles.authProviderSectionTitle}>Quick Login</Text>
 
         <Pressable
           disabled={isOAuthSubmitting}
@@ -102,6 +95,60 @@ export function AuthOptionsScreen({
           >
             {oauthProviderPending === "apple" ? "Opening Apple..." : "Continue with Apple"}
           </Text>
+        </Pressable>
+
+        <Pressable
+          disabled={isOAuthSubmitting}
+          onPress={onPressFacebook}
+          style={[
+            styles.providerButton,
+            styles.facebookProviderButton,
+            isOAuthSubmitting ? styles.providerButtonDisabled : null,
+          ]}
+        >
+          <View style={styles.providerIconSlot}>
+            <MaterialCommunityIcons
+              name="facebook"
+              size={16}
+              color={isOAuthSubmitting ? "#64748B" : "#FFFFFF"}
+              style={[styles.providerIconGlyph, styles.providerIconGlyphTight]}
+            />
+          </View>
+          <Text
+            style={[
+              styles.providerButtonText,
+              styles.facebookProviderButtonText,
+              isOAuthSubmitting ? styles.providerButtonTextDisabled : null,
+            ]}
+          >
+            {oauthProviderPending === "facebook" ? "Opening Facebook..." : "Continue with Facebook"}
+          </Text>
+        </Pressable>
+
+        <View style={styles.authProviderDividerRow}>
+          <View style={styles.authProviderDividerLine} />
+          <Text style={styles.authProviderDividerText}>or</Text>
+          <View style={styles.authProviderDividerLine} />
+        </View>
+
+        <Pressable
+          disabled={isOAuthSubmitting}
+          onPress={onPressEmail}
+          style={[
+            styles.providerButton,
+            styles.emailProviderButton,
+            isOAuthSubmitting ? styles.providerButtonDisabled : null,
+          ]}
+        >
+          <View style={styles.providerIconSlot}>
+            <MaterialCommunityIcons
+              name="email-outline"
+              size={16}
+              color="#0B0F14"
+              style={styles.providerIconGlyph}
+            />
+          </View>
+          <Text style={styles.emailProviderButtonText}>Continue with Email</Text>
         </Pressable>
       </View>
 

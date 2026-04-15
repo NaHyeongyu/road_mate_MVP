@@ -10,7 +10,7 @@ import { validateAuthInput } from "../utils/authValidation";
 
 WebBrowser.maybeCompleteAuthSession();
 
-type OAuthProvider = "google" | "apple";
+type OAuthProvider = "google" | "apple" | "facebook";
 
 type UseAuthFlowArgs = {
   onNotice: (notice: AppNotice) => void;
@@ -25,8 +25,17 @@ type OAuthSessionTokens = {
 const OAUTH_REDIRECT_PATH = "auth/callback";
 const OAUTH_SCHEME = "roadmate";
 
-const getOAuthProviderLabel = (provider: OAuthProvider) =>
-  provider === "google" ? "Google" : "Apple";
+const getOAuthProviderLabel = (provider: OAuthProvider) => {
+  if (provider === "google") {
+    return "Google";
+  }
+
+  if (provider === "apple") {
+    return "Apple";
+  }
+
+  return "Facebook";
+};
 
 const getSessionTokensFromCallbackUrl = (callbackUrl: string): OAuthSessionTokens | null => {
   const [baseUrl, hashFragment] = callbackUrl.split("#");

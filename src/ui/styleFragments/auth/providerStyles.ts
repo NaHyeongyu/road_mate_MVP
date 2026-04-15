@@ -6,9 +6,19 @@ import { AUTH_BODY_FONT_EMPHASIS } from "./constants";
 
 export const createAuthProviderStyles = (colors: AppColors) =>
   ({
+    authProviderSectionTitle: {
+      color: colors.subtext,
+      fontSize: 12,
+      fontWeight: "700",
+      textTransform: "uppercase",
+      letterSpacing: 0.8,
+      fontFamily: AUTH_BODY_FONT_EMPHASIS,
+      paddingHorizontal: 4,
+      paddingBottom: 2,
+    },
     providerButton: {
-      height: 44,
-      borderRadius: 12,
+      height: 48,
+      borderRadius: 14,
       borderWidth: 1,
       borderColor: colors.border,
       backgroundColor: colors.panelAlt,
@@ -46,6 +56,13 @@ export const createAuthProviderStyles = (colors: AppColors) =>
       backgroundColor: "#111827",
       borderColor: "#111827",
     },
+    facebookProviderButton: {
+      backgroundColor: "#1877F2",
+      borderColor: "#1877F2",
+    },
+    facebookProviderButtonText: {
+      color: "#FFFFFF",
+    },
     providerIconSlot: {
       width: 16,
       height: 16,
@@ -75,6 +92,26 @@ export const createAuthProviderStyles = (colors: AppColors) =>
     },
     appleProviderButtonText: {
       color: "#FFFFFF",
+    },
+    authProviderDividerRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 10,
+      paddingVertical: 4,
+    },
+    authProviderDividerLine: {
+      flex: 1,
+      height: 1,
+      backgroundColor: colors.border,
+    },
+    authProviderDividerText: {
+      color: colors.subtext,
+      fontSize: 12,
+      fontWeight: "700",
+      letterSpacing: 0.4,
+      textTransform: "uppercase",
+      fontFamily: AUTH_BODY_FONT_EMPHASIS,
+      paddingHorizontal: 4,
     },
     providerSoonBadge: {
       marginLeft: "auto",
