@@ -46,11 +46,11 @@ export const createAuthProviderStyles = (colors: AppColors) =>
       transform: [{ translateY: Platform.OS === "android" ? 1 : 0.5 }],
     },
     googleProviderButton: {
-      backgroundColor: "#4285F4",
-      borderColor: "#4285F4",
+      backgroundColor: "#FFFFFF",
+      borderColor: "#D2D6DC",
     },
     googleProviderButtonText: {
-      color: "#FFFFFF",
+      color: "#202124",
     },
     appleProviderButton: {
       backgroundColor: "#111827",
@@ -62,6 +62,13 @@ export const createAuthProviderStyles = (colors: AppColors) =>
     },
     facebookProviderButtonText: {
       color: "#FFFFFF",
+    },
+    kakaoProviderButton: {
+      backgroundColor: "#FEE500",
+      borderColor: "#FEE500",
+    },
+    kakaoProviderButtonText: {
+      color: "#191919",
     },
     providerIconSlot: {
       width: 16,

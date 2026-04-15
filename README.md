@@ -11,7 +11,7 @@ Docs:
 Scope:
 
 - Supabase email/password auth
-- Supabase OAuth quick login (Google / Apple / Facebook)
+- Supabase OAuth quick login (Google / Apple / Facebook / Kakao)
 - driver registers one vehicle
 - driver posts regular or one-time routes
 - rider browses the route list
@@ -41,7 +41,7 @@ AdMob note:
 
 OAuth note:
 
-- Enable `Google`, `Apple`, and `Facebook` providers in Supabase Auth settings
+- Enable `Google`, `Apple`, `Facebook`, and `Kakao` providers in Supabase Auth settings
 - Add `roadmate://auth/callback` to Supabase Auth URL configuration (Redirect URLs)
 
 Run `docs/supabase-route-posts.sql` in Supabase SQL Editor before using community posts.

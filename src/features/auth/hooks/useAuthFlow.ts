@@ -10,7 +10,7 @@ import { validateAuthInput } from "../utils/authValidation";
 
 WebBrowser.maybeCompleteAuthSession();
 
-type OAuthProvider = "google" | "apple" | "facebook";
+type OAuthProvider = "google" | "apple" | "facebook" | "kakao";
 
 type UseAuthFlowArgs = {
   onNotice: (notice: AppNotice) => void;
@@ -32,6 +32,10 @@ const getOAuthProviderLabel = (provider: OAuthProvider) => {
 
   if (provider === "apple") {
     return "Apple";
+  }
+
+  if (provider === "kakao") {
+    return "Kakao";
   }
 
   return "Facebook";
