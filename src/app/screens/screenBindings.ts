@@ -36,22 +36,13 @@ export function buildAuthOptionsScreenProps({
     logoSource,
     styles,
     notice: appState.notice,
+    oauthProviderPending: appState.oauthProviderPending,
     onPressEmail: () => {
       clearNotice(appState);
       appState.setAuthEntryMethod("email");
     },
-    onPressGoogle: () => {
-      appState.setNotice({
-        tone: "info",
-        text: "Google sign-in will be connected in the next step.",
-      });
-    },
-    onPressApple: () => {
-      appState.setNotice({
-        tone: "info",
-        text: "Apple sign-in will be connected in the next step.",
-      });
-    },
+    onPressGoogle: () => void appState.handleOAuthSignIn("google"),
+    onPressApple: () => void appState.handleOAuthSignIn("apple"),
   };
 }
 

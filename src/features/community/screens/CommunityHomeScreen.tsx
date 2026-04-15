@@ -9,6 +9,7 @@ import { APP_BAR_BG } from "../../../ui/styleFragments/layout/constants";
 import type { AppStyles } from "../../../ui/types";
 import { NoticeBanner } from "../../shared/components/NoticeBanner";
 import { ScreenHeader } from "../../shared/components/ScreenHeader";
+import { BottomBannerAd } from "../../ads/components/BottomBannerAd";
 import type { MainTab, Mode, StateFilter } from "../types";
 import { RoleModeToggle } from "../components/RoleModeToggle";
 import { useDriverRegistrationPageState } from "./useDriverRegistrationPageState";
@@ -174,6 +175,8 @@ export function CommunityHomeScreen({
             onPostRoute={handleSaveRouteRegistration}
           />
         </ScrollView>
+
+        <BottomBannerAd bottomInset={bottomInset} />
       </View>
     );
   }
@@ -257,6 +260,8 @@ export function CommunityHomeScreen({
           onCloseRiderSearchResultsPage={closeRiderSearchResultsPage}
         />
       </ScrollView>
+
+      <BottomBannerAd bottomInset={isSearchDetailScreen ? bottomInset : 0} />
 
       {!isSearchDetailScreen ? (
         <CommunityBottomBar

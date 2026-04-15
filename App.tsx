@@ -6,6 +6,7 @@ import RoadmateLogoLight from "./assets/branding/logo_light.svg";
 import { AppAuthExperienceScreen } from "./src/app/screens/AppAuthExperienceScreen";
 import { AppCommunityExperienceScreen } from "./src/app/screens/AppCommunityExperienceScreen";
 import { AppLoadingScreen } from "./src/app/screens/AppLoadingScreen";
+import { useAppOpenAd } from "./src/features/ads/hooks/useAppOpenAd";
 import { useRoadmateAppState } from "./src/app/useRoadmateAppState";
 import { brandPalette } from "./src/brandTheme";
 import { supabase } from "./src/lib/supabase";
@@ -29,6 +30,7 @@ export default function App() {
       ? (RoadmateLogoDark as unknown)
       : (RoadmateLogoLight as unknown);
   const styles = useMemo(() => createStyles(colors), [colors]);
+  useAppOpenAd({ enabled: Boolean(appState.currentUser) });
 
   if (appState.loading || (appState.currentUserId && appState.isVehicleLoading)) {
     return <AppLoadingScreen colors={colors} styles={styles} scheme={scheme} />;
