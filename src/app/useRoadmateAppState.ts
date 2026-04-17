@@ -224,6 +224,16 @@ export function useRoadmateAppState() {
     [ensureAuthenticated, saveRouteQuickSettings]
   );
 
+  const handleModeChangeWithAuth = useCallback(
+    (nextMode: Parameters<typeof handleModeChange>[0]) => {
+      if (nextMode === "driver" && !ensureAuthenticated("Driver mode")) {
+        return;
+      }
+      handleModeChange(nextMode);
+    },
+    [ensureAuthenticated, handleModeChange]
+  );
+
   return {
     authEntryMethod,
     authEmail,
@@ -256,7 +266,7 @@ export function useRoadmateAppState() {
     vehicleDraft,
     visiblePosts,
 
-    handleModeChange,
+    handleModeChange: handleModeChangeWithAuth,
     handleSignOut,
     openEmailAuthGate,
     handleSubmitAuth,
