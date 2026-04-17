@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
 import { deriveDisplayName } from "../features/auth/utils/authHelpers";
 import { useAuthFlow } from "../features/auth/hooks/useAuthFlow";
 import { useCommunityActions } from "../features/community/hooks/useCommunityActions";
@@ -165,6 +165,65 @@ export function useRoadmateAppState() {
     onResetSignedInExperience: resetSignedInExperience,
   });
 
+  const isAuthenticated = Boolean(currentUserId);
+
+  const openEmailAuthGate = useCallback(
+    (reason: string) => {
+      setAuthMode("signUp");
+      setAuthEntryMethod("email");
+      setNotice({
+        tone: "info",
+        text: `${reason} requires an account. Verify your email and set a password to continue.`,
+      });
+    },
+    [setAuthEntryMethod, setAuthMode, setNotice]
+  );
+
+  const ensureAuthenticated = useCallback(
+    (reason: string) => {
+      if (isAuthenticated) {
+        return true;
+      }
+      openEmailAuthGate(reason);
+      return false;
+    },
+    [isAuthenticated, openEmailAuthGate]
+  );
+
+  const handleSaveVehicle = useCallback(() => {
+    if (!ensureAuthenticated("Driver registration")) {
+      return;
+    }
+    void saveVehicle();
+  }, [ensureAuthenticated, saveVehicle]);
+
+  const handlePostRoute = useCallback(async () => {
+    if (!ensureAuthenticated("Route posting")) {
+      return false;
+    }
+    return postRoute();
+  }, [ensureAuthenticated, postRoute]);
+
+  const handleToggleSavedPost = useCallback(
+    (post: Parameters<typeof toggleSavedPost>[0]) => {
+      if (!ensureAuthenticated("Saving rides")) {
+        return;
+      }
+      void toggleSavedPost(post);
+    },
+    [ensureAuthenticated, toggleSavedPost]
+  );
+
+  const handleSaveRouteQuickSettings = useCallback(
+    async (input: Parameters<typeof saveRouteQuickSettings>[0]) => {
+      if (!ensureAuthenticated("Updating route settings")) {
+        return;
+      }
+      await saveRouteQuickSettings(input);
+    },
+    [ensureAuthenticated, saveRouteQuickSettings]
+  );
+
   return {
     authEntryMethod,
     authEmail,
@@ -175,6 +234,7 @@ export function useRoadmateAppState() {
     currentUserEmail,
     currentUserId,
     currentUserName,
+    isAuthenticated,
     filter,
     stateFilter,
     fromSearchQuery,
@@ -198,11 +258,12 @@ export function useRoadmateAppState() {
 
     handleModeChange,
     handleSignOut,
+    openEmailAuthGate,
     handleSubmitAuth,
     handleOAuthSignIn,
-    postRoute,
+    postRoute: handlePostRoute,
     removeRoute,
-    saveVehicle,
+    saveVehicle: handleSaveVehicle,
     setAuthEmail,
     setAuthEntryMethod,
     setAuthMode,
@@ -216,8 +277,8 @@ export function useRoadmateAppState() {
     setRouteDraft,
     setToSearchQuery,
     setVehicleDraft,
-    toggleSavedPost,
-    saveRouteQuickSettings,
+    toggleSavedPost: handleToggleSavedPost,
+    saveRouteQuickSettings: handleSaveRouteQuickSettings,
     withdrawAccount,
 
     isSupabaseConfigured,

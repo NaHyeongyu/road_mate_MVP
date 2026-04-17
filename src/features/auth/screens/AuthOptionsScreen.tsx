@@ -12,7 +12,7 @@ type GoogleIconProps = {
 
 function GoogleIcon({ disabled }: GoogleIconProps) {
   return (
-    <Svg width={16} height={16} viewBox="0 0 48 48" opacity={disabled ? 0.58 : 1}>
+    <Svg width={18} height={18} viewBox="0 0 48 48" opacity={disabled ? 0.58 : 1}>
       <Path
         fill="#EA4335"
         d="M24 9.5c3.54 0 6.73 1.22 9.24 3.6l6.9-6.9C35.8 2.4 30.28 0 24 0 14.63 0 6.51 5.38 2.56 13.22l8.06 6.26C12.53 13.74 17.82 9.5 24 9.5z"
@@ -68,8 +68,6 @@ export function AuthOptionsScreen({
       </View>
 
       <View style={styles.authChooserCard}>
-        <Text style={styles.authProviderSectionTitle}>Quick Login</Text>
-
         <Pressable
           disabled={isOAuthSubmitting}
           onPress={onPressGoogle}
@@ -105,7 +103,7 @@ export function AuthOptionsScreen({
           <View style={styles.providerIconSlot}>
             <MaterialCommunityIcons
               name="apple"
-              size={16}
+              size={18}
               color={isOAuthSubmitting ? "#64748B" : "#FFFFFF"}
               style={[styles.providerIconGlyph, styles.providerIconGlyphTight]}
             />
@@ -133,7 +131,7 @@ export function AuthOptionsScreen({
           <View style={styles.providerIconSlot}>
             <MaterialCommunityIcons
               name="facebook"
-              size={16}
+              size={18}
               color={isOAuthSubmitting ? "#64748B" : "#FFFFFF"}
               style={[styles.providerIconGlyph, styles.providerIconGlyphTight]}
             />
@@ -161,7 +159,7 @@ export function AuthOptionsScreen({
           <View style={styles.providerIconSlot}>
             <MaterialCommunityIcons
               name="chat"
-              size={16}
+              size={18}
               color={isOAuthSubmitting ? "#64748B" : "#191919"}
               style={[styles.providerIconGlyph, styles.providerIconGlyphTight]}
             />
@@ -177,12 +175,6 @@ export function AuthOptionsScreen({
           </Text>
         </Pressable>
 
-        <View style={styles.authProviderDividerRow}>
-          <View style={styles.authProviderDividerLine} />
-          <Text style={styles.authProviderDividerText}>or</Text>
-          <View style={styles.authProviderDividerLine} />
-        </View>
-
         <Pressable
           disabled={isOAuthSubmitting}
           onPress={onPressEmail}
@@ -195,7 +187,7 @@ export function AuthOptionsScreen({
           <View style={styles.providerIconSlot}>
             <MaterialCommunityIcons
               name="email-outline"
-              size={16}
+              size={18}
               color="#0B0F14"
               style={styles.providerIconGlyph}
             />

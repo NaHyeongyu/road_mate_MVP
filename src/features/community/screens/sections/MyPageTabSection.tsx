@@ -13,6 +13,7 @@ type MyPageTabSectionProps = {
   styles: AppStyles;
   currentUserName: string;
   currentUserEmail: string;
+  isAuthenticated: boolean;
   mode: Mode;
   myPostsCount: number;
   hasVehicle: boolean;
@@ -22,6 +23,7 @@ type MyPageTabSectionProps = {
   onSaveVehicle: () => void;
   onSignOut: () => void;
   onWithdrawAccount: () => void;
+  onRequestAuth: () => void;
 };
 
 export function MyPageTabSection({
@@ -29,6 +31,7 @@ export function MyPageTabSection({
   styles,
   currentUserName,
   currentUserEmail,
+  isAuthenticated,
   mode,
   myPostsCount,
   hasVehicle,
@@ -38,6 +41,7 @@ export function MyPageTabSection({
   onSaveVehicle,
   onSignOut,
   onWithdrawAccount,
+  onRequestAuth,
 }: MyPageTabSectionProps) {
   const [confirmSignOut, setConfirmSignOut] = useState(false);
   const [confirmWithdraw, setConfirmWithdraw] = useState(false);
@@ -57,8 +61,8 @@ export function MyPageTabSection({
     <>
       <View style={styles.card}>
         <Text style={styles.cardTitle}>Account summary</Text>
-        <Text style={styles.cardBody}>Name: {currentUserName}</Text>
-        <Text style={styles.cardBody}>Email: {currentUserEmail}</Text>
+        <Text style={styles.cardBody}>Name: {isAuthenticated ? currentUserName : "Guest"}</Text>
+        <Text style={styles.cardBody}>Email: {isAuthenticated ? currentUserEmail : "--"}</Text>
         <View style={styles.row}>
           <View style={styles.chip}>
             <Text style={styles.chipText}>Role: {isDriverMode ? "Driver" : "Rider"}</Text>
@@ -118,55 +122,74 @@ export function MyPageTabSection({
 
       <View style={styles.card}>
         <Text style={styles.cardTitle}>Account management</Text>
-        <Text style={styles.cardBody}>
-          Sign out keeps your account. Withdrawal removes access and clears your local driver profile.
-        </Text>
-
-        {confirmSignOut ? (
-          <Text style={styles.cardBody}>Tap sign out once more to confirm.</Text>
-        ) : null}
-        <Pressable
-          style={styles.primaryButton}
-          onPress={() => {
-            if (confirmSignOut) {
-              onSignOut();
-              return;
-            }
-            setConfirmSignOut(true);
-            setConfirmWithdraw(false);
-          }}
-        >
-          <Text style={styles.primaryButtonText}>{confirmSignOut ? "Confirm sign out" : "Sign out"}</Text>
-        </Pressable>
-        {confirmSignOut ? (
-          <Pressable style={styles.inlineTextButton} onPress={() => setConfirmSignOut(false)}>
-            <Text style={styles.inlineTextButtonText}>Cancel sign out</Text>
-          </Pressable>
-        ) : null}
-
-        {confirmWithdraw ? (
-          <Text style={styles.cardBody}>Tap withdraw once more to confirm account withdrawal.</Text>
-        ) : null}
-        <Pressable
-          style={styles.dangerButton}
-          onPress={() => {
-            if (confirmWithdraw) {
-              onWithdrawAccount();
-              return;
-            }
-            setConfirmWithdraw(true);
-            setConfirmSignOut(false);
-          }}
-        >
-          <Text style={styles.dangerButtonText}>
-            {confirmWithdraw ? "Confirm withdraw account" : "Withdraw account"}
+        {isAuthenticated ? (
+          <Text style={styles.cardBody}>
+            Sign out keeps your account. Withdrawal removes access and clears your local driver
+            profile.
           </Text>
-        </Pressable>
-        {confirmWithdraw ? (
-          <Pressable style={styles.inlineTextButton} onPress={() => setConfirmWithdraw(false)}>
-            <Text style={styles.inlineTextButtonText}>Cancel withdrawal</Text>
+        ) : (
+          <Text style={styles.cardBody}>
+            You are browsing as guest. Create an account to save rides and register as a driver.
+          </Text>
+        )}
+
+        {!isAuthenticated ? (
+          <Pressable style={styles.primaryButton} onPress={onRequestAuth}>
+            <Text style={styles.primaryButtonText}>Create account with email</Text>
           </Pressable>
         ) : null}
+
+        {!isAuthenticated ? null : (
+          <>
+            {confirmSignOut ? (
+              <Text style={styles.cardBody}>Tap sign out once more to confirm.</Text>
+            ) : null}
+            <Pressable
+              style={styles.primaryButton}
+              onPress={() => {
+                if (confirmSignOut) {
+                  onSignOut();
+                  return;
+                }
+                setConfirmSignOut(true);
+                setConfirmWithdraw(false);
+              }}
+            >
+              <Text style={styles.primaryButtonText}>
+                {confirmSignOut ? "Confirm sign out" : "Sign out"}
+              </Text>
+            </Pressable>
+            {confirmSignOut ? (
+              <Pressable style={styles.inlineTextButton} onPress={() => setConfirmSignOut(false)}>
+                <Text style={styles.inlineTextButtonText}>Cancel sign out</Text>
+              </Pressable>
+            ) : null}
+
+            {confirmWithdraw ? (
+              <Text style={styles.cardBody}>Tap withdraw once more to confirm account withdrawal.</Text>
+            ) : null}
+            <Pressable
+              style={styles.dangerButton}
+              onPress={() => {
+                if (confirmWithdraw) {
+                  onWithdrawAccount();
+                  return;
+                }
+                setConfirmWithdraw(true);
+                setConfirmSignOut(false);
+              }}
+            >
+              <Text style={styles.dangerButtonText}>
+                {confirmWithdraw ? "Confirm withdraw account" : "Withdraw account"}
+              </Text>
+            </Pressable>
+            {confirmWithdraw ? (
+              <Pressable style={styles.inlineTextButton} onPress={() => setConfirmWithdraw(false)}>
+                <Text style={styles.inlineTextButtonText}>Cancel withdrawal</Text>
+              </Pressable>
+            ) : null}
+          </>
+        )}
       </View>
     </>
   );

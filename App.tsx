@@ -18,7 +18,7 @@ export default function App() {
   const appState = useRoadmateAppState();
 
   const isSupabaseReady = appState.isSupabaseConfigured && Boolean(supabase);
-  const isAuthExperience = !appState.currentUser || !isSupabaseReady;
+  const isAuthExperience = appState.authEntryMethod !== "options";
   const colors = isAuthExperience
     ? brandPalette.light
     : isDarkMode
@@ -36,7 +36,7 @@ export default function App() {
     return <AppLoadingScreen colors={colors} styles={styles} scheme={scheme} />;
   }
 
-  if (!appState.currentUser) {
+  if (isAuthExperience) {
     return (
       <AppAuthExperienceScreen
         appState={appState}

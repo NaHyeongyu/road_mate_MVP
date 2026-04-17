@@ -10,7 +10,8 @@ Docs:
 
 Scope:
 
-- Supabase email/password auth
+- guest entry without login
+- email/password sign-up gate when saving rides or registering/posting as driver
 - Supabase OAuth quick login (Google / Apple / Facebook / Kakao)
 - driver registers one vehicle
 - driver posts regular or one-time routes

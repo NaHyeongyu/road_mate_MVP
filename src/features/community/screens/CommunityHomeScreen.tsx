@@ -24,6 +24,7 @@ export type CommunityHomeScreenProps = {
   currentUserId: string;
   currentUserName: string;
   currentUserEmail: string;
+  isAuthenticated: boolean;
   mainTab: MainTab;
   mode: Mode;
   filter: RouteKind;
@@ -41,6 +42,7 @@ export type CommunityHomeScreenProps = {
   hasVehicle: boolean;
   onSignOut: () => void;
   onWithdrawAccount: () => void;
+  onRequestAuth: () => void;
   onMainTabChange: (tab: MainTab) => void;
   onModeChange: (mode: Mode) => void;
   onFilterChange: (filter: RouteKind) => void;
@@ -67,6 +69,7 @@ export function CommunityHomeScreen({
   currentUserId,
   currentUserName,
   currentUserEmail,
+  isAuthenticated,
   mainTab,
   mode,
   filter,
@@ -84,6 +87,7 @@ export function CommunityHomeScreen({
   hasVehicle,
   onSignOut,
   onWithdrawAccount,
+  onRequestAuth,
   onMainTabChange,
   onModeChange,
   onFilterChange,
@@ -226,6 +230,7 @@ export function CommunityHomeScreen({
           currentUserId={currentUserId}
           currentUserName={currentUserName}
           currentUserEmail={currentUserEmail}
+          isAuthenticated={isAuthenticated}
           mainTab={mainTab}
           mode={mode}
           filter={filter}
@@ -243,6 +248,7 @@ export function CommunityHomeScreen({
           hasVehicle={hasVehicle}
           onSignOut={onSignOut}
           onWithdrawAccount={onWithdrawAccount}
+          onRequestAuth={onRequestAuth}
           onFilterChange={onFilterChange}
           onStateFilterChange={onStateFilterChange}
           onFromSearchQueryChange={onFromSearchQueryChange}

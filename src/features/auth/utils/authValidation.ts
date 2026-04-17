@@ -8,10 +8,10 @@ type ValidateAuthInputArgs = {
 };
 
 export const validateAuthInput = ({
-  authMode,
+  authMode: _authMode,
   email,
   password,
-  displayName,
+  displayName: _displayName,
 }: ValidateAuthInputArgs): string | null => {
   if (!email || !email.includes("@")) {
     return "Please enter a valid email address.";
@@ -19,10 +19,6 @@ export const validateAuthInput = ({
 
   if (password.length < 6) {
     return "Password must be at least 6 characters.";
-  }
-
-  if (authMode === "signUp" && !displayName.trim()) {
-    return "Display name is required for sign up.";
   }
 
   return null;

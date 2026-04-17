@@ -6,26 +6,16 @@ import { AUTH_BODY_FONT_EMPHASIS } from "./constants";
 
 export const createAuthProviderStyles = (colors: AppColors) =>
   ({
-    authProviderSectionTitle: {
-      color: colors.subtext,
-      fontSize: 12,
-      fontWeight: "700",
-      textTransform: "uppercase",
-      letterSpacing: 0.8,
-      fontFamily: AUTH_BODY_FONT_EMPHASIS,
-      paddingHorizontal: 4,
-      paddingBottom: 2,
-    },
     providerButton: {
-      height: 48,
-      borderRadius: 14,
+      height: 56,
+      borderRadius: 16,
       borderWidth: 1,
       borderColor: colors.border,
       backgroundColor: colors.panelAlt,
       flexDirection: "row",
       alignItems: "center",
-      paddingHorizontal: 14,
-      gap: 10,
+      paddingHorizontal: 16,
+      gap: 12,
     },
     providerButtonDisabled: {
       backgroundColor: colors.panelAlt,
@@ -38,11 +28,11 @@ export const createAuthProviderStyles = (colors: AppColors) =>
     },
     emailProviderButtonText: {
       color: colors.brandText,
-      fontSize: 14,
+      fontSize: 15,
       fontWeight: "800",
       fontFamily: AUTH_BODY_FONT_EMPHASIS,
       letterSpacing: -0.15,
-      lineHeight: 18,
+      lineHeight: 19,
       transform: [{ translateY: Platform.OS === "android" ? 1 : 0.5 }],
     },
     googleProviderButton: {
@@ -71,14 +61,14 @@ export const createAuthProviderStyles = (colors: AppColors) =>
       color: "#191919",
     },
     providerIconSlot: {
-      width: 16,
-      height: 16,
+      width: 18,
+      height: 18,
       alignItems: "center",
       justifyContent: "center",
       flexShrink: 0,
     },
     providerIconGlyph: {
-      lineHeight: 16,
+      lineHeight: 18,
       includeFontPadding: false,
       textAlignVertical: "center",
     },
@@ -87,11 +77,11 @@ export const createAuthProviderStyles = (colors: AppColors) =>
     },
     providerButtonText: {
       color: colors.text,
-      fontSize: 14,
+      fontSize: 15,
       fontWeight: "800",
       fontFamily: AUTH_BODY_FONT_EMPHASIS,
       letterSpacing: -0.15,
-      lineHeight: 18,
+      lineHeight: 19,
       transform: [{ translateY: Platform.OS === "android" ? 1 : 0.5 }],
     },
     providerButtonTextDisabled: {
@@ -99,26 +89,6 @@ export const createAuthProviderStyles = (colors: AppColors) =>
     },
     appleProviderButtonText: {
       color: "#FFFFFF",
-    },
-    authProviderDividerRow: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: 10,
-      paddingVertical: 4,
-    },
-    authProviderDividerLine: {
-      flex: 1,
-      height: 1,
-      backgroundColor: colors.border,
-    },
-    authProviderDividerText: {
-      color: colors.subtext,
-      fontSize: 12,
-      fontWeight: "700",
-      letterSpacing: 0.4,
-      textTransform: "uppercase",
-      fontFamily: AUTH_BODY_FONT_EMPHASIS,
-      paddingHorizontal: 4,
     },
     providerSoonBadge: {
       marginLeft: "auto",

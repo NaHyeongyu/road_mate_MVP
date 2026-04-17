@@ -11,14 +11,12 @@ export type AuthEmailScreenProps = {
   colors: AppColors;
   styles: AppStyles;
   authMode: "signIn" | "signUp";
-  authDisplayName: string;
   authEmail: string;
   authPassword: string;
   isAuthSubmitting: boolean;
   notice: { tone: "info" | "success" | "error"; text: string };
   onBack: () => void;
   onChangeAuthMode: (mode: "signIn" | "signUp") => void;
-  onChangeDisplayName: (value: string) => void;
   onChangeEmail: (value: string) => void;
   onChangePassword: (value: string) => void;
   onSubmit: () => void;
@@ -28,14 +26,12 @@ export function AuthEmailScreen({
   colors,
   styles,
   authMode,
-  authDisplayName,
   authEmail,
   authPassword,
   isAuthSubmitting,
   notice,
   onBack,
   onChangeAuthMode,
-  onChangeDisplayName,
   onChangeEmail,
   onChangePassword,
   onSubmit,
@@ -68,12 +64,10 @@ export function AuthEmailScreen({
             colors={colors}
             styles={styles}
             authMode={authMode}
-            authDisplayName={authDisplayName}
             authEmail={authEmail}
             authPassword={authPassword}
             isAuthSubmitting={isAuthSubmitting}
             onChangeAuthMode={onChangeAuthMode}
-            onChangeDisplayName={onChangeDisplayName}
             onChangeEmail={onChangeEmail}
             onChangePassword={onChangePassword}
             onSubmit={onSubmit}

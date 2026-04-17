@@ -8,12 +8,10 @@ type AuthEmailFormCardProps = {
   colors: AppColors;
   styles: AppStyles;
   authMode: "signIn" | "signUp";
-  authDisplayName: string;
   authEmail: string;
   authPassword: string;
   isAuthSubmitting: boolean;
   onChangeAuthMode: (mode: "signIn" | "signUp") => void;
-  onChangeDisplayName: (value: string) => void;
   onChangeEmail: (value: string) => void;
   onChangePassword: (value: string) => void;
   onSubmit: () => void;
@@ -23,12 +21,10 @@ export function AuthEmailFormCard({
   colors,
   styles,
   authMode,
-  authDisplayName,
   authEmail,
   authPassword,
   isAuthSubmitting,
   onChangeAuthMode,
-  onChangeDisplayName,
   onChangeEmail,
   onChangePassword,
   onSubmit,
@@ -45,17 +41,6 @@ export function AuthEmailFormCard({
       </View>
 
       <AuthModeSwitch styles={styles} authMode={authMode} onChangeAuthMode={onChangeAuthMode} />
-
-      {authMode === "signUp" ? (
-        <TextInput
-          autoCapitalize="words"
-          onChangeText={onChangeDisplayName}
-          placeholder="Name"
-          placeholderTextColor={colors.subtext}
-          style={styles.authInput}
-          value={authDisplayName}
-        />
-      ) : null}
 
       <TextInput
         autoCapitalize="none"

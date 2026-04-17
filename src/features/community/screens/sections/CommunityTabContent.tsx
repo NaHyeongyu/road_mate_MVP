@@ -14,6 +14,7 @@ type CommunityTabContentProps = {
   currentUserId: string;
   currentUserName: string;
   currentUserEmail: string;
+  isAuthenticated: boolean;
   mainTab: MainTab;
   mode: Mode;
   filter: RouteKind;
@@ -31,6 +32,7 @@ type CommunityTabContentProps = {
   hasVehicle: boolean;
   onSignOut: () => void;
   onWithdrawAccount: () => void;
+  onRequestAuth: () => void;
   onFilterChange: (filter: RouteKind) => void;
   onStateFilterChange: (value: StateFilter) => void;
   onFromSearchQueryChange: (value: string) => void;
@@ -59,6 +61,7 @@ export function CommunityTabContent({
   currentUserId,
   currentUserName,
   currentUserEmail,
+  isAuthenticated,
   mainTab,
   mode,
   filter,
@@ -76,6 +79,7 @@ export function CommunityTabContent({
   hasVehicle,
   onSignOut,
   onWithdrawAccount,
+  onRequestAuth,
   onFilterChange,
   onStateFilterChange,
   onFromSearchQueryChange,
@@ -148,6 +152,7 @@ export function CommunityTabContent({
       styles={styles}
       currentUserName={currentUserName}
       currentUserEmail={currentUserEmail}
+      isAuthenticated={isAuthenticated}
       mode={mode}
       myPostsCount={myPosts.length}
       hasVehicle={hasVehicle}
@@ -157,6 +162,7 @@ export function CommunityTabContent({
       onSaveVehicle={onSaveVehicle}
       onSignOut={onSignOut}
       onWithdrawAccount={onWithdrawAccount}
+      onRequestAuth={onRequestAuth}
     />
   );
 }

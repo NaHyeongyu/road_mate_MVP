@@ -151,6 +151,7 @@ export function useAuthFlow({ onNotice, onResetSignedInExperience }: UseAuthFlow
 
         setAuthEmail(normalizedEmail);
         setAuthPassword("");
+        setAuthEntryMethod("options");
         onNotice({
           tone: "success",
           text: "Signed in successfully.",
@@ -160,9 +161,7 @@ export function useAuthFlow({ onNotice, onResetSignedInExperience }: UseAuthFlow
           email: normalizedEmail,
           password,
           options: {
-            data: {
-              display_name: displayName,
-            },
+            data: displayName ? { display_name: displayName } : {},
           },
         });
 
@@ -175,9 +174,10 @@ export function useAuthFlow({ onNotice, onResetSignedInExperience }: UseAuthFlow
         setAuthDisplayName("");
 
         if (data.session) {
+          setAuthEntryMethod("options");
           onNotice({
             tone: "success",
-            text: `Signed up and signed in as ${displayName}.`,
+            text: `Signed up and signed in as ${displayName || normalizedEmail}.`,
           });
         } else {
           setAuthMode("signIn");
@@ -301,6 +301,7 @@ export function useAuthFlow({ onNotice, onResetSignedInExperience }: UseAuthFlow
         tone: "success",
         text: `Signed in with ${providerLabel}.`,
       });
+      setAuthEntryMethod("options");
     } catch (error) {
       onNotice({
         tone: "error",
