@@ -5,7 +5,7 @@
     "scheme": "roadmate",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/roadmate-mark.png",
+    "icon": "./assets/roadmate-app-icon.png",
     "userInterfaceStyle": "automatic",
     "ios": {
       "supportsTablet": true,

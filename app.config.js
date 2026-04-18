@@ -66,7 +66,7 @@ module.exports = ({ config }) => {
     [
       "expo-splash-screen",
       {
-        image: "./assets/roadmate-mark.png",
+        image: "./assets/roadmate-splash-mark.png",
         resizeMode: "contain",
         backgroundColor: "#FFFFFF",
         imageWidth: 180,
