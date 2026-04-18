@@ -1,6 +1,6 @@
 import { useState, type ReactNode } from "react";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { Pressable, Text, View } from "react-native";
+import { Pressable, Text, View, useWindowDimensions } from "react-native";
 
 import type { RoutePost } from "../../../model";
 import type { AppStyles } from "../../../ui/types";
@@ -37,6 +37,8 @@ export function PostCard({
   onToggleSave,
   onDelete,
 }: PostCardProps) {
+  const { width } = useWindowDimensions();
+  const isCompactLayout = width < 390;
   const isRegular = post.kind === "regular";
   const seatsLabel = isRegular ? `${post.availableSeats} seats left` : undefined;
   const noticeDateLabel = isRegular ? undefined : formatNoticeDate(post.noticeDate, post.createdAt);
@@ -91,6 +93,11 @@ export function PostCard({
               styles.postHeaderIconAction,
               isSaved ? styles.postHeaderIconActionActive : null,
               pressed ? styles.postHeaderIconActionPressed : null,
+              pressed
+                ? {
+                    transform: [{ scale: 0.94 }],
+                  }
+                : null,
             ]}
             onPress={(event) => {
               event.stopPropagation();
@@ -110,6 +117,11 @@ export function PostCard({
             style={({ pressed }) => [
               styles.postHeaderEditAction,
               pressed ? styles.postHeaderIconActionPressed : null,
+              pressed
+                ? {
+                    transform: [{ scale: 0.97 }],
+                  }
+                : null,
             ]}
             onPress={(event) => {
               event.stopPropagation();
@@ -143,12 +155,28 @@ export function PostCard({
 
   return (
     <>
-      <View style={styles.postCard}>
+      <View
+        style={[
+          styles.postCard,
+          isCompactLayout
+            ? {
+                padding: 14,
+                borderRadius: 16,
+                gap: 10,
+              }
+            : null,
+        ]}
+      >
         {canOpenDetails ? (
           <Pressable
             style={({ pressed }) => [
               styles.postCardContentPressable,
               pressed ? styles.postCardContentPressablePressed : null,
+              pressed
+                ? {
+                    transform: [{ scale: 0.992 }],
+                  }
+                : null,
             ]}
             onPress={handleViewDetails}
           >

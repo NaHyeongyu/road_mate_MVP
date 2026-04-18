@@ -1,5 +1,5 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { Pressable, Text, View } from "react-native";
+import { Pressable, Text, View, useWindowDimensions } from "react-native";
 
 import type { AppColors } from "../../../../brandTheme";
 import type { AppStyles } from "../../../../ui/types";
@@ -22,6 +22,8 @@ export function CommunityBottomBar({
   bottomInset,
   onMainTabChange,
 }: CommunityBottomBarProps) {
+  const { width } = useWindowDimensions();
+  const isCompactLayout = width < 390;
   const homeIconName = isRiderMode ? "home-variant" : "calendar-week";
   const homeLabel = isRiderMode ? "Home" : "Regular";
   const middleIconName = isRiderMode ? "bookmark-multiple-outline" : "clock-outline";
@@ -35,9 +37,30 @@ export function CommunityBottomBar({
           minHeight: 52 + bottomInset,
           paddingBottom: bottomInset,
         },
+        isCompactLayout
+          ? {
+              paddingHorizontal: 4,
+            }
+          : null,
       ]}
     >
-      <Pressable onPress={() => onMainTabChange("home")} style={styles.mainBottomBarItem}>
+      <Pressable
+        onPress={() => onMainTabChange("home")}
+        style={({ pressed }) => [
+          styles.mainBottomBarItem,
+          isCompactLayout
+            ? {
+                gap: 1,
+              }
+            : null,
+          pressed
+            ? {
+                opacity: 0.78,
+                transform: [{ scale: 0.97 }],
+              }
+            : null,
+        ]}
+      >
         <MaterialCommunityIcons
           color={mainTab === "home" ? colors.brand : colors.subtext}
           name={homeIconName}
@@ -47,13 +70,34 @@ export function CommunityBottomBar({
           style={[
             styles.mainBottomBarLabel,
             mainTab === "home" ? styles.mainBottomBarLabelActive : null,
+            isCompactLayout
+              ? {
+                  fontSize: 11,
+                }
+              : null,
           ]}
         >
           {homeLabel}
         </Text>
       </Pressable>
 
-      <Pressable onPress={() => onMainTabChange("saved")} style={styles.mainBottomBarItem}>
+      <Pressable
+        onPress={() => onMainTabChange("saved")}
+        style={({ pressed }) => [
+          styles.mainBottomBarItem,
+          isCompactLayout
+            ? {
+                gap: 1,
+              }
+            : null,
+          pressed
+            ? {
+                opacity: 0.78,
+                transform: [{ scale: 0.97 }],
+              }
+            : null,
+        ]}
+      >
         <MaterialCommunityIcons
           color={mainTab === "saved" ? colors.brand : colors.subtext}
           name={middleIconName}
@@ -63,13 +107,34 @@ export function CommunityBottomBar({
           style={[
             styles.mainBottomBarLabel,
             mainTab === "saved" ? styles.mainBottomBarLabelActive : null,
+            isCompactLayout
+              ? {
+                  fontSize: 11,
+                }
+              : null,
           ]}
         >
           {middleLabel}
         </Text>
       </Pressable>
 
-      <Pressable onPress={() => onMainTabChange("mypage")} style={styles.mainBottomBarItem}>
+      <Pressable
+        onPress={() => onMainTabChange("mypage")}
+        style={({ pressed }) => [
+          styles.mainBottomBarItem,
+          isCompactLayout
+            ? {
+                gap: 1,
+              }
+            : null,
+          pressed
+            ? {
+                opacity: 0.78,
+                transform: [{ scale: 0.97 }],
+              }
+            : null,
+        ]}
+      >
         <MaterialCommunityIcons
           color={mainTab === "mypage" ? colors.brand : colors.subtext}
           name="account-circle-outline"
@@ -79,6 +144,11 @@ export function CommunityBottomBar({
           style={[
             styles.mainBottomBarLabel,
             mainTab === "mypage" ? styles.mainBottomBarLabelActive : null,
+            isCompactLayout
+              ? {
+                  fontSize: 11,
+                }
+              : null,
           ]}
         >
           My Page

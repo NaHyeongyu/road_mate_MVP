@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { ScrollView, StatusBar, View } from "react-native";
+import { KeyboardAvoidingView, Platform, ScrollView, StatusBar, View, useWindowDimensions } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import type { AppNotice } from "../../../app/types";
@@ -9,6 +9,7 @@ import { APP_BAR_BG } from "../../../ui/styleFragments/layout/constants";
 import type { AppStyles } from "../../../ui/types";
 import { NoticeBanner } from "../../shared/components/NoticeBanner";
 import { ScreenHeader } from "../../shared/components/ScreenHeader";
+import { AnimatedEntrance } from "../../shared/components/AnimatedEntrance";
 import { BottomBannerAd } from "../../ads/components/BottomBannerAd";
 import type { MainTab, Mode, StateFilter } from "../types";
 import { RoleModeToggle } from "../components/RoleModeToggle";
@@ -113,10 +114,23 @@ export function CommunityHomeScreen({
   onLoadMoreRiderSearchResults,
 }: CommunityHomeScreenProps) {
   const insets = useSafeAreaInsets();
+  const { width } = useWindowDimensions();
   const bottomInset = Math.max(insets.bottom, 8);
+  const isCompactLayout = width < 390;
   const isRiderMode = mode === "rider";
   const isSearchDetailScreen =
     isRiderMode && mainTab === "home" && isRiderSearchResultsPageVisible;
+  const scrollContentStyle = [
+    styles.screenContent,
+    isCompactLayout
+      ? {
+          paddingHorizontal: 14,
+          paddingTop: 12,
+          paddingBottom: 28,
+          gap: 12,
+        }
+      : null,
+  ];
   const {
     isDriverRegistrationPageVisible,
     activeDriverRouteKind,
@@ -150,6 +164,11 @@ export function CommunityHomeScreen({
             {
               paddingTop: insets.top + 6,
             },
+            isCompactLayout
+              ? {
+                  paddingHorizontal: 14,
+                }
+              : null,
           ]}
         >
           <ScreenHeader
@@ -161,27 +180,37 @@ export function CommunityHomeScreen({
           />
         </View>
 
-        <ScrollView
-          style={styles.screenScroll}
-          contentContainerStyle={styles.screenContent}
-          keyboardShouldPersistTaps="always"
+        <KeyboardAvoidingView
+          style={{ flex: 1 }}
+          behavior={Platform.OS === "ios" ? "padding" : undefined}
         >
-          <NoticeBanner notice={notice} styles={styles} />
-          <DriverRouteComposerSection
-            colors={colors}
-            styles={styles}
-            activeRouteKind={activeDriverRouteKind}
-            routeDraft={activeRouteDraft}
-            hasVehicle={hasVehicle}
-            showVehicleSetup={!hasVehicle}
-            vehicleDraft={vehicleDraft}
-            savedVehicle={savedVehicle}
-            onVehicleDraftChange={onVehicleDraftChange}
-            onSaveVehicle={onSaveVehicle}
-            onRouteDraftChange={onRouteDraftChange}
-            onPostRoute={handleSaveRouteRegistration}
-          />
-        </ScrollView>
+          <ScrollView
+            style={styles.screenScroll}
+            contentContainerStyle={scrollContentStyle}
+            keyboardShouldPersistTaps="always"
+            keyboardDismissMode="on-drag"
+          >
+            <AnimatedEntrance delay={20}>
+              <NoticeBanner notice={notice} styles={styles} />
+            </AnimatedEntrance>
+            <AnimatedEntrance delay={90} resetKey={activeDriverRouteKind}>
+              <DriverRouteComposerSection
+                colors={colors}
+                styles={styles}
+                activeRouteKind={activeDriverRouteKind}
+                routeDraft={activeRouteDraft}
+                hasVehicle={hasVehicle}
+                showVehicleSetup={!hasVehicle}
+                vehicleDraft={vehicleDraft}
+                savedVehicle={savedVehicle}
+                onVehicleDraftChange={onVehicleDraftChange}
+                onSaveVehicle={onSaveVehicle}
+                onRouteDraftChange={onRouteDraftChange}
+                onPostRoute={handleSaveRouteRegistration}
+              />
+            </AnimatedEntrance>
+          </ScrollView>
+        </KeyboardAvoidingView>
 
         <BottomBannerAd bottomInset={bottomInset} />
       </View>
@@ -198,6 +227,11 @@ export function CommunityHomeScreen({
             {
               paddingTop: insets.top + 6,
             },
+            isCompactLayout
+              ? {
+                  paddingHorizontal: 14,
+                }
+              : null,
           ]}
         >
           <ScreenHeader
@@ -215,62 +249,73 @@ export function CommunityHomeScreen({
             {
               paddingTop: insets.top + 10,
             },
+            isCompactLayout
+              ? {
+                  paddingBottom: 4,
+                }
+              : null,
           ]}
         >
           <RoleModeToggle mode={mode} onChangeMode={onModeChange} styles={styles} />
         </View>
       )}
 
-      <ScrollView
-        style={styles.screenScroll}
-        contentContainerStyle={styles.screenContent}
-        keyboardShouldPersistTaps="always"
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
       >
-        <CommunityTabContent
-          colors={colors}
-          styles={styles}
-          notice={notice}
-          currentUserId={currentUserId}
-          currentUserName={currentUserName}
-          currentUserEmail={currentUserEmail}
-          isAuthenticated={isAuthenticated}
-          mainTab={mainTab}
-          mode={mode}
-          filter={filter}
-          stateFilter={stateFilter}
-          fromSearchQuery={fromSearchQuery}
-          toSearchQuery={toSearchQuery}
-          visiblePosts={visiblePosts}
-          myPosts={myPosts}
-          savedPosts={savedPosts}
-          savedPostKeys={savedPostKeys}
-          vehicleDraft={vehicleDraft}
-          savedVehicle={savedVehicle}
-          hasDriverContactMethod={hasDriverContactMethod}
-          routeDraft={routeDraft}
-          hasVehicle={hasVehicle}
-          onSignOut={onSignOut}
-          onWithdrawAccount={onWithdrawAccount}
-          onRequestAuth={onRequestAuth}
-          onFilterChange={onFilterChange}
-          onStateFilterChange={onStateFilterChange}
-          onFromSearchQueryChange={onFromSearchQueryChange}
-          onToSearchQueryChange={onToSearchQueryChange}
-          onVehicleDraftChange={onVehicleDraftChange}
-          onSaveVehicle={onSaveVehicle}
-          onRouteDraftChange={onRouteDraftChange}
-          onPostRoute={onPostRoute}
-          onSaveRouteQuickSettings={onSaveRouteQuickSettings}
-          onOpenDriverRegistrationPage={openDriverRegistrationPage}
-          onRemoveRoute={onRemoveRoute}
-          onToggleSavedPost={onToggleSavedPost}
-          isRiderSearchResultsPageVisible={isRiderSearchResultsPageVisible}
-          canLoadMoreRiderSearchResults={canLoadMoreRiderSearchResults}
-          onOpenRiderSearchResultsPage={onOpenRiderSearchResultsPage}
-          onCloseRiderSearchResultsPage={onCloseRiderSearchResultsPage}
-          onLoadMoreRiderSearchResults={onLoadMoreRiderSearchResults}
-        />
-      </ScrollView>
+        <ScrollView
+          style={styles.screenScroll}
+          contentContainerStyle={scrollContentStyle}
+          keyboardShouldPersistTaps="always"
+          keyboardDismissMode="on-drag"
+        >
+          <CommunityTabContent
+            colors={colors}
+            styles={styles}
+            notice={notice}
+            currentUserId={currentUserId}
+            currentUserName={currentUserName}
+            currentUserEmail={currentUserEmail}
+            isAuthenticated={isAuthenticated}
+            mainTab={mainTab}
+            mode={mode}
+            filter={filter}
+            stateFilter={stateFilter}
+            fromSearchQuery={fromSearchQuery}
+            toSearchQuery={toSearchQuery}
+            visiblePosts={visiblePosts}
+            myPosts={myPosts}
+            savedPosts={savedPosts}
+            savedPostKeys={savedPostKeys}
+            vehicleDraft={vehicleDraft}
+            savedVehicle={savedVehicle}
+            hasDriverContactMethod={hasDriverContactMethod}
+            routeDraft={routeDraft}
+            hasVehicle={hasVehicle}
+            onSignOut={onSignOut}
+            onWithdrawAccount={onWithdrawAccount}
+            onRequestAuth={onRequestAuth}
+            onFilterChange={onFilterChange}
+            onStateFilterChange={onStateFilterChange}
+            onFromSearchQueryChange={onFromSearchQueryChange}
+            onToSearchQueryChange={onToSearchQueryChange}
+            onVehicleDraftChange={onVehicleDraftChange}
+            onSaveVehicle={onSaveVehicle}
+            onRouteDraftChange={onRouteDraftChange}
+            onPostRoute={onPostRoute}
+            onSaveRouteQuickSettings={onSaveRouteQuickSettings}
+            onOpenDriverRegistrationPage={openDriverRegistrationPage}
+            onRemoveRoute={onRemoveRoute}
+            onToggleSavedPost={onToggleSavedPost}
+            isRiderSearchResultsPageVisible={isRiderSearchResultsPageVisible}
+            canLoadMoreRiderSearchResults={canLoadMoreRiderSearchResults}
+            onOpenRiderSearchResultsPage={onOpenRiderSearchResultsPage}
+            onCloseRiderSearchResultsPage={onCloseRiderSearchResultsPage}
+            onLoadMoreRiderSearchResults={onLoadMoreRiderSearchResults}
+          />
+        </ScrollView>
+      </KeyboardAvoidingView>
 
       <BottomBannerAd bottomInset={isSearchDetailScreen ? bottomInset : 0} />
 

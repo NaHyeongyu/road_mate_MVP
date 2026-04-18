@@ -2,6 +2,7 @@ import type { AppNotice } from "../../../../app/types";
 import type { AppColors } from "../../../../brandTheme";
 import type { RouteDraft, RouteKind, RoutePost } from "../../../../model";
 import type { AppStyles } from "../../../../ui/types";
+import { AnimatedEntrance } from "../../../shared/components/AnimatedEntrance";
 import { NoticeBanner } from "../../../shared/components/NoticeBanner";
 import type { Mode, StateFilter } from "../../types";
 import { DriverHomeSection } from "./home/DriverHomeSection";
@@ -74,42 +75,46 @@ export function HomeTabSection({
 }: HomeTabSectionProps) {
   return (
     <>
-      <NoticeBanner notice={notice} styles={styles} />
+      <AnimatedEntrance delay={20} resetKey={`notice-${mode}`}>
+        <NoticeBanner notice={notice} styles={styles} />
+      </AnimatedEntrance>
 
-      {mode === "driver" ? (
-        <DriverHomeSection
-          styles={styles}
-          driverRouteKind={driverRouteKind}
-          routeDraft={routeDraft}
-          hasDriverContactMethod={hasDriverContactMethod}
-          myPosts={myPosts}
-          onRouteDraftChange={onRouteDraftChange}
-          onSaveRouteQuickSettings={onSaveRouteQuickSettings}
-          onOpenRouteRegistrationPage={onOpenDriverRegistrationPage}
-        />
-      ) : (
-        <RiderFeedSection
-          colors={colors}
-          styles={styles}
-          filter={filter}
-          stateFilter={stateFilter}
-          fromSearchQuery={fromSearchQuery}
-          toSearchQuery={toSearchQuery}
-          visiblePosts={visiblePosts}
-          currentUserId={currentUserId}
-          savedPostKeys={savedPostKeys}
-          onFilterChange={onFilterChange}
-          onStateFilterChange={onStateFilterChange}
-          onFromSearchQueryChange={onFromSearchQueryChange}
-          onToSearchQueryChange={onToSearchQueryChange}
-          onToggleSavedPost={onToggleSavedPost}
-          isSearchResultsPageVisible={isRiderSearchResultsPageVisible}
-          canLoadMoreSearchResults={canLoadMoreRiderSearchResults}
-          onOpenSearchResultsPage={onOpenRiderSearchResultsPage}
-          onCloseSearchResultsPage={onCloseRiderSearchResultsPage}
-          onLoadMoreSearchResults={onLoadMoreRiderSearchResults}
-        />
-      )}
+      <AnimatedEntrance delay={95} resetKey={`home-section-${mode}-${driverRouteKind}`}>
+        {mode === "driver" ? (
+          <DriverHomeSection
+            styles={styles}
+            driverRouteKind={driverRouteKind}
+            routeDraft={routeDraft}
+            hasDriverContactMethod={hasDriverContactMethod}
+            myPosts={myPosts}
+            onRouteDraftChange={onRouteDraftChange}
+            onSaveRouteQuickSettings={onSaveRouteQuickSettings}
+            onOpenRouteRegistrationPage={onOpenDriverRegistrationPage}
+          />
+        ) : (
+          <RiderFeedSection
+            colors={colors}
+            styles={styles}
+            filter={filter}
+            stateFilter={stateFilter}
+            fromSearchQuery={fromSearchQuery}
+            toSearchQuery={toSearchQuery}
+            visiblePosts={visiblePosts}
+            currentUserId={currentUserId}
+            savedPostKeys={savedPostKeys}
+            onFilterChange={onFilterChange}
+            onStateFilterChange={onStateFilterChange}
+            onFromSearchQueryChange={onFromSearchQueryChange}
+            onToSearchQueryChange={onToSearchQueryChange}
+            onToggleSavedPost={onToggleSavedPost}
+            isSearchResultsPageVisible={isRiderSearchResultsPageVisible}
+            canLoadMoreSearchResults={canLoadMoreRiderSearchResults}
+            onOpenSearchResultsPage={onOpenRiderSearchResultsPage}
+            onCloseSearchResultsPage={onCloseRiderSearchResultsPage}
+            onLoadMoreSearchResults={onLoadMoreRiderSearchResults}
+          />
+        )}
+      </AnimatedEntrance>
     </>
   );
 }

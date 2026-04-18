@@ -1,10 +1,11 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { Keyboard, Pressable, Text, TextInput, View } from "react-native";
+import { Keyboard, Pressable, Text, TextInput, View, useWindowDimensions } from "react-native";
 
 import type { AppColors } from "../../../../../brandTheme";
 import type { RouteKind, RoutePost } from "../../../../../model";
 import type { AppStyles } from "../../../../../ui/types";
+import { AnimatedEntrance } from "../../../../shared/components/AnimatedEntrance";
 import { PostCard } from "../../../components/PostCard";
 import { getPostSaveKey } from "../../../utils/storage";
 import { RiderFeedEmptyState } from "./RiderFeedEmptyState";
@@ -61,6 +62,8 @@ export function RiderFeedSection({
   onCloseSearchResultsPage,
   onLoadMoreSearchResults,
 }: RiderFeedSectionProps) {
+  const { width } = useWindowDimensions();
+  const isCompactLayout = width < 390;
   const savedPostKeySet = useMemo(() => new Set(savedPostKeys), [savedPostKeys]);
   const hasStateSelected = stateFilter !== "ALL";
   const hasRoutePairQuery = Boolean(fromSearchQuery.trim() && toSearchQuery.trim());
@@ -112,6 +115,19 @@ export function RiderFeedSection({
   });
   const feedPosts = hasSearchRequested && isSearchReady ? matchedFeedPosts : [];
   const isResultsPage = isSearchResultsPageVisible && hasSearchRequested && isSearchReady;
+  const compactSearchGridStyle = isCompactLayout ? { gap: 10 } : null;
+  const compactSummaryCardStyle = isCompactLayout
+    ? {
+        paddingHorizontal: 10,
+        paddingVertical: 9,
+      }
+    : null;
+  const compactSearchButtonStyle = isCompactLayout
+    ? {
+        minHeight: 48,
+        borderRadius: 14,
+      }
+    : null;
 
   useEffect(() => {
     setHasSearchRequested(false);
@@ -130,9 +146,12 @@ export function RiderFeedSection({
 
   if (isResultsPage) {
     return (
-      <>
-        <View style={styles.routeResultsSummaryCard}>
-          <Text style={styles.routeResultsSummaryText}>{routeSummary}</Text>
+      <AnimatedEntrance delay={40} resetKey={`rider-results-${filter}-${stateFilter}`}>
+        <>
+        <View style={[styles.routeResultsSummaryCard, compactSummaryCardStyle]}>
+          <Text numberOfLines={2} style={styles.routeResultsSummaryText}>
+            {routeSummary}
+          </Text>
           <Text style={styles.routeResultsSummaryMeta}>{stateFilterLabel}</Text>
         </View>
 
@@ -182,6 +201,7 @@ export function RiderFeedSection({
               <Pressable
                 style={({ pressed }) => [
                   styles.routeSearchActionButton,
+                  compactSearchButtonStyle,
                   pressed ? styles.routeSearchActionButtonPressed : null,
                 ]}
                 onPress={onLoadMoreSearchResults}
@@ -192,15 +212,17 @@ export function RiderFeedSection({
             ) : null}
           </>
         )}
-      </>
+        </>
+      </AnimatedEntrance>
     );
   }
 
   return (
-    <>
+    <AnimatedEntrance delay={40} resetKey={`rider-search-${filter}`}>
+      <>
       <RiderFeedTypeTabs colors={colors} styles={styles} filter={filter} onFilterChange={onFilterChange} />
 
-      <View style={styles.routeSearchGrid}>
+      <View style={[styles.routeSearchGrid, compactSearchGridStyle]}>
         <RiderStateFilterSelect
           colors={colors}
           styles={styles}
@@ -251,6 +273,7 @@ export function RiderFeedSection({
         <Pressable
           style={({ pressed }) => [
             styles.routeSearchActionButton,
+            compactSearchButtonStyle,
             !isSearchReady ? styles.routeSearchActionButtonDisabled : null,
             pressed ? styles.routeSearchActionButtonPressed : null,
           ]}
@@ -267,6 +290,7 @@ export function RiderFeedSection({
           </Text>
         </Pressable>
       </View>
-    </>
+      </>
+    </AnimatedEntrance>
   );
 }
