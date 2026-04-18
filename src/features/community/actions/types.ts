@@ -1,4 +1,5 @@
 import type { AppNotice } from "../../../app/types";
+import type { AppCopy } from "../../../i18n/copy";
 import type { RouteDraft, RouteKind, RoutePost, VehicleInfo } from "../../../model";
 import type { Filter, MainTab, Mode, StateFilter } from "../types";
 
@@ -20,6 +21,7 @@ export type CommunityActionsContext = {
   setRouteDraft: (value: RouteDraft) => void;
   resetAllRouteDrafts: () => void;
   onNotice: (notice: AppNotice) => void;
+  copy: AppCopy;
   persistPosts: (nextPosts: RoutePost[]) => Promise<void>;
   persistSavedPostKeys: (nextKeys: string[]) => Promise<void>;
   persistVehicle: (nextVehicle: VehicleInfo) => Promise<void>;

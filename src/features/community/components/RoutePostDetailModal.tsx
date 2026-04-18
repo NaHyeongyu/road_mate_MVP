@@ -1,9 +1,14 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Modal, Pressable, Text, View } from "react-native";
 
+import { useAppCopy } from "../../../i18n/AppI18nContext";
+import {
+  formatLocalizedNoticeCountdown,
+  formatLocalizedNoticeDate,
+  getLocalizedNoticeDayDelta,
+} from "../../../i18n/formatters";
 import type { RoutePost } from "../../../model";
 import type { AppStyles } from "../../../ui/types";
-import { formatNoticeCountdown, formatNoticeDate, getNoticeDayDelta } from "../utils/storage";
 import { PostCardActions } from "./postCard/PostCardActions";
 import { PostCardContactRow } from "./postCard/PostCardContactRow";
 import { PostCardFooter } from "./postCard/PostCardFooter";
@@ -32,17 +37,28 @@ export function RoutePostDetailModal({
   onDelete,
   onClose,
 }: RoutePostDetailModalProps) {
+  const copy = useAppCopy();
   const isRegular = post.kind === "regular";
   const shouldShowSaveAction = !isOwnedByCurrentUser && Boolean(onToggleSave);
-  const seatsLabel = isRegular ? `${post.availableSeats} seats left` : undefined;
-  const noticeDateLabel = isRegular ? undefined : formatNoticeDate(post.noticeDate, post.createdAt);
+  const seatsLabel = isRegular ? copy.community.seatsLeft(post.availableSeats) : undefined;
+  const noticeDateLabel = isRegular
+    ? undefined
+    : formatLocalizedNoticeDate(copy, post.noticeDate, post.createdAt);
+  const returnDateLabel =
+    isRegular || !(post.oneTimeTripType === "round_trip" || Boolean(post.returnSchedule))
+      ? undefined
+      : formatLocalizedNoticeDate(copy, post.returnDate ?? post.noticeDate, post.createdAt);
   const noticeTripTypeLabel = isRegular
     ? undefined
     : post.oneTimeTripType === "round_trip" || Boolean(post.returnSchedule)
-      ? "Round-trip"
-      : "One-way";
-  const noticeDayDelta = isRegular ? null : getNoticeDayDelta(post.noticeDate, post.createdAt);
-  const noticeCountdownLabel = isRegular ? undefined : formatNoticeCountdown(noticeDayDelta);
+      ? copy.tripTypes.roundTrip
+      : copy.tripTypes.oneWay;
+  const noticeDayDelta = isRegular
+    ? null
+    : getLocalizedNoticeDayDelta(post.noticeDate, post.createdAt);
+  const noticeCountdownLabel = isRegular
+    ? undefined
+    : formatLocalizedNoticeCountdown(copy, noticeDayDelta);
   const noticeCountdownTone = isRegular
     ? "unknown"
     : noticeDayDelta === null
@@ -50,6 +66,12 @@ export function RoutePostDetailModal({
       : noticeDayDelta < 0
         ? "past"
         : "upcoming";
+  const oneTimeSummaryLabel =
+    !isRegular && noticeDateLabel
+      ? returnDateLabel && noticeDateLabel !== returnDateLabel
+        ? `${noticeDateLabel} -> ${returnDateLabel}`
+        : copy.community.noticeFor(noticeDateLabel)
+      : "";
   const detailNote = post.note.trim();
 
   const handleDelete = () => {
@@ -71,9 +93,11 @@ export function RoutePostDetailModal({
         <View style={styles.postDetailModalCard}>
           <View style={styles.postDetailModalHeaderRow}>
             <View style={styles.postDetailModalTitleBlock}>
-              <Text style={styles.postDetailModalTitle}>Ride details</Text>
+              <Text style={styles.postDetailModalTitle}>{copy.common.rideDetails}</Text>
               <Text numberOfLines={1} style={styles.postDetailModalSubtitle}>
-                {isRegular ? `${post.from} -> ${post.to}` : `Notice for ${noticeDateLabel}`}
+                {isRegular
+                  ? copy.community.rideDetailsSubtitle(post.from, post.to)
+                  : oneTimeSummaryLabel}
               </Text>
             </View>
 
@@ -115,6 +139,7 @@ export function RoutePostDetailModal({
               isRegular={isRegular}
               seatsLabel={seatsLabel}
               noticeDateLabel={noticeDateLabel}
+              returnDateLabel={returnDateLabel}
               noticeTripTypeLabel={noticeTripTypeLabel}
               noticeCountdownLabel={noticeCountdownLabel}
               noticeCountdownTone={noticeCountdownTone}
@@ -126,11 +151,11 @@ export function RoutePostDetailModal({
 
             {detailNote ? (
               <View style={styles.postSummaryRow}>
-                <Text style={styles.postSummaryText}>Note</Text>
+                <Text style={styles.postSummaryText}>{copy.common.note}</Text>
                 <Text style={styles.postNote}>{detailNote}</Text>
               </View>
             ) : null}
-            {isOwnedByCurrentUser ? <Text style={styles.mine}>From my driver profile</Text> : null}
+            {isOwnedByCurrentUser ? <Text style={styles.mine}>{copy.community.fromMyDriverProfile}</Text> : null}
 
             <PostCardActions
               styles={styles}

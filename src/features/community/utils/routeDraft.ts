@@ -22,12 +22,22 @@ export const buildRoutePost = ({
   const profileContactLink = savedVehicle.contactLink.trim();
   const fallbackDraftContactPhone = routeDraft.contactPhone.trim();
   const fallbackDraftContactLink = routeDraft.contactLink.trim();
+  const contactPhone = isOneTime
+    ? profileContactPhone || fallbackDraftContactPhone || undefined
+    : profileContactPhone || undefined;
+  const contactLink = isOneTime
+    ? profileContactLink || fallbackDraftContactLink || undefined
+    : profileContactLink || undefined;
 
   return {
     id: `mine-${Date.now()}`,
     kind: routeDraft.kind,
     oneTimeTripType: isOneTime ? routeDraft.oneTimeTripType : undefined,
     noticeDate: isOneTime ? routeDraft.noticeDate.trim() : undefined,
+    returnDate:
+      isOneTime && isOneTimeRoundTrip
+        ? routeDraft.returnDate?.trim() || routeDraft.noticeDate.trim() || undefined
+        : undefined,
     from: routeDraft.from.trim(),
     to: routeDraft.to.trim(),
     schedule: routeDraft.schedule.trim(),
@@ -40,8 +50,8 @@ export const buildRoutePost = ({
       ? 1
       : Math.min(Number.parseInt(String(routeDraft.availableSeats ?? "").trim(), 10) || 0, MAX_SEATS),
     operatingDays: isOneTime ? [] : routeDraft.operatingDays,
-    contactPhone: profileContactPhone || fallbackDraftContactPhone || undefined,
-    contactLink: profileContactLink || fallbackDraftContactLink || undefined,
+    contactPhone,
+    contactLink,
     note: routeDraft.note.trim(),
     vehicleModel: savedVehicle.model,
     vehiclePlate: savedVehicle.plate,
@@ -67,6 +77,14 @@ export const validateRoutePost = (routePost: RoutePost): string | null => {
 
   if (!Number.isFinite(routePost.availableSeats) || routePost.availableSeats < 1) {
     return "Set available seats to at least 1.";
+  }
+
+  if (
+    routePost.kind === "one_time" &&
+    routePost.oneTimeTripType === "round_trip" &&
+    (!routePost.returnDate || !isRouteDateValue(routePost.returnDate))
+  ) {
+    return "Set return date using calendar picker for round-trip notice.";
   }
 
   if (

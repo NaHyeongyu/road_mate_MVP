@@ -2,6 +2,7 @@ import type { AppColors } from "../../brandTheme";
 import { isSocialAuthEnabled } from "../../features/auth/config";
 import type { AuthEmailScreenProps } from "../../features/auth/screens/AuthEmailScreen";
 import type { AuthOptionsScreenProps } from "../../features/auth/screens/AuthOptionsScreen";
+import type { AuthPasswordResetScreenProps } from "../../features/auth/screens/AuthPasswordResetScreen";
 import type { CommunityHomeScreenProps } from "../../features/community/screens/CommunityHomeScreen";
 import type { AppStyles } from "../../ui/types";
 import type { RoadmateAppState } from "../useRoadmateAppState";
@@ -13,6 +14,12 @@ type AuthOptionsBindingsArgs = {
 };
 
 type AuthEmailBindingsArgs = {
+  appState: RoadmateAppState;
+  colors: AppColors;
+  styles: AppStyles;
+};
+
+type AuthPasswordResetBindingsArgs = {
   appState: RoadmateAppState;
   colors: AppColors;
   styles: AppStyles;
@@ -61,16 +68,62 @@ export function buildAuthEmailScreenProps({
     authMode: appState.authMode,
     authEmail: appState.authEmail,
     authPassword: appState.authPassword,
+    authPasswordConfirm: appState.authPasswordConfirm,
     isAuthSubmitting: appState.isAuthSubmitting,
+    pendingVerificationEmail: appState.pendingVerificationEmail,
+    isResendingVerification: appState.isResendingVerification,
+    isPasswordRecoveryMode: appState.isPasswordRecoveryMode,
+    isPasswordResetEmailSending: appState.isPasswordResetEmailSending,
+    isPasswordResetSubmitting: appState.isPasswordResetSubmitting,
+    emailDuplicateCheckStatus: appState.emailDuplicateCheckStatus,
+    isCheckingEmailDuplicate: appState.isCheckingEmailDuplicate,
     notice: appState.notice,
     onBack: () => {
       clearNotice(appState);
-      appState.setAuthEntryMethod("options");
+      appState.handleCloseEmailAuth();
     },
     onChangeAuthMode: appState.setAuthMode,
     onChangeEmail: appState.setAuthEmail,
     onChangePassword: appState.setAuthPassword,
+    onChangePasswordConfirm: appState.setAuthPasswordConfirm,
     onSubmit: appState.handleSubmitAuth,
+    onCheckEmailDuplicate: appState.handleCheckEmailDuplicate,
+    onOpenPasswordResetPage: appState.handleOpenPasswordReset,
+    onCompletePasswordReset: appState.handleCompletePasswordReset,
+    onResendVerificationEmail: appState.handleResendVerificationEmail,
+  };
+}
+
+export function buildAuthPasswordResetScreenProps({
+  appState,
+  colors,
+  styles,
+}: AuthPasswordResetBindingsArgs): AuthPasswordResetScreenProps {
+  return {
+    colors,
+    styles,
+    authEmail: appState.authEmail,
+    authPassword: appState.authPassword,
+    authPasswordConfirm: appState.authPasswordConfirm,
+    isPasswordRecoveryMode: appState.isPasswordRecoveryMode,
+    isPasswordResetEmailSending: appState.isPasswordResetEmailSending,
+    isPasswordResetSubmitting: appState.isPasswordResetSubmitting,
+    passwordResetEmailStatus: appState.passwordResetEmailStatus,
+    passwordResetSentEmail: appState.passwordResetSentEmail,
+    passwordResetEmailCooldownSeconds: appState.passwordResetEmailCooldownSeconds,
+    isPasswordResetReadyToChange: appState.isPasswordResetReadyToChange,
+    isCheckingPasswordResetEmail: appState.isCheckingPasswordResetEmail,
+    onBack: () => {
+      clearNotice(appState);
+      appState.handleCloseEmailAuth();
+    },
+    onChangeEmail: appState.setAuthEmail,
+    onChangePassword: appState.setAuthPassword,
+    onChangePasswordConfirm: appState.setAuthPasswordConfirm,
+    onCheckRegisteredEmail: appState.handleCheckPasswordResetEmail,
+    onStartPasswordResetRecovery: appState.handleStartPasswordResetRecovery,
+    onSendPasswordResetEmail: appState.handleRequestPasswordReset,
+    onCompletePasswordReset: appState.handleCompletePasswordReset,
   };
 }
 
@@ -104,7 +157,7 @@ export function buildCommunityHomeScreenProps({
     hasVehicle: appState.hasVehicle,
     onSignOut: appState.handleSignOut,
     onWithdrawAccount: appState.withdrawAccount,
-    onRequestAuth: () => appState.openEmailAuthGate("Account access"),
+    onRequestAuth: () => appState.openEmailAuthGate("accountAccess"),
     onMainTabChange: appState.setMainTab,
     onModeChange: appState.handleModeChange,
     onFilterChange: appState.setFilter,

@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Pressable, Text, View } from "react-native";
 
 import type { AppColors } from "../../../../brandTheme";
+import { useAppCopy } from "../../../../i18n/AppI18nContext";
 import type { VehicleInfo } from "../../../../model";
 import type { AppStyles } from "../../../../ui/types";
 import type { Mode } from "../../types";
@@ -21,9 +22,8 @@ type MyPageTabSectionProps = {
   savedVehicle: VehicleInfo;
   onVehicleDraftChange: (draft: VehicleInfo) => void;
   onSaveVehicle: () => void;
-  onSignOut: () => void;
-  onWithdrawAccount: () => void;
   onRequestAuth: () => void;
+  onOpenSettingsPage: () => void;
 };
 
 export function MyPageTabSection({
@@ -39,158 +39,165 @@ export function MyPageTabSection({
   savedVehicle,
   onVehicleDraftChange,
   onSaveVehicle,
-  onSignOut,
-  onWithdrawAccount,
   onRequestAuth,
+  onOpenSettingsPage,
 }: MyPageTabSectionProps) {
-  const [confirmSignOut, setConfirmSignOut] = useState(false);
-  const [confirmWithdraw, setConfirmWithdraw] = useState(false);
+  const copy = useAppCopy();
   const isDriverMode = mode === "driver";
   const hasContactMethod = Boolean(
     savedVehicle.contactPhone.trim() || savedVehicle.contactLink.trim()
   );
   const driverProfileStatusText = !isDriverMode
-    ? "Rider mode is active."
+    ? copy.community.riderModeActive
     : hasVehicle
       ? hasContactMethod
-        ? "Driver profile is ready for posting."
-        : "Driver profile is saved, but contact method is missing."
-      : "Driver profile is not completed yet.";
+        ? copy.community.driverProfileReady
+        : copy.community.driverProfileMissingContact
+      : copy.community.driverProfileIncomplete;
 
   return (
     <>
-      <View style={styles.card}>
-        <Text style={styles.cardTitle}>Account summary</Text>
-        <Text style={styles.cardBody}>Name: {isAuthenticated ? currentUserName : "Guest"}</Text>
-        <Text style={styles.cardBody}>Email: {isAuthenticated ? currentUserEmail : "--"}</Text>
-        <View style={styles.row}>
-          <View style={styles.chip}>
-            <Text style={styles.chipText}>Role: {isDriverMode ? "Driver" : "Rider"}</Text>
+      {!isAuthenticated ? (
+        <View style={styles.card}>
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              gap: 10,
+            }}
+          >
+            <View
+              style={{
+                alignItems: "center",
+                justifyContent: "center",
+                width: 40,
+                height: 40,
+                borderRadius: 14,
+                backgroundColor: colors.panelAlt,
+              }}
+            >
+              <MaterialCommunityIcons
+                name="account-circle-outline"
+                size={22}
+                color={colors.hero}
+              />
+            </View>
+            <Text style={styles.cardTitle}>{copy.common.guest}</Text>
           </View>
-          <View style={styles.chip}>
-            <Text style={styles.chipText}>My routes: {myPostsCount}</Text>
-          </View>
-        </View>
-      </View>
 
-      <View style={styles.card}>
-        <Text style={styles.cardTitle}>Driver profile status</Text>
-        <Text style={styles.cardBody}>{driverProfileStatusText}</Text>
-        {!isDriverMode ? (
-          <Text style={styles.cardBody}>Switch to driver mode to manage your vehicle profile.</Text>
-        ) : !hasVehicle ? (
-          <Text style={styles.cardBody}>
-            Register vehicle and contact details once to start posting regular or one-time routes.
-          </Text>
-        ) : (
-          <>
-            <Text style={styles.cardBody}>
-              Vehicle: {savedVehicle.model} · {savedVehicle.plate}
-            </Text>
-            {savedVehicle.contactPhone ? (
-              <Text style={styles.cardBody}>Phone: {savedVehicle.contactPhone}</Text>
-            ) : null}
-            {savedVehicle.contactLink ? (
-              <Text numberOfLines={1} style={styles.cardBody}>
-                {toContactLinkLabel(savedVehicle.contactLink)}: {savedVehicle.contactLink}
-              </Text>
-            ) : null}
-            {!savedVehicle.contactPhone && !savedVehicle.contactLink ? (
-              <Text style={styles.cardBody}>
-                Add phone or chat link (WhatsApp/Kakao/Telegram) to make riders contact you.
-              </Text>
-            ) : null}
-            {savedVehicle.note ? (
-              <Text numberOfLines={2} style={styles.cardBody}>
-                Car note: {savedVehicle.note}
-              </Text>
-            ) : null}
-          </>
-        )}
-      </View>
+          <Text style={styles.cardBody}>{copy.community.guestMyPageMessage}</Text>
 
-      {isDriverMode ? (
-        <DriverGarageSection
-          colors={colors}
-          styles={styles}
-          hasVehicle={hasVehicle}
-          vehicleDraft={vehicleDraft}
-          onVehicleDraftChange={onVehicleDraftChange}
-          onSaveVehicle={onSaveVehicle}
-        />
-      ) : null}
-
-      <View style={styles.card}>
-        <Text style={styles.cardTitle}>Account management</Text>
-        {isAuthenticated ? (
-          <Text style={styles.cardBody}>
-            Sign out keeps your account. Leave community removes your public posts and driver
-            profile, then signs you out.
-          </Text>
-        ) : (
-          <Text style={styles.cardBody}>
-            You are browsing as guest. Create an account to save rides and register as a driver.
-          </Text>
-        )}
-
-        {!isAuthenticated ? (
-          <Pressable style={styles.primaryButton} onPress={onRequestAuth}>
-            <Text style={styles.primaryButtonText}>Create account with email</Text>
+          <Pressable
+            style={[
+              styles.primaryButton,
+              {
+                marginTop: 0,
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: 6,
+              },
+            ]}
+            onPress={onRequestAuth}
+          >
+            <MaterialCommunityIcons
+              name="account-plus-outline"
+              size={18}
+              color={colors.brandText}
+            />
+            <Text style={styles.primaryButtonText}>{copy.auth.signUp}</Text>
           </Pressable>
-        ) : null}
+        </View>
+      ) : (
+        <>
+          <View style={styles.card}>
+            <Text style={styles.cardTitle}>{copy.common.accountSummary}</Text>
+            <Text style={styles.cardBody}>
+              {copy.community.accountSummaryName(currentUserName)}
+            </Text>
+            <Text style={styles.cardBody}>
+              {copy.community.accountSummaryEmail(currentUserEmail)}
+            </Text>
+            <View style={styles.row}>
+              <View style={styles.chip}>
+                <Text style={styles.chipText}>
+                  {copy.community.accountSummaryRole(isDriverMode ? copy.common.driver : copy.common.rider)}
+                </Text>
+              </View>
+              <View style={styles.chip}>
+                <Text style={styles.chipText}>{copy.community.accountSummaryRoutes(myPostsCount)}</Text>
+              </View>
+            </View>
+          </View>
 
-        {!isAuthenticated ? null : (
-          <>
-            {confirmSignOut ? (
-              <Text style={styles.cardBody}>Tap sign out once more to confirm.</Text>
-            ) : null}
-            <Pressable
-              style={styles.primaryButton}
-              onPress={() => {
-                if (confirmSignOut) {
-                  onSignOut();
-                  return;
-                }
-                setConfirmSignOut(true);
-                setConfirmWithdraw(false);
-              }}
-            >
-              <Text style={styles.primaryButtonText}>
-                {confirmSignOut ? "Confirm sign out" : "Sign out"}
-              </Text>
-            </Pressable>
-            {confirmSignOut ? (
-              <Pressable style={styles.inlineTextButton} onPress={() => setConfirmSignOut(false)}>
-                <Text style={styles.inlineTextButtonText}>Cancel sign out</Text>
-              </Pressable>
-            ) : null}
+          <View style={styles.card}>
+            <Text style={styles.cardTitle}>{copy.community.driverProfileStatus}</Text>
+            <Text style={styles.cardBody}>{driverProfileStatusText}</Text>
+            {!isDriverMode ? (
+              <Text style={styles.cardBody}>{copy.community.switchToDriver}</Text>
+            ) : !hasVehicle ? (
+              <Text style={styles.cardBody}>{copy.community.registerVehicleFirst}</Text>
+            ) : (
+              <>
+                <Text style={styles.cardBody}>{copy.community.vehicleRow(savedVehicle.model, savedVehicle.plate)}</Text>
+                {savedVehicle.contactPhone ? (
+                  <Text style={styles.cardBody}>{copy.community.phoneRow(savedVehicle.contactPhone)}</Text>
+                ) : null}
+                {savedVehicle.contactLink ? (
+                  <Text numberOfLines={1} style={styles.cardBody}>
+                    {toContactLinkLabel(savedVehicle.contactLink)}: {savedVehicle.contactLink}
+                  </Text>
+                ) : null}
+                {!savedVehicle.contactPhone && !savedVehicle.contactLink ? (
+                  <Text style={styles.cardBody}>
+                    {copy.community.addContactMethod}
+                  </Text>
+                ) : null}
+                {savedVehicle.note ? (
+                  <Text numberOfLines={2} style={styles.cardBody}>
+                    {copy.community.carNoteRow(savedVehicle.note)}
+                  </Text>
+                ) : null}
+              </>
+            )}
+          </View>
 
-            {confirmWithdraw ? (
-              <Text style={styles.cardBody}>Tap leave community once more to confirm.</Text>
-            ) : null}
-            <Pressable
-              style={styles.dangerButton}
-              onPress={() => {
-                if (confirmWithdraw) {
-                  onWithdrawAccount();
-                  return;
-                }
-                setConfirmWithdraw(true);
-                setConfirmSignOut(false);
-              }}
-            >
-              <Text style={styles.dangerButtonText}>
-                {confirmWithdraw ? "Confirm leave community" : "Leave community"}
-              </Text>
-            </Pressable>
-            {confirmWithdraw ? (
-              <Pressable style={styles.inlineTextButton} onPress={() => setConfirmWithdraw(false)}>
-                <Text style={styles.inlineTextButtonText}>Cancel leaving</Text>
-              </Pressable>
-            ) : null}
-          </>
-        )}
-      </View>
+          {isDriverMode ? (
+            <DriverGarageSection
+              colors={colors}
+              styles={styles}
+              hasVehicle={hasVehicle}
+              vehicleDraft={vehicleDraft}
+              onVehicleDraftChange={onVehicleDraftChange}
+              onSaveVehicle={onSaveVehicle}
+            />
+          ) : null}
+        </>
+      )}
+
+      <Pressable
+        style={[
+          styles.primaryButton,
+          {
+            marginTop: 0,
+            backgroundColor: "#FFFFFF",
+            borderWidth: 1,
+            borderColor: "#E2E8F0",
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 8,
+          },
+        ]}
+        onPress={onOpenSettingsPage}
+      >
+        <MaterialCommunityIcons
+          name="cog-outline"
+          size={18}
+          color={colors.brandText}
+        />
+        <Text style={styles.primaryButtonText}>{copy.common.settings}</Text>
+      </Pressable>
     </>
   );
 }

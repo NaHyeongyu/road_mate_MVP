@@ -94,7 +94,10 @@ export const createCommunityPostRouteStyles = (colors: AppColors) =>
     postTypePillText: {
       color: colors.text,
       fontSize: 12,
+      lineHeight: 14,
       fontWeight: "700",
+      includeFontPadding: false,
+      textAlignVertical: "center",
     },
     postTypePillTextRegular: {
       color: colors.brandText,
@@ -137,6 +140,8 @@ export const createCommunityPostRouteStyles = (colors: AppColors) =>
       lineHeight: 22,
       fontWeight: "700",
       letterSpacing: -0.1,
+      includeFontPadding: false,
+      textAlignVertical: "center",
     },
     postRouteDirectionRow: {
       width: 24,
@@ -178,7 +183,10 @@ export const createCommunityPostRouteStyles = (colors: AppColors) =>
     postRouteTimeText: {
       color: colors.subtext,
       fontSize: 13,
+      lineHeight: 16,
       fontWeight: "700",
       letterSpacing: 0.1,
+      includeFontPadding: false,
+      textAlignVertical: "center",
     },
   }) satisfies StyleMap;

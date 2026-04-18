@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import { getAppCopy } from "../../../i18n/copy";
 import { EMPTY_ROUTE_DRAFT, EMPTY_VEHICLE, type VehicleInfo } from "../../../model";
 import { createCommunityVehicleActions } from "./vehicleActions";
 import type { CommunityActionsContext } from "./types";
@@ -41,6 +42,7 @@ const createContext = (
     setRouteDraft: vi.fn(),
     resetAllRouteDrafts: vi.fn(),
     onNotice: onNoticeMock,
+    copy: getAppCopy("en"),
     persistPosts: vi.fn(async () => undefined),
     persistSavedPostKeys: vi.fn(async () => undefined),
     persistVehicle: persistVehicleMock,

@@ -3,6 +3,7 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 import { Platform, Text, TextInput, View } from "react-native";
 
 import type { AppColors } from "../../../../../brandTheme";
+import { useAppCopy } from "../../../../../i18n/AppI18nContext";
 import type { OneTimeTripType, RouteDraft, RouteKind, VehicleInfo } from "../../../../../model";
 import type { AppStyles } from "../../../../../ui/types";
 import {
@@ -10,12 +11,12 @@ import {
   toDateFromRouteTime,
 } from "../../../../community/utils/routeForm";
 import { DriverGarageSection } from "./DriverGarageSection";
-import { InlinePickerCard } from "./InlinePickerCard";
 import { RegularRouteSettingsSection } from "./RegularRouteSettingsSection";
 import { RouteDraftTextField } from "./RouteDraftTextField";
 import { RoutePlaceField } from "./RoutePlaceField";
 import { RouteSaveActionSection } from "./RouteSaveActionSection";
 import { RouteScheduleSection } from "./RouteScheduleSection";
+import { InlinePickerCard } from "./InlinePickerCard";
 import { useDriverComposerSubmitState } from "./useDriverComposerSubmitState";
 import { useRouteComposerPickers } from "./useRouteComposerPickers";
 import { useRouteComposerPlaces } from "./useRouteComposerPlaces";
@@ -38,6 +39,7 @@ type DriverRouteComposerSectionProps = {
 
 const MIN_SEATS = 1;
 const MAX_SEATS = 8;
+const COMPOSER_SECTION_GAP = 18;
 
 export function DriverRouteComposerSection({
   colors,
@@ -53,6 +55,7 @@ export function DriverRouteComposerSection({
   onRouteDraftChange,
   onPostRoute,
 }: DriverRouteComposerSectionProps) {
+  const copy = useAppCopy();
   const isOneTimeRoute = activeRouteKind === "one_time";
   const oneTimeTripType = routeDraft.oneTimeTripType === "round_trip" ? "round_trip" : "one_way";
   const isOneTimeRoundTrip = isOneTimeRoute && oneTimeTripType === "round_trip";
@@ -73,6 +76,7 @@ export function DriverRouteComposerSection({
     updateRouteDraft({
       kind: activeRouteKind,
       oneTimeTripType: activeRouteKind === "one_time" ? "one_way" : "round_trip",
+      returnDate: activeRouteKind === "one_time" ? "" : routeDraft.returnDate,
       returnSchedule: activeRouteKind === "one_time" ? "" : routeDraft.returnSchedule,
     });
   }, [activeRouteKind, onRouteDraftChange, routeDraft]);
@@ -80,12 +84,15 @@ export function DriverRouteComposerSection({
   const handleOneTimeTripTypeChange = (nextType: OneTimeTripType) => {
     updateRouteDraft({
       oneTimeTripType: nextType,
+      returnDate:
+        nextType === "one_way" ? "" : routeDraft.returnDate || routeDraft.noticeDate || "",
       returnSchedule: nextType === "one_way" ? "" : routeDraft.returnSchedule,
     });
   };
 
   const {
     activeTimeField,
+    activeDateField,
     isDatePickerOpen,
     iosTimePickerValue,
     iosDatePickerValue,
@@ -108,7 +115,7 @@ export function DriverRouteComposerSection({
 
   const handleCompleteDestination = () => {
     if (isOneTimeRoute) {
-      openDatePicker();
+      openDatePicker("noticeDate");
       return;
     }
 
@@ -155,23 +162,12 @@ export function DriverRouteComposerSection({
     onPostRoute,
   });
 
-  return (
+  const routeFields = (
     <>
-      {showVehicleSetup ? (
-        <DriverGarageSection
-          colors={colors}
-          styles={styles}
-          hasVehicle={hasVehicle}
-          vehicleDraft={vehicleDraft}
-          onVehicleDraftChange={onVehicleDraftChange}
-          onSaveVehicle={onSaveVehicle}
-        />
-      ) : null}
-
       <RoutePlaceField
         colors={colors}
         styles={styles}
-        label="From"
+        label={copy.common.from}
         value={routeDraft.from}
         placeholder="Collingwood, VIC 3066"
         suggestions={fromSuggestions}
@@ -188,7 +184,7 @@ export function DriverRouteComposerSection({
       <RoutePlaceField
         colors={colors}
         styles={styles}
-        label="To"
+        label={copy.common.to}
         value={routeDraft.to}
         placeholder="Sydney, NSW 2000"
         suggestions={toSuggestions}
@@ -202,101 +198,145 @@ export function DriverRouteComposerSection({
         onClear={handleClearTo}
         onSelectSuggestion={handleSelectToSuggestion}
       />
+    </>
+  );
 
-      <View style={styles.routeComposerDivider} />
-
+  const scheduleFields = (
+    <>
       <RouteScheduleSection
         styles={styles}
         routeDraft={routeDraft}
         isOneTimeRoute={isOneTimeRoute}
         isOneTimeRoundTrip={isOneTimeRoundTrip}
-        onPressDate={openDatePicker}
+        onPressDepartureDate={() => openDatePicker("noticeDate")}
+        onPressReturnDate={() => openDatePicker("returnDate")}
         onChangeOneTimeTripType={handleOneTimeTripTypeChange}
         onPressScheduleTime={() => openTimePicker("schedule")}
         onPressReturnTime={() => openTimePicker("returnSchedule")}
       />
-      {Platform.OS === "ios" && isDatePickerOpen ? (
-        <InlinePickerCard
-          styles={styles}
-          title="Notice date"
-          onCancel={closeDatePicker}
-          onConfirm={handleConfirmIosDate}
-        >
-          <DateTimePicker
-            mode="date"
-            value={iosDatePickerValue}
-            display="spinner"
-            onChange={handleIosDatePickerChange}
-          />
-        </InlinePickerCard>
-      ) : null}
-
-      {Platform.OS === "ios" && activeTimeField ? (
-        <InlinePickerCard
-          styles={styles}
-          title={
-            isOneTimeRoute
-              ? "Time"
-              : activeTimeField === "schedule"
-                ? "Departure time"
-                : "Arrival time"
-          }
-          onCancel={closeTimePicker}
-          onConfirm={handleConfirmIosTime}
-        >
-          <DateTimePicker
-            mode="time"
-            value={iosTimePickerValue}
-            display="spinner"
-            onChange={handleIosTimePickerChange}
-          />
-        </InlinePickerCard>
-      ) : null}
-
-      {!isOneTimeRoute ? (
-        <RegularRouteSettingsSection
-          colors={colors}
-          styles={styles}
-          routeDraft={routeDraft}
-          currentSeatCount={currentSeatCount}
-          onDecreaseSeats={() => updateSeatCount(currentSeatCount - 1)}
-          onIncreaseSeats={() => updateSeatCount(currentSeatCount + 1)}
-          onApplyOperatingDays={applyOperatingDays}
-          onRouteDraftChange={onRouteDraftChange}
-          onChangeContactPhone={(value) => updateRouteDraft({ contactPhone: value })}
-          onChangeContactLink={(value) => updateRouteDraft({ contactLink: value })}
-          onSetVisibility={(isPublic) => updateRouteDraft({ isPublic })}
+    </>
+  );
+  const inlinePickerCard =
+    Platform.OS === "ios" && activeTimeField ? (
+      <InlinePickerCard
+        styles={styles}
+        title={activeTimeField === "schedule" ? "Select departure time" : "Select return time"}
+        onCancel={closeTimePicker}
+        onConfirm={handleConfirmIosTime}
+      >
+        <DateTimePicker
+          mode="time"
+          display="spinner"
+          value={iosTimePickerValue}
+          onChange={handleIosTimePickerChange}
         />
-      ) : null}
-      <Text style={styles.cardBody}>
-        Optional: add extra instructions or pickup notes for riders.
-      </Text>
-      <RouteDraftTextField
-        colors={colors}
+      </InlinePickerCard>
+    ) : Platform.OS === "ios" && isDatePickerOpen ? (
+      <InlinePickerCard
         styles={styles}
-        label="Additional details"
-        optional
-        value={routeDraft.note}
-        onChangeText={(value) => updateRouteDraft({ note: value })}
-        placeholder={
-          isOneTimeRoute
-            ? "Write additional details for this one-time notice"
-            : "Write additional details for this regular registration"
-        }
-        multiline
-      />
+        title={activeDateField === "noticeDate" ? "Select departure date" : "Select return date"}
+        onCancel={closeDatePicker}
+        onConfirm={handleConfirmIosDate}
+      >
+        <DateTimePicker
+          mode="date"
+          display="spinner"
+          value={iosDatePickerValue}
+          onChange={handleIosDatePickerChange}
+        />
+      </InlinePickerCard>
+    ) : null;
 
-      <RouteSaveActionSection
-        styles={styles}
-        isOneTimeRoute={isOneTimeRoute}
-        isReadyToSave={isReadyToSave}
-        isSubmitting={isSubmitting}
-        remainingRequiredCount={remainingRequired.length}
-        remainingRequiredText={remainingRequiredText}
-        onPress={() => {
-          void handlePressSaveRegistration();
-        }}
-      />
+  const noteField = (
+    <RouteDraftTextField
+      colors={colors}
+      styles={styles}
+      label={copy.common.additionalDetails}
+      optional
+      value={routeDraft.note}
+      onChangeText={(value) => updateRouteDraft({ note: value })}
+      placeholder={
+        isOneTimeRoute
+          ? "Write additional details for this one-time notice"
+          : "Write additional details for this regular registration"
+      }
+      multiline
+    />
+  );
+
+  const saveAction = (
+    <RouteSaveActionSection
+      styles={styles}
+      isOneTimeRoute={isOneTimeRoute}
+      isReadyToSave={isReadyToSave}
+      isSubmitting={isSubmitting}
+      remainingRequiredCount={remainingRequired.length}
+      remainingRequiredText={remainingRequiredText}
+      onPress={() => {
+        void handlePressSaveRegistration();
+      }}
+    />
+  );
+
+  return (
+    <>
+      <View style={{ gap: COMPOSER_SECTION_GAP }}>
+        {showVehicleSetup ? (
+          <DriverGarageSection
+            colors={colors}
+            styles={styles}
+            hasVehicle={hasVehicle}
+            vehicleDraft={vehicleDraft}
+            onVehicleDraftChange={onVehicleDraftChange}
+            onSaveVehicle={onSaveVehicle}
+          />
+        ) : null}
+
+        <View style={{ gap: COMPOSER_SECTION_GAP }}>
+          <View style={styles.card}>
+            <Text style={styles.composerSectionTitle}>{copy.community.routeSectionTitle}</Text>
+            <View style={styles.composerSectionFields}>{routeFields}</View>
+          </View>
+
+          <View style={styles.card}>
+            <Text style={styles.composerSectionTitle}>{copy.community.scheduleSectionTitle}</Text>
+            <View style={styles.composerSectionFields}>
+              {scheduleFields}
+              {inlinePickerCard}
+            </View>
+          </View>
+
+          {!isOneTimeRoute ? (
+            <View style={styles.card}>
+              <Text style={styles.composerSectionTitle}>
+                {copy.community.regularSettingsSectionTitle}
+              </Text>
+              <View style={styles.composerSectionFields}>
+                <RegularRouteSettingsSection
+                  colors={colors}
+                  styles={styles}
+                  routeDraft={routeDraft}
+                  currentSeatCount={currentSeatCount}
+                  onDecreaseSeats={() => updateSeatCount(currentSeatCount - 1)}
+                  onIncreaseSeats={() => updateSeatCount(currentSeatCount + 1)}
+                  onApplyOperatingDays={applyOperatingDays}
+                  onRouteDraftChange={onRouteDraftChange}
+                  onSetVisibility={(isPublic) => updateRouteDraft({ isPublic })}
+                />
+              </View>
+            </View>
+          ) : null}
+
+          <View style={styles.card}>
+            <Text style={styles.composerSectionTitle}>{copy.community.noteSectionTitle}</Text>
+            <View style={styles.composerSectionFields}>{noteField}</View>
+          </View>
+        </View>
+
+        <View>
+          {saveAction}
+        </View>
+      </View>
 
       {Platform.OS === "android" && activeTimeField ? (
         <DateTimePicker
@@ -309,7 +349,7 @@ export function DriverRouteComposerSection({
       {Platform.OS === "android" && isDatePickerOpen ? (
         <DateTimePicker
           mode="date"
-          value={toDateFromRouteDate(routeDraft.noticeDate)}
+          value={toDateFromRouteDate(routeDraft[activeDateField] ?? "")}
           display="calendar"
           onChange={handleAndroidDatePickerChange}
         />

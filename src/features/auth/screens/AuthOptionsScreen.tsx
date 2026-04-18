@@ -1,9 +1,9 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { Pressable, Text, View } from "react-native";
+import { Pressable, ScrollView, Text, View } from "react-native";
 import Svg, { Path } from "react-native-svg";
 
+import { useAppCopy } from "../../../i18n/AppI18nContext";
 import { BrandLogo } from "../../shared/components/BrandLogo";
-import { NoticeBanner } from "../../shared/components/NoticeBanner";
 import type { AppStyles } from "../../../ui/types";
 
 type GoogleIconProps = {
@@ -58,18 +58,57 @@ export function AuthOptionsScreen({
   onPressFacebook,
   onPressKakao,
 }: AuthOptionsScreenProps) {
+  const copy = useAppCopy();
   const isOAuthSubmitting = Boolean(oauthProviderPending);
 
   return (
-    <>
-      <View style={styles.authSimpleHero}>
-        <View style={styles.authLogoStage}>
-          <BrandLogo source={logoSource} width={188} height={188} />
+    <ScrollView
+      keyboardShouldPersistTaps="handled"
+      style={styles.authPageScroll}
+      contentContainerStyle={styles.authPageScrollContent}
+    >
+      <View style={styles.authHero}>
+        <View style={styles.authHeroRingLarge} />
+        <View style={styles.authHeroRingSmall} />
+
+        <View style={styles.brandBadge}>
+          <BrandLogo source={logoSource} width={34} height={34} />
+          <View style={styles.brandBadgeTextBlock}>
+            <Text style={styles.brandBadgeTitle}>Roadmate</Text>
+            <Text style={styles.brandBadgeCaption}>Shared rides for daily routes</Text>
+          </View>
         </View>
-        <Text style={styles.authSimpleTitle}>Get Started with Roadmate</Text>
+
+        <Text style={styles.authHeroEyebrow}>Commute smarter</Text>
+        <Text style={styles.authHeroTitle}>Find seats, post routes, and keep auth friction low.</Text>
+        <Text style={styles.authHeroBody}>
+          Social login is still available, but email sign-up now shows the verification step clearly
+          and signs the user in immediately when the confirmation link returns to the app.
+        </Text>
+
+        <View style={styles.featureRow}>
+          <View style={styles.featurePill}>
+            <Text style={styles.featurePillText}>Driver tools</Text>
+          </View>
+          <View style={styles.featurePill}>
+            <Text style={styles.featurePillText}>Rider search</Text>
+          </View>
+          <View style={styles.featurePill}>
+            <Text style={styles.featurePillText}>Clear verification UX</Text>
+          </View>
+        </View>
       </View>
 
       <View style={styles.authChooserCard}>
+        <View style={styles.authChooserHeader}>
+          <Text style={styles.authSectionEyebrow}>Choose access</Text>
+          <Text style={styles.authSectionTitle}>Start with social login or email.</Text>
+          <Text style={styles.authSectionBody}>
+            Email is the cleanest option when you want a direct password flow and an explicit
+            verification checkpoint.
+          </Text>
+        </View>
+
         {isSocialAuthEnabled ? (
           <>
             <Pressable
@@ -91,7 +130,9 @@ export function AuthOptionsScreen({
                   isOAuthSubmitting ? styles.providerButtonTextDisabled : null,
                 ]}
               >
-                {oauthProviderPending === "google" ? "Opening Google..." : "Continue with Google"}
+                {oauthProviderPending === "google"
+                  ? copy.auth.openingProvider("Google")
+                  : copy.auth.continueWithProvider("Google")}
               </Text>
             </Pressable>
 
@@ -119,7 +160,9 @@ export function AuthOptionsScreen({
                   isOAuthSubmitting ? styles.providerButtonTextDisabled : null,
                 ]}
               >
-                {oauthProviderPending === "apple" ? "Opening Apple..." : "Continue with Apple"}
+                {oauthProviderPending === "apple"
+                  ? copy.auth.openingProvider("Apple")
+                  : copy.auth.continueWithProvider("Apple")}
               </Text>
             </Pressable>
 
@@ -148,8 +191,8 @@ export function AuthOptionsScreen({
                 ]}
               >
                 {oauthProviderPending === "facebook"
-                  ? "Opening Facebook..."
-                  : "Continue with Facebook"}
+                  ? copy.auth.openingProvider("Facebook")
+                  : copy.auth.continueWithProvider("Facebook")}
               </Text>
             </Pressable>
 
@@ -177,13 +220,21 @@ export function AuthOptionsScreen({
                   isOAuthSubmitting ? styles.providerButtonTextDisabled : null,
                 ]}
               >
-                {oauthProviderPending === "kakao" ? "Opening Kakao..." : "Continue with Kakao"}
+                {oauthProviderPending === "kakao"
+                  ? copy.auth.openingProvider("Kakao")
+                  : copy.auth.continueWithProvider("Kakao")}
               </Text>
             </Pressable>
           </>
         ) : (
-          <Text style={styles.cardBody}>Email sign-in is enabled for this build.</Text>
+          <Text style={styles.cardBody}>{copy.auth.emailEnabled}</Text>
         )}
+
+        <View style={styles.authDividerRow}>
+          <View style={styles.authDividerLine} />
+          <Text style={styles.authDividerText}>or</Text>
+          <View style={styles.authDividerLine} />
+        </View>
 
         <Pressable
           disabled={isOAuthSubmitting}
@@ -202,11 +253,14 @@ export function AuthOptionsScreen({
               style={styles.providerIconGlyph}
             />
           </View>
-          <Text style={styles.emailProviderButtonText}>Continue with Email</Text>
+          <Text style={styles.emailProviderButtonText}>{copy.auth.continueWithEmail}</Text>
         </Pressable>
-      </View>
 
-      <NoticeBanner notice={notice} styles={styles} />
-    </>
+        <Text style={styles.authEntryHint}>
+          New email accounts get a verification link. When that link opens Roadmate again, the app
+          completes sign-in automatically.
+        </Text>
+      </View>
+    </ScrollView>
   );
 }

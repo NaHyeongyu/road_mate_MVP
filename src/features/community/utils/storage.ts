@@ -75,9 +75,11 @@ export const parsePosts = (raw: string | null): RoutePost[] => {
       const vehiclePlate = String(post.vehiclePlate ?? "").trim();
       const ownerUserId = String(post.ownerUserId ?? post.ownerEmail ?? "").trim();
       const noticeDate = String(post.noticeDate ?? "").trim();
+      const returnDate = String(post.returnDate ?? "").trim();
       const contactPhone = String(post.contactPhone ?? "").trim();
       const contactLink = String(post.contactLink ?? "").trim();
       const isPublic = typeof post.isPublic === "boolean" ? post.isPublic : true;
+      const isActive = typeof post.isActive === "boolean" ? post.isActive : true;
 
       if (!id || !from || !to || !schedule || !vehicleModel || !vehiclePlate || !ownerUserId) {
         return [];
@@ -87,15 +89,20 @@ export const parsePosts = (raw: string | null): RoutePost[] => {
         {
           id,
           kind: post.kind === "one_time" ? "one_time" : "regular",
+          isActive,
           oneTimeTripType:
             post.kind === "one_time"
-              ? post.oneTimeTripType === "round_trip" || returnSchedule
+              ? post.oneTimeTripType === "round_trip" || returnSchedule || returnDate
                 ? "round_trip"
                 : "one_way"
               : undefined,
           noticeDate:
             post.kind === "one_time"
               ? noticeDate || String(post.createdAt ?? "").trim().slice(0, 10) || undefined
+              : undefined,
+          returnDate:
+            post.kind === "one_time"
+              ? returnDate || (returnSchedule ? noticeDate || undefined : undefined)
               : undefined,
           from,
           to,
@@ -196,6 +203,25 @@ export const getNoticeDayDelta = (value: string | undefined, fallbackCreatedAt?:
   const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
   return Math.round((noticeDate.getTime() - todayStart.getTime()) / NOTICE_DAY_MS);
 };
+
+export const isActiveOneTimePost = (
+  post: Pick<RoutePost, "kind" | "noticeDate" | "createdAt" | "isActive">
+) => {
+  if (post.kind !== "one_time") {
+    return false;
+  }
+
+  if (post.isActive === false) {
+    return false;
+  }
+
+  const dayDelta = getNoticeDayDelta(post.noticeDate, post.createdAt);
+  return dayDelta === null || dayDelta >= 0;
+};
+
+export const isPreviousOneTimePost = (
+  post: Pick<RoutePost, "kind" | "noticeDate" | "createdAt" | "isActive">
+) => post.kind === "one_time" && !isActiveOneTimePost(post);
 
 export const formatNoticeCountdown = (dayDelta: number | null) => {
   if (dayDelta === null) {

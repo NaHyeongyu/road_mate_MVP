@@ -1,12 +1,15 @@
 import { useEffect, useMemo, useState } from "react";
 
 import type { RouteDraft, RouteKind, RoutePost } from "../../../../../model";
+import { isActiveOneTimePost } from "../../../utils/storage";
 import { hasRouteDraftInput, isRouteDraftReady, toDraftFromPost } from "../../../utils/routeDraftState";
 import {
   getDriverHomeMissingRequiredLabels,
   normalizeDriverHomeSeats,
   DRIVER_HOME_MIN_SEATS,
 } from "./driverHomeState";
+
+export type PreviousNoticesPeriod = "all" | "30d" | "90d" | "365d";
 
 type UseDriverHomeOverviewStateOptions = {
   driverRouteKind: "regular" | "one_time";
@@ -32,6 +35,21 @@ export function useDriverHomeOverviewState({
   onOpenRouteRegistrationPage,
 }: UseDriverHomeOverviewStateOptions) {
   const [isQuickSettingSaving, setIsQuickSettingSaving] = useState(false);
+  const [isPreviousNoticesVisible, setIsPreviousNoticesVisible] = useState(false);
+  const [previousNoticesPeriod, setPreviousNoticesPeriod] = useState<PreviousNoticesPeriod>("all");
+
+  const toNoticeTimestamp = (post: RoutePost) => {
+    const noticeDate = String(post.noticeDate ?? "").trim();
+    if (noticeDate) {
+      const noticeTimestamp = Date.parse(`${noticeDate}T00:00:00`);
+      if (Number.isFinite(noticeTimestamp)) {
+        return noticeTimestamp;
+      }
+    }
+
+    const createdAt = Date.parse(post.createdAt);
+    return Number.isFinite(createdAt) ? createdAt : 0;
+  };
 
   const hasDraftInput = hasRouteDraftInput(routeDraft);
   const isDraftReady = isRouteDraftReady(routeDraft, hasDriverContactMethod);
@@ -44,23 +62,43 @@ export function useDriverHomeOverviewState({
     () => myPosts.filter((post) => post.kind === driverRouteKind),
     [driverRouteKind, myPosts]
   );
-  const latestRegisteredPost = myPostsForActiveKind[0] ?? null;
-  const hasPublishedRoute = Boolean(latestRegisteredPost);
+  const activePublishedPost =
+    driverRouteKind === "one_time"
+      ? myPostsForActiveKind.find((post) => isActiveOneTimePost(post)) ?? null
+      : myPostsForActiveKind[0] ?? null;
+  const previousOneTimePosts = useMemo(
+    () =>
+      driverRouteKind === "one_time"
+        ? myPostsForActiveKind.filter((post) => !isActiveOneTimePost(post))
+        : [],
+    [driverRouteKind, myPostsForActiveKind]
+  );
+  const filteredPreviousOneTimePosts = useMemo(() => {
+    if (previousNoticesPeriod === "all") {
+      return previousOneTimePosts;
+    }
+
+    const days = previousNoticesPeriod === "30d" ? 30 : previousNoticesPeriod === "90d" ? 90 : 365;
+    const threshold = Date.now() - days * 24 * 60 * 60 * 1000;
+
+    return previousOneTimePosts.filter((post) => toNoticeTimestamp(post) >= threshold);
+  }, [previousNoticesPeriod, previousOneTimePosts]);
+  const hasPublishedRoute = Boolean(activePublishedPost);
 
   const activeRouteDraft =
-    isDraftReady || !latestRegisteredPost ? routeDraft : toDraftFromPost(latestRegisteredPost);
+    isDraftReady || !activePublishedPost ? routeDraft : toDraftFromPost(activePublishedPost);
 
   useEffect(() => {
-    if (isDraftReady || hasDraftInput || !latestRegisteredPost) {
+    if (isDraftReady || hasDraftInput || !activePublishedPost) {
       return;
     }
 
-    onRouteDraftChange(toDraftFromPost(latestRegisteredPost));
-  }, [hasDraftInput, isDraftReady, latestRegisteredPost, onRouteDraftChange]);
+    onRouteDraftChange(toDraftFromPost(activePublishedPost));
+  }, [activePublishedPost, hasDraftInput, isDraftReady, onRouteDraftChange]);
 
   const handleOpenRouteRegistration = () => {
-    if (!isDraftReady && !hasDraftInput && latestRegisteredPost) {
-      onRouteDraftChange(toDraftFromPost(latestRegisteredPost));
+    if (!isDraftReady && !hasDraftInput && activePublishedPost) {
+      onRouteDraftChange(toDraftFromPost(activePublishedPost));
     }
 
     onOpenRouteRegistrationPage();
@@ -130,14 +168,23 @@ export function useDriverHomeOverviewState({
   };
 
   return {
+    activePublishedPost,
     hasRouteRegistration: hasPublishedRoute,
     hasDraftInput,
     isDraftReady,
     missingRequiredLabels,
     isQuickSettingSaving,
+    previousOneTimePosts: filteredPreviousOneTimePosts,
+    previousOneTimeCount: previousOneTimePosts.length,
+    hasPreviousOneTimePosts: previousOneTimePosts.length > 0,
+    isPreviousNoticesVisible,
+    previousNoticesPeriod,
     routeDraft: activeRouteDraft,
     onOpenRouteRegistration: handleOpenRouteRegistration,
     onAdjustSeats: handleAdjustSeats,
     onRouteVisibilityChange: handleRouteVisibilityChange,
+    onTogglePreviousNoticesVisibility: () =>
+      setIsPreviousNoticesVisible((current) => !current),
+    onPreviousNoticesPeriodChange: setPreviousNoticesPeriod,
   };
 }

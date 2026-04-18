@@ -1,5 +1,6 @@
 import { Text, View } from "react-native";
 
+import { useAppCopy } from "../../../../i18n/AppI18nContext";
 import type { RoutePost } from "../../../../model";
 import type { AppStyles } from "../../../../ui/types";
 
@@ -11,6 +12,7 @@ type PostCardWeekdayRowProps = {
 };
 
 export function PostCardWeekdayRow({ post, styles }: PostCardWeekdayRowProps) {
+  const copy = useAppCopy();
   const operatingDays = new Set(post.operatingDays);
 
   return (
@@ -23,7 +25,7 @@ export function PostCardWeekdayRow({ post, styles }: PostCardWeekdayRowProps) {
             style={[styles.postWeekdayChip, active ? styles.postWeekdayChipActive : null]}
           >
             <Text style={[styles.postWeekdayText, active ? styles.postWeekdayTextActive : null]}>
-              {day}
+              {copy.weekdays[day]}
             </Text>
           </View>
         );

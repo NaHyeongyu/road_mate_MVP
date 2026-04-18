@@ -1,5 +1,7 @@
-import { Pressable, Text } from "react-native";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { Pressable, Text, View } from "react-native";
 
+import { useAppCopy } from "../../../../../i18n/AppI18nContext";
 import type { AppStyles } from "../../../../../ui/types";
 
 type RouteSaveActionSectionProps = {
@@ -12,28 +14,6 @@ type RouteSaveActionSectionProps = {
   onPress: () => void;
 };
 
-function toSaveActionLabel({
-  isOneTimeRoute,
-  isReadyToSave,
-  isSubmitting,
-  remainingRequiredCount,
-}: {
-  isOneTimeRoute: boolean;
-  isReadyToSave: boolean;
-  isSubmitting: boolean;
-  remainingRequiredCount: number;
-}) {
-  if (isSubmitting) {
-    return isOneTimeRoute ? "Posting one-time notice..." : "Saving registration...";
-  }
-
-  if (isReadyToSave) {
-    return isOneTimeRoute ? "Post one-time notice" : "Save registration";
-  }
-
-  return `Complete ${remainingRequiredCount} required item${remainingRequiredCount > 1 ? "s" : ""}`;
-}
-
 export function RouteSaveActionSection({
   styles,
   isOneTimeRoute,
@@ -43,35 +23,60 @@ export function RouteSaveActionSection({
   remainingRequiredText,
   onPress,
 }: RouteSaveActionSectionProps) {
+  const copy = useAppCopy();
+  const buttonTitle = isSubmitting
+    ? isOneTimeRoute
+      ? copy.community.postingOneTimeNotice
+      : copy.community.savingRegistration
+    : isReadyToSave
+      ? isOneTimeRoute
+        ? copy.community.postOneTimeNotice
+        : copy.community.saveRegistration
+      : copy.community.completeRequiredItems(remainingRequiredCount);
+  const buttonHint = isReadyToSave
+    ? isOneTimeRoute
+      ? copy.community.oneTimePublishButtonHint
+      : copy.community.regularSaveButtonHint
+    : "";
+  const buttonIconName = isOneTimeRoute ? "bullhorn-outline" : "calendar-sync";
+
   return (
     <>
       {!isReadyToSave ? (
         <>
           <Text style={styles.cardBody}>
-            {isOneTimeRoute
-              ? "Fill required fields to post this one-time notice."
-              : "Fill all required fields to save this registration."}
+            {remainingRequiredText ||
+              (isOneTimeRoute
+                ? copy.community.fillRequiredOneTime
+                : copy.community.fillRequiredRegistration)}
           </Text>
-          {remainingRequiredText ? <Text style={styles.cardBody}>{remainingRequiredText}</Text> : null}
         </>
       ) : null}
 
       <Pressable
         style={[
-          styles.primaryButton,
-          !isReadyToSave || isSubmitting ? styles.primaryButtonDisabled : null,
+          styles.noticeSubmitButton,
+          !isReadyToSave || isSubmitting ? styles.noticeSubmitButtonDisabled : null,
         ]}
         disabled={!isReadyToSave || isSubmitting}
         onPress={onPress}
       >
-        <Text style={styles.primaryButtonText}>
-          {toSaveActionLabel({
-            isOneTimeRoute,
-            isReadyToSave,
-            isSubmitting,
-            remainingRequiredCount,
-          })}
-        </Text>
+        <View style={styles.noticeSubmitButtonMain}>
+          <View style={styles.noticeSubmitButtonIconWrap}>
+            <MaterialCommunityIcons name={buttonIconName} size={18} color="#0B0F14" />
+          </View>
+          <View style={styles.noticeSubmitButtonTextWrap}>
+            <Text style={styles.noticeSubmitButtonTitle}>{buttonTitle}</Text>
+            {buttonHint ? (
+              <Text style={styles.noticeSubmitButtonCaption}>{buttonHint}</Text>
+            ) : null}
+          </View>
+        </View>
+        <MaterialCommunityIcons
+          name={isSubmitting ? "loading" : "chevron-right"}
+          size={20}
+          color="#0B0F14"
+        />
       </Pressable>
     </>
   );

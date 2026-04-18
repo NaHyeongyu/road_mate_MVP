@@ -2,6 +2,7 @@ import { waitFor } from "@testing-library/react";
 import { Alert } from "react-native";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import { getAppCopy } from "../../../i18n/copy";
 import { EMPTY_ROUTE_DRAFT, EMPTY_VEHICLE, type RoutePost } from "../../../model";
 import { createCommunityAccountActions } from "./accountActions";
 import type { CommunityActionsContext } from "./types";
@@ -103,6 +104,7 @@ const createContext = (
     setRouteDraft: vi.fn(),
     resetAllRouteDrafts: resetAllRouteDraftsMock,
     onNotice: onNoticeMock,
+    copy: getAppCopy("en"),
     persistPosts: persistPostsMock,
     persistSavedPostKeys: vi.fn(async () => undefined),
     persistVehicle: vi.fn(async () => undefined),

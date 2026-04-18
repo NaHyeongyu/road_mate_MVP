@@ -19,6 +19,8 @@ type CommunityAccountActions = {
 export const createCommunityAccountActions = (
   context: CommunityActionsContext
 ): CommunityAccountActions => {
+  const { copy } = context;
+
   const resetSignedInExperience = () => {
     context.setMode("rider");
     context.setFilter("regular");
@@ -35,7 +37,7 @@ export const createCommunityAccountActions = (
       if (!context.hasVehicle) {
         context.onNotice({
           tone: "info",
-          text: "Complete driver registration first: save your car model and plate.",
+          text: copy.notices.driverRegistrationFirst,
         });
       } else {
         context.onNotice({ tone: "info", text: "" });
@@ -52,19 +54,19 @@ export const createCommunityAccountActions = (
     if (!supabase || !context.currentUserId) {
       context.onNotice({
         tone: "error",
-        text: "Sign in before leaving the community.",
+        text: copy.notices.signInBeforeLeaving,
       });
       return;
     }
     const authClient = supabase;
 
     Alert.alert(
-      "Leave community?",
-      "This removes your route posts and driver profile, marks your community access inactive, and signs you out.",
+      copy.alerts.leaveCommunityTitle,
+      copy.alerts.leaveCommunityBody,
       [
-        { text: "Cancel", style: "cancel" },
+        { text: copy.common.cancel, style: "cancel" },
         {
-          text: "Leave",
+          text: copy.alerts.leaveCommunityAction,
           style: "destructive",
           onPress: () => {
             void (async () => {
@@ -99,12 +101,12 @@ export const createCommunityAccountActions = (
                 resetSignedInExperience();
                 context.onNotice({
                   tone: "success",
-                  text: "Community profile cleared and signed out.",
+                  text: copy.notices.leaveCommunitySuccess,
                 });
               } catch (error) {
                 context.onNotice({
                   tone: "error",
-                  text: `Leave community failed: ${(error as Error).message}`,
+                  text: copy.notices.leaveCommunityFailed((error as Error).message),
                 });
               }
             })();

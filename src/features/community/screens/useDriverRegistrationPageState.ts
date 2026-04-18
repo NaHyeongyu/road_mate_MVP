@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 
 import type { RouteDraft, RouteKind, RoutePost } from "../../../model";
+import { isActiveOneTimePost } from "../utils/storage";
 import { hasRouteDraftInput, isRouteDraftReady, toDraftFromPost } from "../utils/routeDraftState";
 import type { MainTab, Mode } from "../types";
 
@@ -30,7 +31,10 @@ export function useDriverRegistrationPageState({
     () => myPosts.filter((post) => post.kind === activeDriverRouteKind),
     [activeDriverRouteKind, myPosts]
   );
-  const latestRegisteredPost = myPostsForActiveKind[0] ?? null;
+  const latestRegisteredPost =
+    activeDriverRouteKind === "one_time"
+      ? myPostsForActiveKind.find((post) => isActiveOneTimePost(post)) ?? null
+      : myPostsForActiveKind[0] ?? null;
   const activeRouteDraft =
     isRouteDraftReady(routeDraft, hasDriverContactMethod) || !latestRegisteredPost
       ? routeDraft

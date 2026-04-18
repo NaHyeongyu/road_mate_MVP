@@ -1,24 +1,29 @@
+import type { AppCopy } from "../../../i18n/copy";
 import type { AuthMode } from "../types";
 
 type ValidateAuthInputArgs = {
   authMode: AuthMode;
   email: string;
   password: string;
-  displayName: string;
+  passwordConfirm?: string;
 };
 
 export const validateAuthInput = ({
-  authMode: _authMode,
+  authMode,
   email,
   password,
-  displayName: _displayName,
-}: ValidateAuthInputArgs): string | null => {
+  passwordConfirm,
+}: ValidateAuthInputArgs, copy: AppCopy): string | null => {
   if (!email || !email.includes("@")) {
-    return "Please enter a valid email address.";
+    return copy.validation.validEmail;
   }
 
   if (password.length < 6) {
-    return "Password must be at least 6 characters.";
+    return copy.validation.passwordLength;
+  }
+
+  if (authMode === "signUp" && password !== String(passwordConfirm ?? "")) {
+    return copy.validation.passwordConfirmMismatch;
   }
 
   return null;

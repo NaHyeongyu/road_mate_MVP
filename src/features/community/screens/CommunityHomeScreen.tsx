@@ -1,13 +1,13 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { KeyboardAvoidingView, Platform, ScrollView, StatusBar, View, useWindowDimensions } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import type { AppNotice } from "../../../app/types";
 import type { AppColors } from "../../../brandTheme";
+import { useAppCopy } from "../../../i18n/AppI18nContext";
 import type { RouteDraft, RouteKind, RoutePost, VehicleInfo } from "../../../model";
 import { APP_BAR_BG } from "../../../ui/styleFragments/layout/constants";
 import type { AppStyles } from "../../../ui/types";
-import { NoticeBanner } from "../../shared/components/NoticeBanner";
 import { ScreenHeader } from "../../shared/components/ScreenHeader";
 import { AnimatedEntrance } from "../../shared/components/AnimatedEntrance";
 import { BottomBannerAd } from "../../ads/components/BottomBannerAd";
@@ -16,6 +16,7 @@ import { RoleModeToggle } from "../components/RoleModeToggle";
 import { useDriverRegistrationPageState } from "./useDriverRegistrationPageState";
 import { CommunityBottomBar } from "./sections/CommunityBottomBar";
 import { CommunityTabContent } from "./sections/CommunityTabContent";
+import { SettingsTabSection } from "./sections/SettingsTabSection";
 import { DriverRouteComposerSection } from "./sections/home/DriverRouteComposerSection";
 
 export type CommunityHomeScreenProps = {
@@ -113,6 +114,7 @@ export function CommunityHomeScreen({
   onCloseRiderSearchResultsPage,
   onLoadMoreRiderSearchResults,
 }: CommunityHomeScreenProps) {
+  const copy = useAppCopy();
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
   const bottomInset = Math.max(insets.bottom, 8);
@@ -120,6 +122,7 @@ export function CommunityHomeScreen({
   const isRiderMode = mode === "rider";
   const isSearchDetailScreen =
     isRiderMode && mainTab === "home" && isRiderSearchResultsPageVisible;
+  const [isSettingsPageVisible, setIsSettingsPageVisible] = useState(false);
   const scrollContentStyle = [
     styles.screenContent,
     isCompactLayout
@@ -154,6 +157,12 @@ export function CommunityHomeScreen({
     }
   }, [isRiderMode, mainTab, onCloseRiderSearchResultsPage]);
 
+  useEffect(() => {
+    if (mainTab !== "mypage") {
+      setIsSettingsPageVisible(false);
+    }
+  }, [mainTab]);
+
   if (isDriverRegistrationPageVisible) {
     return (
       <View style={styles.screen}>
@@ -172,9 +181,13 @@ export function CommunityHomeScreen({
           ]}
         >
           <ScreenHeader
-            title={activeDriverRouteKind === "regular" ? "Regular registration" : "One-time registration"}
+            title={
+              activeDriverRouteKind === "regular"
+                ? copy.community.regularRegistration
+                : copy.community.oneTimeRegistration
+            }
             leftActionType="back"
-            leftActionLabel="Back"
+            leftActionLabel={copy.common.back}
             onLeftActionPress={closeDriverRegistrationPage}
             styles={styles}
           />
@@ -190,9 +203,6 @@ export function CommunityHomeScreen({
             keyboardShouldPersistTaps="always"
             keyboardDismissMode="on-drag"
           >
-            <AnimatedEntrance delay={20}>
-              <NoticeBanner notice={notice} styles={styles} />
-            </AnimatedEntrance>
             <AnimatedEntrance delay={90} resetKey={activeDriverRouteKind}>
               <DriverRouteComposerSection
                 colors={colors}
@@ -207,6 +217,60 @@ export function CommunityHomeScreen({
                 onSaveVehicle={onSaveVehicle}
                 onRouteDraftChange={onRouteDraftChange}
                 onPostRoute={handleSaveRouteRegistration}
+              />
+            </AnimatedEntrance>
+          </ScrollView>
+        </KeyboardAvoidingView>
+
+        <BottomBannerAd bottomInset={bottomInset} />
+      </View>
+    );
+  }
+
+  if (isSettingsPageVisible) {
+    return (
+      <View style={styles.screen}>
+        <StatusBar barStyle="dark-content" backgroundColor={APP_BAR_BG} translucent={false} />
+        <View
+          style={[
+            styles.headerDock,
+            {
+              paddingTop: insets.top + 6,
+            },
+            isCompactLayout
+              ? {
+                  paddingHorizontal: 14,
+                }
+              : null,
+          ]}
+        >
+          <ScreenHeader
+            title={copy.common.settings}
+            leftActionType="back"
+            leftActionLabel={copy.common.back}
+            onLeftActionPress={() => setIsSettingsPageVisible(false)}
+            styles={styles}
+          />
+        </View>
+
+        <KeyboardAvoidingView
+          style={{ flex: 1 }}
+          behavior={Platform.OS === "ios" ? "padding" : undefined}
+        >
+          <ScrollView
+            style={styles.screenScroll}
+            contentContainerStyle={scrollContentStyle}
+            keyboardShouldPersistTaps="always"
+            keyboardDismissMode="on-drag"
+          >
+            <AnimatedEntrance delay={90}>
+              <SettingsTabSection
+                colors={colors}
+                styles={styles}
+                isAuthenticated={isAuthenticated}
+                onSignOut={onSignOut}
+                onWithdrawAccount={onWithdrawAccount}
+                onRequestAuth={onRequestAuth}
               />
             </AnimatedEntrance>
           </ScrollView>
@@ -235,9 +299,9 @@ export function CommunityHomeScreen({
           ]}
         >
           <ScreenHeader
-            title="Search results"
+            title={copy.common.searchResults}
             leftActionType="back"
-            leftActionLabel="Back"
+            leftActionLabel={copy.common.back}
             onLeftActionPress={onCloseRiderSearchResultsPage}
             styles={styles}
           />
@@ -293,9 +357,8 @@ export function CommunityHomeScreen({
             hasDriverContactMethod={hasDriverContactMethod}
             routeDraft={routeDraft}
             hasVehicle={hasVehicle}
-            onSignOut={onSignOut}
-            onWithdrawAccount={onWithdrawAccount}
             onRequestAuth={onRequestAuth}
+            onOpenSettingsPage={() => setIsSettingsPageVisible(true)}
             onFilterChange={onFilterChange}
             onStateFilterChange={onStateFilterChange}
             onFromSearchQueryChange={onFromSearchQueryChange}
@@ -311,7 +374,6 @@ export function CommunityHomeScreen({
             isRiderSearchResultsPageVisible={isRiderSearchResultsPageVisible}
             canLoadMoreRiderSearchResults={canLoadMoreRiderSearchResults}
             onOpenRiderSearchResultsPage={onOpenRiderSearchResultsPage}
-            onCloseRiderSearchResultsPage={onCloseRiderSearchResultsPage}
             onLoadMoreRiderSearchResults={onLoadMoreRiderSearchResults}
           />
         </ScrollView>

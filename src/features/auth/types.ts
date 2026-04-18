@@ -1,2 +1,2 @@
 export type AuthMode = "signIn" | "signUp";
-export type AuthEntryMethod = "options" | "email";
+export type AuthEntryMethod = "options" | "email" | "passwordReset";

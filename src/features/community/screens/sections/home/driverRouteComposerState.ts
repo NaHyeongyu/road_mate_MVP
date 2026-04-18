@@ -10,6 +10,7 @@ type BuildRequiredChecksArgs = {
   hasFrom: boolean;
   hasTo: boolean;
   hasNoticeDate: boolean;
+  hasReturnDate: boolean;
   hasDepartureTime: boolean;
   hasReturnTime: boolean;
   hasSeats: boolean;
@@ -30,6 +31,7 @@ export const buildRequiredChecks = ({
   hasFrom,
   hasTo,
   hasNoticeDate,
+  hasReturnDate,
   hasDepartureTime,
   hasReturnTime,
   hasSeats,
@@ -41,9 +43,14 @@ export const buildRequiredChecks = ({
         { label: "Vehicle profile", done: hasVehicle },
         { label: "From", done: hasFrom },
         { label: "To", done: hasTo },
-        { label: "Date", done: hasNoticeDate },
-        { label: "Time", done: hasDepartureTime },
-        ...(isOneTimeRoundTrip ? [{ label: "Return time", done: hasReturnTime }] : []),
+        { label: "Departure date", done: hasNoticeDate },
+        { label: "Departure time", done: hasDepartureTime },
+        ...(isOneTimeRoundTrip
+          ? [
+              { label: "Return date", done: hasReturnDate },
+              { label: "Return time", done: hasReturnTime },
+            ]
+          : []),
       ]
     : [
         { label: "Vehicle profile", done: hasVehicle },

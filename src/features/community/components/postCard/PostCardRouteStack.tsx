@@ -1,6 +1,8 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Pressable, Text, View } from "react-native";
 
+import { useAppCopy } from "../../../../i18n/AppI18nContext";
+import { formatLocalizedNoticeDate } from "../../../../i18n/formatters";
 import type { RoutePost } from "../../../../model";
 import type { AppStyles } from "../../../../ui/types";
 import { openPlaceInGoogleMaps } from "./linking";
@@ -12,9 +14,17 @@ type PostCardRouteStackProps = {
 };
 
 export function PostCardRouteStack({ post, styles, isRegular }: PostCardRouteStackProps) {
+  const copy = useAppCopy();
   const isOneTimeRoundTrip =
     !isRegular && (post.oneTimeTripType === "round_trip" || Boolean(post.returnSchedule));
   const shouldShowReturnTime = isRegular || isOneTimeRoundTrip;
+  const departureDateLabel = !isRegular
+    ? formatLocalizedNoticeDate(copy, post.noticeDate, post.createdAt)
+    : null;
+  const returnDateLabel =
+    !isRegular && isOneTimeRoundTrip
+      ? formatLocalizedNoticeDate(copy, post.returnDate ?? post.noticeDate, post.createdAt)
+      : null;
 
   return (
     <View style={styles.postRouteStack}>
@@ -30,6 +40,14 @@ export function PostCardRouteStack({ post, styles, isRegular }: PostCardRouteSta
             {post.from}
           </Text>
         </View>
+        {!isRegular ? (
+          <View style={styles.postRouteTimeRow}>
+            <View style={styles.postRouteLeadIconSlot}>
+              <MaterialCommunityIcons name="calendar-month-outline" size={14} color="#64748B" />
+            </View>
+            <Text style={styles.postRouteTimeText}>{departureDateLabel}</Text>
+          </View>
+        ) : null}
         <View style={styles.postRouteTimeRow}>
           <View style={styles.postRouteLeadIconSlot}>
             <MaterialCommunityIcons name="clock-outline" size={14} color="#64748B" />
@@ -69,12 +87,22 @@ export function PostCardRouteStack({ post, styles, isRegular }: PostCardRouteSta
           </Text>
         </View>
         {shouldShowReturnTime ? (
-          <View style={styles.postRouteTimeRow}>
-            <View style={styles.postRouteLeadIconSlot}>
-              <MaterialCommunityIcons name="clock-outline" size={14} color="#64748B" />
+          <>
+            {isRegular ? null : (
+              <View style={styles.postRouteTimeRow}>
+                <View style={styles.postRouteLeadIconSlot}>
+                  <MaterialCommunityIcons name="calendar-month-outline" size={14} color="#64748B" />
+                </View>
+                <Text style={styles.postRouteTimeText}>{returnDateLabel}</Text>
+              </View>
+            )}
+            <View style={styles.postRouteTimeRow}>
+              <View style={styles.postRouteLeadIconSlot}>
+                <MaterialCommunityIcons name="clock-outline" size={14} color="#64748B" />
+              </View>
+              <Text style={styles.postRouteTimeText}>{post.returnSchedule || "--:--"}</Text>
             </View>
-            <Text style={styles.postRouteTimeText}>{post.returnSchedule || "--:--"}</Text>
-          </View>
+          </>
         ) : null}
       </Pressable>
     </View>

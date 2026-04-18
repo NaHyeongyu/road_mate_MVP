@@ -15,7 +15,10 @@ export const createCommunityPostDetailStyles = (colors: AppColors) =>
     postSummaryText: {
       color: colors.subtext,
       fontSize: 13,
+      lineHeight: 16,
       fontWeight: "700",
+      includeFontPadding: false,
+      textAlignVertical: "center",
     },
     postMetaBadgesRow: {
       flexDirection: "row",
@@ -50,8 +53,11 @@ export const createCommunityPostDetailStyles = (colors: AppColors) =>
     postMetaBadgeText: {
       color: colors.subtext,
       fontSize: 12,
+      lineHeight: 14,
       fontWeight: "700",
       flexShrink: 1,
+      includeFontPadding: false,
+      textAlignVertical: "center",
     },
     postMetaBadgeTextPrimary: {
       color: "#1D4ED8",
@@ -88,8 +94,11 @@ export const createCommunityPostDetailStyles = (colors: AppColors) =>
     postWeekdayText: {
       color: colors.subtext,
       fontSize: 10,
+      lineHeight: 12,
       fontWeight: "700",
       letterSpacing: -0.1,
+      includeFontPadding: false,
+      textAlignVertical: "center",
     },
     postWeekdayTextActive: {
       color: colors.text,
@@ -114,18 +123,27 @@ export const createCommunityPostDetailStyles = (colors: AppColors) =>
       width: 48,
       color: colors.subtext,
       fontSize: 12,
+      lineHeight: 16,
       fontWeight: "700",
+      includeFontPadding: false,
+      textAlignVertical: "center",
     },
     postFooterValue: {
       flex: 1,
       color: colors.text,
       fontSize: 14,
+      lineHeight: 18,
       fontWeight: "800",
+      includeFontPadding: false,
+      textAlignVertical: "center",
     },
     postFooterValueSecondary: {
       color: colors.subtext,
       fontSize: 13,
+      lineHeight: 18,
       fontWeight: "700",
+      includeFontPadding: false,
+      textAlignVertical: "center",
     },
     postFooterDivider: {
       height: 1,
@@ -154,8 +172,11 @@ export const createCommunityPostDetailStyles = (colors: AppColors) =>
     postContactActionText: {
       color: "#1D4ED8",
       fontSize: 12,
+      lineHeight: 16,
       fontWeight: "700",
       flexShrink: 1,
+      includeFontPadding: false,
+      textAlignVertical: "center",
     },
     postNote: {
       color: colors.subtext,

@@ -22,6 +22,10 @@ export const AUTH_BODY_FONT_EMPHASIS = Platform.select({
   default: "system-ui",
 });
 
-export const APP_BAR_TEXT = "#111827";
-export const APP_BAR_SUBTEXT = "#6B7280";
-export const APP_BAR_ACTION_TEXT = "#2563EB";
+export const APP_BAR_TEXT = "#0D274A";
+export const APP_BAR_SUBTEXT = "#6D7B8F";
+export const APP_BAR_ACTION_TEXT = "#0D274A";
+export const APP_BAR_ACTION_BG = "#FFFFFF";
+export const APP_BAR_ACTION_BORDER = "#D8E1EC";
+export const APP_BAR_GHOST_BG = "#FFFFFF";
+export const APP_BAR_GHOST_BORDER = "#E1E8F0";

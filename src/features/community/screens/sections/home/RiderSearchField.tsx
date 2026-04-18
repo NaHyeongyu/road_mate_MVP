@@ -69,7 +69,7 @@ export function RiderSearchField({
           onSubmitEditing={onSubmitEditing}
         />
         {value.trim() ? (
-          <Pressable style={styles.routeSearchClearButton} onPress={onClear}>
+          <Pressable style={styles.routeSearchClearButton} onPressIn={onClear}>
             <MaterialCommunityIcons name="close-circle" size={18} color={colors.subtext} />
           </Pressable>
         ) : null}

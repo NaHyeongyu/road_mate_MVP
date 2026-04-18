@@ -17,6 +17,9 @@ export const createAuthHeroStyles = (colors: AppColors) =>
       shadowRadius: 18,
       shadowOffset: { width: 0, height: 10 },
       elevation: 6,
+      width: "100%",
+      maxWidth: 420,
+      alignSelf: "center",
     },
     authHeroRingLarge: {
       position: "absolute",
@@ -79,14 +82,14 @@ export const createAuthHeroStyles = (colors: AppColors) =>
       fontSize: 34,
       lineHeight: 40,
       fontWeight: "900",
-      maxWidth: 300,
+      maxWidth: 330,
     },
     authHeroBody: {
       color: colors.heroMuted,
       fontSize: 15,
       lineHeight: 22,
       marginTop: 12,
-      maxWidth: 310,
+      maxWidth: 330,
     },
     featureRow: {
       flexDirection: "row",

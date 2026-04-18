@@ -1,5 +1,6 @@
-import { Pressable, Text, View } from "react-native";
+import { Pressable, Text, View, useWindowDimensions } from "react-native";
 
+import { useAppCopy } from "../../../../../i18n/AppI18nContext";
 import type { AppStyles } from "../../../../../ui/types";
 
 type NoticeScope = "upcoming" | "all";
@@ -15,18 +16,30 @@ export function RiderNoticeScopeChips({
   noticeScope,
   onNoticeScopeChange,
 }: RiderNoticeScopeChipsProps) {
+  const copy = useAppCopy();
+  const { width } = useWindowDimensions();
+  const isCompactLayout = width < 390;
+
   return (
-    <View style={styles.row}>
+    <View style={styles.riderScopeRow}>
       <Pressable
         onPress={() => onNoticeScopeChange("upcoming")}
         style={({ pressed }) => [
           styles.chip,
+          styles.riderScopeChip,
+          isCompactLayout ? styles.riderScopeChipCompact : null,
           noticeScope === "upcoming" ? styles.chipActive : null,
           pressed ? styles.routeFilterItemPressed : null,
         ]}
       >
-        <Text style={[styles.chipText, noticeScope === "upcoming" ? styles.chipTextActive : null]}>
-          Upcoming
+        <Text
+          style={[
+            styles.chipText,
+            styles.riderScopeChipText,
+            noticeScope === "upcoming" ? styles.chipTextActive : null,
+          ]}
+        >
+          {copy.community.upcoming}
         </Text>
       </Pressable>
 
@@ -34,12 +47,20 @@ export function RiderNoticeScopeChips({
         onPress={() => onNoticeScopeChange("all")}
         style={({ pressed }) => [
           styles.chip,
+          styles.riderScopeChip,
+          isCompactLayout ? styles.riderScopeChipCompact : null,
           noticeScope === "all" ? styles.chipActive : null,
           pressed ? styles.routeFilterItemPressed : null,
         ]}
       >
-        <Text style={[styles.chipText, noticeScope === "all" ? styles.chipTextActive : null]}>
-          All notices
+        <Text
+          style={[
+            styles.chipText,
+            styles.riderScopeChipText,
+            noticeScope === "all" ? styles.chipTextActive : null,
+          ]}
+        >
+          {copy.community.allNotices}
         </Text>
       </Pressable>
     </View>

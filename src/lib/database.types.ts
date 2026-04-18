@@ -13,7 +13,9 @@ export type Database = {
         Row: {
           id: string;
           kind: "regular" | "one_time";
+          is_active: boolean;
           notice_date: string | null;
+          return_date: string | null;
           from_location: string;
           to_location: string;
           schedule: string;
@@ -34,7 +36,9 @@ export type Database = {
         Insert: {
           id: string;
           kind: "regular" | "one_time";
+          is_active?: boolean;
           notice_date?: string | null;
+          return_date?: string | null;
           from_location: string;
           to_location: string;
           schedule: string;
@@ -55,7 +59,9 @@ export type Database = {
         Update: {
           id?: string;
           kind?: "regular" | "one_time";
+          is_active?: boolean;
           notice_date?: string | null;
+          return_date?: string | null;
           from_location?: string;
           to_location?: string;
           schedule?: string;
@@ -126,7 +132,14 @@ export type Database = {
       };
     };
     Views: Record<string, never>;
-    Functions: Record<string, never>;
+    Functions: {
+      is_email_registered: {
+        Args: {
+          check_email: string;
+        };
+        Returns: boolean;
+      };
+    };
     Enums: Record<string, never>;
     CompositeTypes: Record<string, never>;
   };

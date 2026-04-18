@@ -6,7 +6,7 @@ export const createCommunityVehicleActions = (context: CommunityActionsContext) 
     if (!context.currentUserId) {
       context.onNotice({
         tone: "error",
-        text: "Sign in before saving a vehicle.",
+        text: context.copy.notices.signInBeforeSavingVehicle,
       });
       return;
     }
@@ -22,7 +22,7 @@ export const createCommunityVehicleActions = (context: CommunityActionsContext) 
     if (!nextVehicle.model || !nextVehicle.plate) {
       context.onNotice({
         tone: "error",
-        text: "Driver needs at least a car model and plate number.",
+        text: context.copy.notices.vehicleModelAndPlateRequired,
       });
       return;
     }
@@ -30,7 +30,7 @@ export const createCommunityVehicleActions = (context: CommunityActionsContext) 
     await context.persistVehicle(nextVehicle);
     context.onNotice({
       tone: "success",
-      text: "Driver profile saved.",
+      text: context.copy.notices.driverProfileSaved,
     });
   };
 

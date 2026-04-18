@@ -7,7 +7,7 @@ import { sortByNewest } from "../utils/storage";
 
 const ROUTE_POSTS_TABLE = "route_posts";
 const ROUTE_POSTS_SELECT =
-  "id,kind,notice_date,from_location,to_location,schedule,return_schedule,available_seats,operating_days,contact_phone,contact_link,note,vehicle_model,vehicle_plate,owner_user_id,owner_name,is_public,created_at";
+  "id,kind,is_active,notice_date,return_date,from_location,to_location,schedule,return_schedule,available_seats,operating_days,contact_phone,contact_link,note,vehicle_model,vehicle_plate,owner_user_id,owner_name,is_public,created_at";
 
 type RoutePostRecord = Database["public"]["Tables"]["route_posts"]["Row"];
 type RoutePostRecordInsert = Database["public"]["Tables"]["route_posts"]["Insert"];
@@ -90,14 +90,20 @@ const toRoutePost = (record: Partial<RoutePostRecord>): RoutePost | null => {
   const note = String(record.note ?? "").trim();
   const createdAt = String(record.created_at ?? new Date().toISOString()).trim();
   const noticeDateRaw = String(record.notice_date ?? "").trim();
+  const returnDateRaw = String(record.return_date ?? "").trim();
 
   return {
     id,
     kind,
+    isActive: record.is_active !== false,
     oneTimeTripType:
-      kind === "one_time" ? (returnSchedule ? "round_trip" : "one_way") : undefined,
+      kind === "one_time" ? (returnSchedule || returnDateRaw ? "round_trip" : "one_way") : undefined,
     noticeDate:
       kind === "one_time" ? noticeDateRaw || createdAt.slice(0, 10) || undefined : undefined,
+    returnDate:
+      kind === "one_time"
+        ? returnDateRaw || (returnSchedule ? noticeDateRaw || createdAt.slice(0, 10) || undefined : undefined)
+        : undefined,
     from,
     to,
     schedule,
@@ -119,7 +125,12 @@ const toRoutePost = (record: Partial<RoutePostRecord>): RoutePost | null => {
 const toRoutePostRecord = (post: RoutePost): RoutePostRecordInsert => ({
   id: post.id,
   kind: post.kind,
+  is_active: post.kind === "one_time" ? post.isActive !== false : true,
   notice_date: post.kind === "one_time" ? post.noticeDate?.trim() || null : null,
+  return_date:
+    post.kind === "one_time" && (post.oneTimeTripType === "round_trip" || post.returnSchedule)
+      ? post.returnDate?.trim() || post.noticeDate?.trim() || null
+      : null,
   from_location: post.from.trim(),
   to_location: post.to.trim(),
   schedule: post.schedule.trim(),
@@ -150,6 +161,12 @@ export const isRoutePostRepositoryEnabled = () => isSupabaseConfigured && Boolea
 
 export const getDefaultRoutePostId = (ownerUserId: string, kind: RouteKind) =>
   `${ownerUserId}:${kind}`;
+
+export const getNextRoutePostId = (
+  ownerUserId: string,
+  kind: RouteKind,
+  uniqueToken: string
+) => (kind === "regular" ? getDefaultRoutePostId(ownerUserId, kind) : `${ownerUserId}:${kind}:${uniqueToken}`);
 
 export const fetchRoutePostsFromDb = async (
   query: FetchRoutePostsQuery = {}
@@ -234,7 +251,7 @@ export const upsertRoutePostInDb = async (post: RoutePost): Promise<RoutePost> =
   const record = toRoutePostRecord(post);
   const { data, error } = await supabase
     .from(ROUTE_POSTS_TABLE)
-    .upsert(record, { onConflict: "owner_user_id,kind" })
+    .upsert(record, { onConflict: "id" })
     .select(ROUTE_POSTS_SELECT)
     .single();
   if (error) {
@@ -244,6 +261,30 @@ export const upsertRoutePostInDb = async (post: RoutePost): Promise<RoutePost> =
   clearRoutePostsQueryCache();
   const mapped = toRoutePost(data);
   return mapped ?? post;
+};
+
+export const deactivateOneTimeRoutePostsInDb = async (ownerUserId: string, excludeRouteId?: string) => {
+  if (!supabase) {
+    return;
+  }
+
+  let query = supabase
+    .from(ROUTE_POSTS_TABLE)
+    .update({ is_active: false })
+    .eq("owner_user_id", ownerUserId)
+    .eq("kind", "one_time")
+    .eq("is_active", true);
+
+  if (excludeRouteId) {
+    query = query.neq("id", excludeRouteId);
+  }
+
+  const { error } = await query;
+  if (error) {
+    throw error;
+  }
+
+  clearRoutePostsQueryCache();
 };
 
 export const deleteRoutePostInDb = async (routeId: string, ownerUserId: string) => {
