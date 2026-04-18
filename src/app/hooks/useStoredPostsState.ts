@@ -13,7 +13,6 @@ import {
   sortByNewest,
 } from "../../features/community/utils/storage";
 import type { RoutePost } from "../../model";
-import { supabase } from "../../lib/supabase";
 import type { AppNotice } from "../types";
 
 type UseStoredPostsStateOptions = {
@@ -34,7 +33,10 @@ export function useStoredPostsState({
 
   useEffect(() => {
     let cancelled = false;
-    let releaseRemoteSubscription: (() => void) | undefined;
+
+    if (shouldSyncRemotePosts) {
+      setIsPostsLoading(true);
+    }
 
     const syncCache = async (posts: RoutePost[]) => {
       try {
@@ -86,28 +88,7 @@ export function useStoredPostsState({
           return;
         }
 
-        const didSyncRemote = await refreshRemotePosts(true);
-        if (didSyncRemote && supabase) {
-          const supabaseClient = supabase;
-          const channel = supabaseClient
-            .channel("route_posts:public_feed")
-            .on(
-              "postgres_changes",
-              {
-                event: "*",
-                schema: "public",
-                table: "route_posts",
-              },
-              () => {
-                void refreshRemotePosts(false);
-              }
-            )
-            .subscribe();
-
-          releaseRemoteSubscription = () => {
-            void supabaseClient.removeChannel(channel);
-          };
-        }
+        await refreshRemotePosts(true);
       } catch {
         if (!cancelled) {
           onLoadError({
@@ -126,7 +107,6 @@ export function useStoredPostsState({
 
     return () => {
       cancelled = true;
-      releaseRemoteSubscription?.();
     };
   }, [currentUserId, onLoadError, remoteQuery, shouldSyncRemotePosts]);
 

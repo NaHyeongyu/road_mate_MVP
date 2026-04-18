@@ -52,19 +52,19 @@ export const createCommunityAccountActions = (
     if (!supabase || !context.currentUserId) {
       context.onNotice({
         tone: "error",
-        text: "Sign in before managing account withdrawal.",
+        text: "Sign in before leaving the community.",
       });
       return;
     }
     const authClient = supabase;
 
     Alert.alert(
-      "Withdraw account?",
-      "This will sign you out and clear your driver profile from this device.",
+      "Leave community?",
+      "This removes your route posts and driver profile, marks your community access inactive, and signs you out.",
       [
         { text: "Cancel", style: "cancel" },
         {
-          text: "Withdraw",
+          text: "Leave",
           style: "destructive",
           onPress: () => {
             void (async () => {
@@ -99,12 +99,12 @@ export const createCommunityAccountActions = (
                 resetSignedInExperience();
                 context.onNotice({
                   tone: "success",
-                  text: "Account withdrawal completed.",
+                  text: "Community profile cleared and signed out.",
                 });
               } catch (error) {
                 context.onNotice({
                   tone: "error",
-                  text: `Account withdrawal failed: ${(error as Error).message}`,
+                  text: `Leave community failed: ${(error as Error).message}`,
                 });
               }
             })();

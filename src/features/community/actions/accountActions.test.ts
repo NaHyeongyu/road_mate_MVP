@@ -165,7 +165,7 @@ describe("createCommunityAccountActions", () => {
     expect(Alert.alert).not.toHaveBeenCalled();
     expect(ctx.onNoticeMock).toHaveBeenCalledWith({
       tone: "error",
-      text: "Sign in before managing account withdrawal.",
+      text: "Sign in before leaving the community.",
     });
   });
 
@@ -178,7 +178,7 @@ describe("createCommunityAccountActions", () => {
     const ctx = createContext({ storedPosts: [ownPost, otherPost] });
 
     vi.mocked(Alert.alert).mockImplementation((_, __, buttons) => {
-      const withdrawButton = buttons?.find((button) => button.text === "Withdraw");
+      const withdrawButton = buttons?.find((button) => button.text === "Leave");
       withdrawButton?.onPress?.();
     });
 
@@ -205,7 +205,7 @@ describe("createCommunityAccountActions", () => {
 
     expect(ctx.onNoticeMock).toHaveBeenCalledWith({
       tone: "success",
-      text: "Account withdrawal completed.",
+      text: "Community profile cleared and signed out.",
     });
   });
 });

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useEffect } from "react";
 import { ScrollView, StatusBar, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -60,6 +60,11 @@ export type CommunityHomeScreenProps = {
   }) => Promise<void>;
   onRemoveRoute: (id: string) => void;
   onToggleSavedPost: (post: RoutePost) => void;
+  isRiderSearchResultsPageVisible: boolean;
+  canLoadMoreRiderSearchResults: boolean;
+  onOpenRiderSearchResultsPage: () => void;
+  onCloseRiderSearchResultsPage: () => void;
+  onLoadMoreRiderSearchResults: () => void;
 };
 
 export function CommunityHomeScreen({
@@ -101,17 +106,15 @@ export function CommunityHomeScreen({
   onSaveRouteQuickSettings,
   onRemoveRoute,
   onToggleSavedPost,
+  isRiderSearchResultsPageVisible,
+  canLoadMoreRiderSearchResults,
+  onOpenRiderSearchResultsPage,
+  onCloseRiderSearchResultsPage,
+  onLoadMoreRiderSearchResults,
 }: CommunityHomeScreenProps) {
   const insets = useSafeAreaInsets();
   const bottomInset = Math.max(insets.bottom, 8);
   const isRiderMode = mode === "rider";
-  const [isRiderSearchResultsPageVisible, setIsRiderSearchResultsPageVisible] = useState(false);
-  const openRiderSearchResultsPage = useCallback(() => {
-    setIsRiderSearchResultsPageVisible(true);
-  }, []);
-  const closeRiderSearchResultsPage = useCallback(() => {
-    setIsRiderSearchResultsPageVisible(false);
-  }, []);
   const isSearchDetailScreen =
     isRiderMode && mainTab === "home" && isRiderSearchResultsPageVisible;
   const {
@@ -133,9 +136,9 @@ export function CommunityHomeScreen({
 
   useEffect(() => {
     if (!isRiderMode || mainTab !== "home") {
-      closeRiderSearchResultsPage();
+      onCloseRiderSearchResultsPage();
     }
-  }, [closeRiderSearchResultsPage, isRiderMode, mainTab]);
+  }, [isRiderMode, mainTab, onCloseRiderSearchResultsPage]);
 
   if (isDriverRegistrationPageVisible) {
     return (
@@ -201,7 +204,7 @@ export function CommunityHomeScreen({
             title="Search results"
             leftActionType="back"
             leftActionLabel="Back"
-            onLeftActionPress={closeRiderSearchResultsPage}
+            onLeftActionPress={onCloseRiderSearchResultsPage}
             styles={styles}
           />
         </View>
@@ -262,8 +265,10 @@ export function CommunityHomeScreen({
           onRemoveRoute={onRemoveRoute}
           onToggleSavedPost={onToggleSavedPost}
           isRiderSearchResultsPageVisible={isRiderSearchResultsPageVisible}
-          onOpenRiderSearchResultsPage={openRiderSearchResultsPage}
-          onCloseRiderSearchResultsPage={closeRiderSearchResultsPage}
+          canLoadMoreRiderSearchResults={canLoadMoreRiderSearchResults}
+          onOpenRiderSearchResultsPage={onOpenRiderSearchResultsPage}
+          onCloseRiderSearchResultsPage={onCloseRiderSearchResultsPage}
+          onLoadMoreRiderSearchResults={onLoadMoreRiderSearchResults}
         />
       </ScrollView>
 

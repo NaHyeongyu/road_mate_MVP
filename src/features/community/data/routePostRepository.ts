@@ -17,9 +17,13 @@ export type FetchRoutePostsQuery = {
   stateFilter?: StateFilter;
   fromQuery?: string;
   toQuery?: string;
+  ownerUserId?: string;
+  limit?: number;
 };
 
 const MAX_SEATS = 8;
+const QUERY_CACHE_TTL_MS = 60_000;
+const routePostsQueryCache = new Map<string, { fetchedAt: number; posts: RoutePost[] }>();
 
 const normalizeQuery = (value: string) =>
   value
@@ -39,6 +43,27 @@ const normalizeOperatingDays = (value: unknown) =>
         .filter(Boolean)
         .slice(0, 7)
     : [];
+
+const normalizeQueryValue = (value: string | undefined) => value?.trim() || undefined;
+
+const normalizeLimit = (value: number | undefined) => {
+  if (!Number.isFinite(value)) {
+    return undefined;
+  }
+
+  const normalized = Math.floor(Number(value));
+  return normalized > 0 ? normalized : undefined;
+};
+
+const toQueryCacheKey = (query: FetchRoutePostsQuery) =>
+  JSON.stringify({
+    kind: query.kind,
+    stateFilter: query.stateFilter,
+    fromQuery: normalizeQueryValue(query.fromQuery),
+    toQuery: normalizeQueryValue(query.toQuery),
+    ownerUserId: normalizeQueryValue(query.ownerUserId),
+    limit: normalizeLimit(query.limit),
+  });
 
 const toRoutePost = (record: Partial<RoutePostRecord>): RoutePost | null => {
   const id = String(record.id ?? "").trim();
@@ -114,7 +139,8 @@ const toRoutePostRecord = (post: RoutePost): RoutePostRecordInsert => ({
 
 const hasRemoteFilterQuery = (query: FetchRoutePostsQuery) =>
   Boolean(
-    query.kind ||
+    query.ownerUserId ||
+      query.kind ||
       (query.stateFilter && query.stateFilter !== "ALL") ||
       query.fromQuery?.trim() ||
       query.toQuery?.trim()
@@ -132,10 +158,20 @@ export const fetchRoutePostsFromDb = async (
     return [];
   }
 
+  const cacheKey = toQueryCacheKey(query);
+  const cachedEntry = routePostsQueryCache.get(cacheKey);
+  if (cachedEntry && Date.now() - cachedEntry.fetchedAt < QUERY_CACHE_TTL_MS) {
+    return cachedEntry.posts;
+  }
+
   let dbQuery = supabase
     .from(ROUTE_POSTS_TABLE)
     .select(ROUTE_POSTS_SELECT)
     .order("created_at", { ascending: false });
+
+  if (query.ownerUserId) {
+    dbQuery = dbQuery.eq("owner_user_id", query.ownerUserId);
+  }
 
   if (query.kind) {
     dbQuery = dbQuery.eq("kind", query.kind);
@@ -162,15 +198,29 @@ export const fetchRoutePostsFromDb = async (
     dbQuery = dbQuery.ilike("to_location", `%${escapeLikeToken(token)}%`);
   }
 
+  const normalizedLimit = normalizeLimit(query.limit);
+  if (normalizedLimit) {
+    dbQuery = dbQuery.limit(normalizedLimit);
+  }
+
   const { data, error } = await dbQuery;
   if (error) {
     throw error;
   }
 
-  return sortByNewest((data ?? []).flatMap((record) => {
+  const posts = sortByNewest((data ?? []).flatMap((record) => {
     const mapped = toRoutePost(record);
     return mapped ? [mapped] : [];
   }));
+  routePostsQueryCache.set(cacheKey, {
+    fetchedAt: Date.now(),
+    posts,
+  });
+  return posts;
+};
+
+export const clearRoutePostsQueryCache = () => {
+  routePostsQueryCache.clear();
 };
 
 export const shouldSkipRoutePostsCacheWrite = (query: FetchRoutePostsQuery = {}) =>
@@ -191,6 +241,7 @@ export const upsertRoutePostInDb = async (post: RoutePost): Promise<RoutePost> =
     throw error;
   }
 
+  clearRoutePostsQueryCache();
   const mapped = toRoutePost(data);
   return mapped ?? post;
 };
@@ -208,6 +259,8 @@ export const deleteRoutePostInDb = async (routeId: string, ownerUserId: string) 
   if (error) {
     throw error;
   }
+
+  clearRoutePostsQueryCache();
 };
 
 type UpdateRouteQuickSettingsInDbInput = {
@@ -245,6 +298,7 @@ export const updateRouteQuickSettingsInDb = async ({
     return null;
   }
 
+  clearRoutePostsQueryCache();
   return toRoutePost(data);
 };
 
@@ -260,4 +314,6 @@ export const deleteMyRoutePostsInDb = async (ownerUserId: string) => {
   if (error) {
     throw error;
   }
+
+  clearRoutePostsQueryCache();
 };

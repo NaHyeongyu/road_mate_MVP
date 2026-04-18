@@ -23,8 +23,8 @@ export function useRouteComposerPlaces({
   const blurTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [activePlaceField, setActivePlaceField] = useState<PlaceField | null>(null);
 
-  const fromSuggestions = usePlaceSuggestions(routeDraft.from);
-  const toSuggestions = usePlaceSuggestions(routeDraft.to);
+  const fromSuggestions = usePlaceSuggestions(routeDraft.from, 8, "ALL", activePlaceField === "from");
+  const toSuggestions = usePlaceSuggestions(routeDraft.to, 8, "ALL", activePlaceField === "to");
 
   const showFromSuggestions =
     activePlaceField === "from" && routeDraft.from.trim().length > 0 && fromSuggestions.length > 0;

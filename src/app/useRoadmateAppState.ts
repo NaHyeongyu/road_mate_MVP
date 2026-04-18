@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { deriveDisplayName } from "../features/auth/utils/authHelpers";
 import { useAuthFlow } from "../features/auth/hooks/useAuthFlow";
 import { useCommunityActions } from "../features/community/hooks/useCommunityActions";
@@ -11,6 +11,9 @@ import { useDriverRouteDraftState } from "./hooks/useDriverRouteDraftState";
 import { useSavedPostKeysCleanup } from "./hooks/useSavedPostKeysCleanup";
 import { useSessionState } from "./hooks/useSessionState";
 import { useStoredPostsState } from "./hooks/useStoredPostsState";
+
+const DRIVER_REMOTE_POST_LIMIT = 8;
+const RIDER_SEARCH_RESULTS_PAGE_SIZE = 40;
 
 export function useRoadmateAppState() {
   const {
@@ -35,6 +38,20 @@ export function useRoadmateAppState() {
     setNotice,
     handleLoadError,
   } = useCommunityUiState();
+  const [isRiderSearchResultsPageVisible, setIsRiderSearchResultsPageVisible] = useState(false);
+  const [riderSearchResultsLimit, setRiderSearchResultsLimit] = useState(
+    RIDER_SEARCH_RESULTS_PAGE_SIZE
+  );
+  const openRiderSearchResultsPage = useCallback(() => {
+    setRiderSearchResultsLimit(RIDER_SEARCH_RESULTS_PAGE_SIZE);
+    setIsRiderSearchResultsPageVisible(true);
+  }, []);
+  const closeRiderSearchResultsPage = useCallback(() => {
+    setIsRiderSearchResultsPageVisible(false);
+  }, []);
+  const loadMoreRiderSearchResults = useCallback(() => {
+    setRiderSearchResultsLimit((current) => current + RIDER_SEARCH_RESULTS_PAGE_SIZE);
+  }, []);
 
   const { authSession, isSessionLoading } = useSessionState({
     onLoadError: handleLoadError,
@@ -45,7 +62,21 @@ export function useRoadmateAppState() {
     (fromSearchQuery.trim() && toSearchQuery.trim()) || stateFilter !== "ALL"
   );
   const remoteQuery = useMemo<FetchRoutePostsQuery | undefined>(() => {
-    if (mode !== "rider" || mainTab !== "home" || !isRiderSearchReady) {
+    if (mode === "driver") {
+      return currentUserId
+        ? {
+            ownerUserId: currentUserId,
+            limit: DRIVER_REMOTE_POST_LIMIT,
+          }
+        : undefined;
+    }
+
+    if (
+      mode !== "rider" ||
+      mainTab !== "home" ||
+      !isRiderSearchReady ||
+      !isRiderSearchResultsPageVisible
+    ) {
       return undefined;
     }
 
@@ -54,9 +85,21 @@ export function useRoadmateAppState() {
       stateFilter,
       fromQuery: fromSearchQuery,
       toQuery: toSearchQuery,
+      limit: riderSearchResultsLimit,
     };
-  }, [filter, fromSearchQuery, isRiderSearchReady, mainTab, mode, stateFilter, toSearchQuery]);
-  const shouldSyncRemotePosts = mode === "driver" || isRiderSearchReady;
+  }, [
+    currentUserId,
+    filter,
+    fromSearchQuery,
+    isRiderSearchReady,
+    isRiderSearchResultsPageVisible,
+    mainTab,
+    mode,
+    riderSearchResultsLimit,
+    stateFilter,
+    toSearchQuery,
+  ]);
+  const shouldSyncRemotePosts = Boolean(remoteQuery);
   const { storedPosts, isPostsLoading, persistPosts } = useStoredPostsState({
     currentUserId,
     shouldSyncRemotePosts,
@@ -111,6 +154,56 @@ export function useRoadmateAppState() {
     persistSavedPostKeys,
   });
 
+  const setModeWithSearchReset = useCallback(
+    (nextMode: Parameters<typeof setMode>[0]) => {
+      closeRiderSearchResultsPage();
+      setMode(nextMode);
+    },
+    [closeRiderSearchResultsPage, setMode]
+  );
+
+  const handleMainTabChange = useCallback(
+    (nextTab: Parameters<typeof setMainTab>[0]) => {
+      if (nextTab !== "home") {
+        closeRiderSearchResultsPage();
+      }
+      setMainTab(nextTab);
+    },
+    [closeRiderSearchResultsPage, setMainTab]
+  );
+
+  const handleFilterChange = useCallback(
+    (nextFilter: Parameters<typeof setFilter>[0]) => {
+      closeRiderSearchResultsPage();
+      setFilter(nextFilter);
+    },
+    [closeRiderSearchResultsPage, setFilter]
+  );
+
+  const handleStateFilterChange = useCallback(
+    (nextStateFilter: Parameters<typeof setStateFilter>[0]) => {
+      closeRiderSearchResultsPage();
+      setStateFilter(nextStateFilter);
+    },
+    [closeRiderSearchResultsPage, setStateFilter]
+  );
+
+  const handleFromSearchQueryChange = useCallback(
+    (value: string) => {
+      closeRiderSearchResultsPage();
+      setFromSearchQuery(value);
+    },
+    [closeRiderSearchResultsPage, setFromSearchQuery]
+  );
+
+  const handleToSearchQueryChange = useCallback(
+    (value: string) => {
+      closeRiderSearchResultsPage();
+      setToSearchQuery(value);
+    },
+    [closeRiderSearchResultsPage, setToSearchQuery]
+  );
+
   const {
     handleModeChange,
     withdrawAccount,
@@ -131,10 +224,10 @@ export function useRoadmateAppState() {
     routeDraft,
     savedVehicle,
     vehicleDraft,
-    setMode,
-    setFilter,
-    setStateFilter,
-    setMainTab,
+    setMode: setModeWithSearchReset,
+    setFilter: handleFilterChange,
+    setStateFilter: handleStateFilterChange,
+    setMainTab: handleMainTabChange,
     setRouteDraft,
     resetAllRouteDrafts,
     onNotice: setNotice,
@@ -166,6 +259,16 @@ export function useRoadmateAppState() {
   });
 
   const isAuthenticated = Boolean(currentUserId);
+  const canLoadMoreRiderSearchResults =
+    mode === "rider" &&
+    isRiderSearchResultsPageVisible &&
+    storedPosts.length >= riderSearchResultsLimit;
+
+  useEffect(() => {
+    if (mode !== "rider" || mainTab !== "home") {
+      setIsRiderSearchResultsPageVisible(false);
+    }
+  }, [mainTab, mode]);
 
   const openEmailAuthGate = useCallback(
     (reason: string) => {
@@ -229,9 +332,10 @@ export function useRoadmateAppState() {
       if (nextMode === "driver" && !ensureAuthenticated("Driver mode")) {
         return;
       }
+      closeRiderSearchResultsPage();
       handleModeChange(nextMode);
     },
-    [ensureAuthenticated, handleModeChange]
+    [closeRiderSearchResultsPage, ensureAuthenticated, handleModeChange]
   );
 
   return {
@@ -253,7 +357,9 @@ export function useRoadmateAppState() {
     isAuthSubmitting,
     oauthProviderPending,
     isVehicleLoading,
+    isRiderSearchResultsPageVisible,
     loading,
+    canLoadMoreRiderSearchResults,
     mainTab,
     mode,
     myPosts,
@@ -267,6 +373,9 @@ export function useRoadmateAppState() {
     visiblePosts,
 
     handleModeChange: handleModeChangeWithAuth,
+    openRiderSearchResultsPage,
+    closeRiderSearchResultsPage,
+    loadMoreRiderSearchResults,
     handleSignOut,
     openEmailAuthGate,
     handleSubmitAuth,
@@ -279,13 +388,13 @@ export function useRoadmateAppState() {
     setAuthMode,
     setAuthPassword,
     setAuthDisplayName,
-    setFilter,
-    setStateFilter,
-    setFromSearchQuery,
-    setMainTab,
+    setFilter: handleFilterChange,
+    setStateFilter: handleStateFilterChange,
+    setFromSearchQuery: handleFromSearchQueryChange,
+    setMainTab: handleMainTabChange,
     setNotice,
     setRouteDraft,
-    setToSearchQuery,
+    setToSearchQuery: handleToSearchQueryChange,
     setVehicleDraft,
     toggleSavedPost: handleToggleSavedPost,
     saveRouteQuickSettings: handleSaveRouteQuickSettings,

@@ -50,8 +50,10 @@ type CommunityTabContentProps = {
   onRemoveRoute: (id: string) => void;
   onToggleSavedPost: (post: RoutePost) => void;
   isRiderSearchResultsPageVisible: boolean;
+  canLoadMoreRiderSearchResults: boolean;
   onOpenRiderSearchResultsPage: () => void;
   onCloseRiderSearchResultsPage: () => void;
+  onLoadMoreRiderSearchResults: () => void;
 };
 
 export function CommunityTabContent({
@@ -93,8 +95,10 @@ export function CommunityTabContent({
   onRemoveRoute,
   onToggleSavedPost,
   isRiderSearchResultsPageVisible,
+  canLoadMoreRiderSearchResults,
   onOpenRiderSearchResultsPage,
   onCloseRiderSearchResultsPage,
+  onLoadMoreRiderSearchResults,
 }: CommunityTabContentProps) {
   const isRiderMode = mode === "rider";
   const shouldRenderHomeTab = mainTab === "home" || (mode === "driver" && mainTab === "saved");
@@ -124,8 +128,10 @@ export function CommunityTabContent({
     onOpenDriverRegistrationPage,
     onToggleSavedPost,
     isRiderSearchResultsPageVisible,
+    canLoadMoreRiderSearchResults,
     onOpenRiderSearchResultsPage,
     onCloseRiderSearchResultsPage,
+    onLoadMoreRiderSearchResults,
   } as const;
 
   if (shouldRenderHomeTab) {

@@ -34,8 +34,10 @@ type RiderFeedSectionProps = {
   onToSearchQueryChange: (value: string) => void;
   onToggleSavedPost: (post: RoutePost) => void;
   isSearchResultsPageVisible: boolean;
+  canLoadMoreSearchResults: boolean;
   onOpenSearchResultsPage: () => void;
   onCloseSearchResultsPage: () => void;
+  onLoadMoreSearchResults: () => void;
 };
 
 export function RiderFeedSection({
@@ -54,8 +56,10 @@ export function RiderFeedSection({
   onToSearchQueryChange,
   onToggleSavedPost,
   isSearchResultsPageVisible,
+  canLoadMoreSearchResults,
   onOpenSearchResultsPage,
   onCloseSearchResultsPage,
+  onLoadMoreSearchResults,
 }: RiderFeedSectionProps) {
   const savedPostKeySet = useMemo(() => new Set(savedPostKeys), [savedPostKeys]);
   const hasStateSelected = stateFilter !== "ALL";
@@ -154,25 +158,39 @@ export function RiderFeedSection({
             pastNoticeCount={pastNoticeCount}
           />
         ) : (
-          feedPosts.map((post) => (
-            <PostCard
-              key={post.id}
-              post={post}
-              styles={styles}
-              isSaved={savedPostKeySet.has(getPostSaveKey(post))}
-              onToggleSave={() => onToggleSavedPost(post)}
-              extraContent={
-                post.note.trim() ? (
-                  <View style={styles.postSummaryRow}>
-                    <Text style={styles.postSummaryText}>Note</Text>
-                    <Text numberOfLines={5} ellipsizeMode="tail" style={styles.postNote}>
-                      {post.note.trim()}
-                    </Text>
-                  </View>
-                ) : undefined
-              }
-            />
-          ))
+          <>
+            {feedPosts.map((post) => (
+              <PostCard
+                key={post.id}
+                post={post}
+                styles={styles}
+                isSaved={savedPostKeySet.has(getPostSaveKey(post))}
+                onToggleSave={() => onToggleSavedPost(post)}
+                extraContent={
+                  post.note.trim() ? (
+                    <View style={styles.postSummaryRow}>
+                      <Text style={styles.postSummaryText}>Note</Text>
+                      <Text numberOfLines={5} ellipsizeMode="tail" style={styles.postNote}>
+                        {post.note.trim()}
+                      </Text>
+                    </View>
+                  ) : undefined
+                }
+              />
+            ))}
+            {canLoadMoreSearchResults ? (
+              <Pressable
+                style={({ pressed }) => [
+                  styles.routeSearchActionButton,
+                  pressed ? styles.routeSearchActionButtonPressed : null,
+                ]}
+                onPress={onLoadMoreSearchResults}
+              >
+                <MaterialCommunityIcons name="plus-circle-outline" size={18} color={colors.heroText} />
+                <Text style={styles.routeSearchActionButtonText}>Load more results</Text>
+              </Pressable>
+            ) : null}
+          </>
         )}
       </>
     );

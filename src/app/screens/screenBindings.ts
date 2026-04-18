@@ -1,4 +1,5 @@
 import type { AppColors } from "../../brandTheme";
+import { isSocialAuthEnabled } from "../../features/auth/config";
 import type { AuthEmailScreenProps } from "../../features/auth/screens/AuthEmailScreen";
 import type { AuthOptionsScreenProps } from "../../features/auth/screens/AuthOptionsScreen";
 import type { CommunityHomeScreenProps } from "../../features/community/screens/CommunityHomeScreen";
@@ -36,6 +37,7 @@ export function buildAuthOptionsScreenProps({
     logoSource,
     styles,
     notice: appState.notice,
+    isSocialAuthEnabled,
     oauthProviderPending: appState.oauthProviderPending,
     onPressEmail: () => {
       clearNotice(appState);
@@ -116,5 +118,10 @@ export function buildCommunityHomeScreenProps({
     onSaveRouteQuickSettings: appState.saveRouteQuickSettings,
     onRemoveRoute: appState.removeRoute,
     onToggleSavedPost: appState.toggleSavedPost,
+    isRiderSearchResultsPageVisible: appState.isRiderSearchResultsPageVisible,
+    canLoadMoreRiderSearchResults: appState.canLoadMoreRiderSearchResults,
+    onOpenRiderSearchResultsPage: appState.openRiderSearchResultsPage,
+    onCloseRiderSearchResultsPage: appState.closeRiderSearchResultsPage,
+    onLoadMoreRiderSearchResults: appState.loadMoreRiderSearchResults,
   };
 }

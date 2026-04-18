@@ -1,4 +1,4 @@
-# roadmate_mvp
+# Roadmate
 
 Minimal Expo MVP for a community-style ride board.
 
@@ -12,7 +12,7 @@ Scope:
 
 - guest entry without login
 - email/password sign-up gate when saving rides or registering/posting as driver
-- Supabase OAuth quick login (Google / Apple / Facebook / Kakao)
+- optional Supabase OAuth quick login (Google / Apple / Facebook / Kakao), disabled by default for release builds
 - driver registers one vehicle
 - driver posts regular or one-time routes
 - rider browses the route list
@@ -28,8 +28,13 @@ cp .env.example .env
 Set:
 
 ```bash
+EXPO_PUBLIC_ENABLE_SEED_POSTS=false
+EXPO_PUBLIC_ENABLE_ADS=false
+EXPO_PUBLIC_ENABLE_SOCIAL_AUTH=false
 EXPO_PUBLIC_SUPABASE_URL=...
 EXPO_PUBLIC_SUPABASE_ANON_KEY=...
+ADMOB_ANDROID_APP_ID=...
+ADMOB_IOS_APP_ID=...
 EXPO_PUBLIC_ADMOB_BANNER_UNIT_ID=...
 EXPO_PUBLIC_ADMOB_APP_OPEN_UNIT_ID=...
 ```
@@ -37,13 +42,20 @@ EXPO_PUBLIC_ADMOB_APP_OPEN_UNIT_ID=...
 AdMob note:
 
 - The app uses `react-native-google-mobile-ads` (banner + app open ad)
+- Ads stay disabled unless `EXPO_PUBLIC_ENABLE_ADS=true`
 - Use a development build (`npx expo run:android` / `npx expo run:ios`), not Expo Go
-- Replace test app IDs in `app.json` plugin config with your real AdMob app IDs before release
+- Set real `ADMOB_ANDROID_APP_ID`, `ADMOB_IOS_APP_ID`, and production unit IDs before any non-development build
+- When ads are enabled in development without production unit IDs, the app falls back to Google test ad units
 
 OAuth note:
 
+- Social auth stays hidden unless `EXPO_PUBLIC_ENABLE_SOCIAL_AUTH=true`
 - Enable `Google`, `Apple`, `Facebook`, and `Kakao` providers in Supabase Auth settings
 - Add `roadmate://auth/callback` to Supabase Auth URL configuration (Redirect URLs)
+
+Demo data note:
+
+- Seed route posts stay hidden unless `EXPO_PUBLIC_ENABLE_SEED_POSTS=true`
 
 Run `docs/supabase-route-posts.sql` in Supabase SQL Editor before using community posts.
 
@@ -51,5 +63,14 @@ Then run:
 
 ```bash
 npm install
+npm run sync:native
 npm run start
 ```
+
+Release pipeline note:
+
+- Because `ios/` is checked in, run `npm run sync:native` before store builds so `app.config.js` changes are pushed into native files.
+- EAS build profiles are defined in `eas.json`
+- Preview builds: `npm run build:preview:ios` / `npm run build:preview:android`
+- Production builds: `npm run build:production:ios` / `npm run build:production:android`
+- iOS TestFlight auto-submit: `npm run deploy:ios:testflight`

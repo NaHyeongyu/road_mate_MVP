@@ -124,8 +124,8 @@ export function MyPageTabSection({
         <Text style={styles.cardTitle}>Account management</Text>
         {isAuthenticated ? (
           <Text style={styles.cardBody}>
-            Sign out keeps your account. Withdrawal removes access and clears your local driver
-            profile.
+            Sign out keeps your account. Leave community removes your public posts and driver
+            profile, then signs you out.
           </Text>
         ) : (
           <Text style={styles.cardBody}>
@@ -166,7 +166,7 @@ export function MyPageTabSection({
             ) : null}
 
             {confirmWithdraw ? (
-              <Text style={styles.cardBody}>Tap withdraw once more to confirm account withdrawal.</Text>
+              <Text style={styles.cardBody}>Tap leave community once more to confirm.</Text>
             ) : null}
             <Pressable
               style={styles.dangerButton}
@@ -180,12 +180,12 @@ export function MyPageTabSection({
               }}
             >
               <Text style={styles.dangerButtonText}>
-                {confirmWithdraw ? "Confirm withdraw account" : "Withdraw account"}
+                {confirmWithdraw ? "Confirm leave community" : "Leave community"}
               </Text>
             </Pressable>
             {confirmWithdraw ? (
               <Pressable style={styles.inlineTextButton} onPress={() => setConfirmWithdraw(false)}>
-                <Text style={styles.inlineTextButtonText}>Cancel withdrawal</Text>
+                <Text style={styles.inlineTextButtonText}>Cancel leaving</Text>
               </Pressable>
             ) : null}
           </>

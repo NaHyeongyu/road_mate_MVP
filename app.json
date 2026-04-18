@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "roadmate_mvp",
+    "name": "Roadmate",
     "slug": "roadmate-mvp",
     "scheme": "roadmate",
     "version": "1.0.0",
@@ -9,22 +9,20 @@
     "userInterfaceStyle": "automatic",
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.nahyeongyu.roadmatemvp"
+      "bundleIdentifier": "com.roadmate.web",
+      "buildNumber": "1"
     },
     "android": {
-      "package": "com.roadmate.app"
+      "package": "com.roadmate.app",
+      "versionCode": 1
     },
     "plugins": [
-      "@react-native-community/datetimepicker",
-      [
-        "react-native-google-mobile-ads",
-        {
-          "androidAppId": "ca-app-pub-3940256099942544~3347511713",
-          "iosAppId": "ca-app-pub-3940256099942544~1458002511",
-          "delayAppMeasurementInit": true,
-          "userTrackingUsageDescription": "This identifier will be used to deliver personalized ads to you."
-        }
-      ]
-    ]
+      "@react-native-community/datetimepicker"
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "fc74ac46-2213-4380-92f2-2ed6ca0d99ca"
+      }
+    }
   }
 }

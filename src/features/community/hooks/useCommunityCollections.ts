@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 
 import type { RoutePost } from "../../../model";
-import { SEED_POSTS } from "../../../seed";
+import { SEED_POSTS, isSeedPostCatalogEnabled } from "../../../seed";
 import { getPostSaveKey, sortByNewest } from "../utils/storage";
 import { matchesRoutePostStateFilter } from "../utils/stateFilter";
 import type { Filter, StateFilter } from "../types";
@@ -101,7 +101,10 @@ export function useCommunityCollections({
     [currentUserId, storedPosts]
   );
 
-  const allPosts = useMemo(() => sortByNewest([...SEED_POSTS, ...storedPosts]), [storedPosts]);
+  const allPosts = useMemo(() => {
+    const sourcePosts = isSeedPostCatalogEnabled ? [...SEED_POSTS, ...storedPosts] : storedPosts;
+    return sortByNewest(sourcePosts);
+  }, [storedPosts]);
   const savedPostKeySet = useMemo(() => new Set(savedPostKeys), [savedPostKeys]);
   const fromTokens = useMemo(() => toTokens(fromSearchQuery), [fromSearchQuery]);
   const toTokensQuery = useMemo(() => toTokens(toSearchQuery), [toSearchQuery]);

@@ -37,6 +37,7 @@ export type AuthOptionsScreenProps = {
   logoSource: unknown;
   styles: AppStyles;
   notice: { tone: "info" | "success" | "error"; text: string };
+  isSocialAuthEnabled: boolean;
   oauthProviderPending: "google" | "apple" | "facebook" | "kakao" | null;
   onPressEmail: () => void;
   onPressGoogle: () => void;
@@ -49,6 +50,7 @@ export function AuthOptionsScreen({
   logoSource,
   styles,
   notice,
+  isSocialAuthEnabled,
   oauthProviderPending,
   onPressEmail,
   onPressGoogle,
@@ -68,112 +70,120 @@ export function AuthOptionsScreen({
       </View>
 
       <View style={styles.authChooserCard}>
-        <Pressable
-          disabled={isOAuthSubmitting}
-          onPress={onPressGoogle}
-          style={[
-            styles.providerButton,
-            styles.googleProviderButton,
-            isOAuthSubmitting ? styles.providerButtonDisabled : null,
-          ]}
-        >
-          <View style={styles.providerIconSlot}>
-            <GoogleIcon disabled={isOAuthSubmitting} />
-          </View>
-          <Text
-            style={[
-              styles.providerButtonText,
-              styles.googleProviderButtonText,
-              isOAuthSubmitting ? styles.providerButtonTextDisabled : null,
-            ]}
-          >
-            {oauthProviderPending === "google" ? "Opening Google..." : "Continue with Google"}
-          </Text>
-        </Pressable>
+        {isSocialAuthEnabled ? (
+          <>
+            <Pressable
+              disabled={isOAuthSubmitting}
+              onPress={onPressGoogle}
+              style={[
+                styles.providerButton,
+                styles.googleProviderButton,
+                isOAuthSubmitting ? styles.providerButtonDisabled : null,
+              ]}
+            >
+              <View style={styles.providerIconSlot}>
+                <GoogleIcon disabled={isOAuthSubmitting} />
+              </View>
+              <Text
+                style={[
+                  styles.providerButtonText,
+                  styles.googleProviderButtonText,
+                  isOAuthSubmitting ? styles.providerButtonTextDisabled : null,
+                ]}
+              >
+                {oauthProviderPending === "google" ? "Opening Google..." : "Continue with Google"}
+              </Text>
+            </Pressable>
 
-        <Pressable
-          disabled={isOAuthSubmitting}
-          onPress={onPressApple}
-          style={[
-            styles.providerButton,
-            styles.appleProviderButton,
-            isOAuthSubmitting ? styles.providerButtonDisabled : null,
-          ]}
-        >
-          <View style={styles.providerIconSlot}>
-            <MaterialCommunityIcons
-              name="apple"
-              size={18}
-              color={isOAuthSubmitting ? "#64748B" : "#FFFFFF"}
-              style={[styles.providerIconGlyph, styles.providerIconGlyphTight]}
-            />
-          </View>
-          <Text
-            style={[
-              styles.providerButtonText,
-              styles.appleProviderButtonText,
-              isOAuthSubmitting ? styles.providerButtonTextDisabled : null,
-            ]}
-          >
-            {oauthProviderPending === "apple" ? "Opening Apple..." : "Continue with Apple"}
-          </Text>
-        </Pressable>
+            <Pressable
+              disabled={isOAuthSubmitting}
+              onPress={onPressApple}
+              style={[
+                styles.providerButton,
+                styles.appleProviderButton,
+                isOAuthSubmitting ? styles.providerButtonDisabled : null,
+              ]}
+            >
+              <View style={styles.providerIconSlot}>
+                <MaterialCommunityIcons
+                  name="apple"
+                  size={18}
+                  color={isOAuthSubmitting ? "#64748B" : "#FFFFFF"}
+                  style={[styles.providerIconGlyph, styles.providerIconGlyphTight]}
+                />
+              </View>
+              <Text
+                style={[
+                  styles.providerButtonText,
+                  styles.appleProviderButtonText,
+                  isOAuthSubmitting ? styles.providerButtonTextDisabled : null,
+                ]}
+              >
+                {oauthProviderPending === "apple" ? "Opening Apple..." : "Continue with Apple"}
+              </Text>
+            </Pressable>
 
-        <Pressable
-          disabled={isOAuthSubmitting}
-          onPress={onPressFacebook}
-          style={[
-            styles.providerButton,
-            styles.facebookProviderButton,
-            isOAuthSubmitting ? styles.providerButtonDisabled : null,
-          ]}
-        >
-          <View style={styles.providerIconSlot}>
-            <MaterialCommunityIcons
-              name="facebook"
-              size={18}
-              color={isOAuthSubmitting ? "#64748B" : "#FFFFFF"}
-              style={[styles.providerIconGlyph, styles.providerIconGlyphTight]}
-            />
-          </View>
-          <Text
-            style={[
-              styles.providerButtonText,
-              styles.facebookProviderButtonText,
-              isOAuthSubmitting ? styles.providerButtonTextDisabled : null,
-            ]}
-          >
-            {oauthProviderPending === "facebook" ? "Opening Facebook..." : "Continue with Facebook"}
-          </Text>
-        </Pressable>
+            <Pressable
+              disabled={isOAuthSubmitting}
+              onPress={onPressFacebook}
+              style={[
+                styles.providerButton,
+                styles.facebookProviderButton,
+                isOAuthSubmitting ? styles.providerButtonDisabled : null,
+              ]}
+            >
+              <View style={styles.providerIconSlot}>
+                <MaterialCommunityIcons
+                  name="facebook"
+                  size={18}
+                  color={isOAuthSubmitting ? "#64748B" : "#FFFFFF"}
+                  style={[styles.providerIconGlyph, styles.providerIconGlyphTight]}
+                />
+              </View>
+              <Text
+                style={[
+                  styles.providerButtonText,
+                  styles.facebookProviderButtonText,
+                  isOAuthSubmitting ? styles.providerButtonTextDisabled : null,
+                ]}
+              >
+                {oauthProviderPending === "facebook"
+                  ? "Opening Facebook..."
+                  : "Continue with Facebook"}
+              </Text>
+            </Pressable>
 
-        <Pressable
-          disabled={isOAuthSubmitting}
-          onPress={onPressKakao}
-          style={[
-            styles.providerButton,
-            styles.kakaoProviderButton,
-            isOAuthSubmitting ? styles.providerButtonDisabled : null,
-          ]}
-        >
-          <View style={styles.providerIconSlot}>
-            <MaterialCommunityIcons
-              name="chat"
-              size={18}
-              color={isOAuthSubmitting ? "#64748B" : "#191919"}
-              style={[styles.providerIconGlyph, styles.providerIconGlyphTight]}
-            />
-          </View>
-          <Text
-            style={[
-              styles.providerButtonText,
-              styles.kakaoProviderButtonText,
-              isOAuthSubmitting ? styles.providerButtonTextDisabled : null,
-            ]}
-          >
-            {oauthProviderPending === "kakao" ? "Opening Kakao..." : "Continue with Kakao"}
-          </Text>
-        </Pressable>
+            <Pressable
+              disabled={isOAuthSubmitting}
+              onPress={onPressKakao}
+              style={[
+                styles.providerButton,
+                styles.kakaoProviderButton,
+                isOAuthSubmitting ? styles.providerButtonDisabled : null,
+              ]}
+            >
+              <View style={styles.providerIconSlot}>
+                <MaterialCommunityIcons
+                  name="chat"
+                  size={18}
+                  color={isOAuthSubmitting ? "#64748B" : "#191919"}
+                  style={[styles.providerIconGlyph, styles.providerIconGlyphTight]}
+                />
+              </View>
+              <Text
+                style={[
+                  styles.providerButtonText,
+                  styles.kakaoProviderButtonText,
+                  isOAuthSubmitting ? styles.providerButtonTextDisabled : null,
+                ]}
+              >
+                {oauthProviderPending === "kakao" ? "Opening Kakao..." : "Continue with Kakao"}
+              </Text>
+            </Pressable>
+          </>
+        ) : (
+          <Text style={styles.cardBody}>Email sign-in is enabled for this build.</Text>
+        )}
 
         <Pressable
           disabled={isOAuthSubmitting}

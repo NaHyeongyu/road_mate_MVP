@@ -36,8 +36,10 @@ type HomeTabSectionProps = {
   onOpenDriverRegistrationPage: () => void;
   onToggleSavedPost: (post: RoutePost) => void;
   isRiderSearchResultsPageVisible: boolean;
+  canLoadMoreRiderSearchResults: boolean;
   onOpenRiderSearchResultsPage: () => void;
   onCloseRiderSearchResultsPage: () => void;
+  onLoadMoreRiderSearchResults: () => void;
 };
 
 export function HomeTabSection({
@@ -65,8 +67,10 @@ export function HomeTabSection({
   onOpenDriverRegistrationPage,
   onToggleSavedPost,
   isRiderSearchResultsPageVisible,
+  canLoadMoreRiderSearchResults,
   onOpenRiderSearchResultsPage,
   onCloseRiderSearchResultsPage,
+  onLoadMoreRiderSearchResults,
 }: HomeTabSectionProps) {
   return (
     <>
@@ -100,8 +104,10 @@ export function HomeTabSection({
           onToSearchQueryChange={onToSearchQueryChange}
           onToggleSavedPost={onToggleSavedPost}
           isSearchResultsPageVisible={isRiderSearchResultsPageVisible}
+          canLoadMoreSearchResults={canLoadMoreRiderSearchResults}
           onOpenSearchResultsPage={onOpenRiderSearchResultsPage}
           onCloseSearchResultsPage={onCloseRiderSearchResultsPage}
+          onLoadMoreSearchResults={onLoadMoreRiderSearchResults}
         />
       )}
     </>

@@ -17,7 +17,7 @@ export function AppLoadingScreen({ colors, styles, scheme }: AppLoadingScreenPro
       <StatusBar barStyle={scheme === "dark" ? "light-content" : "dark-content"} />
       <View style={styles.loadingWrap}>
         <ActivityIndicator size="large" color={colors.brand} />
-        <Text style={styles.loadingText}>Loading roadmate_mvp...</Text>
+        <Text style={styles.loadingText}>Loading Roadmate...</Text>
       </View>
     </SafeAreaView>
   );

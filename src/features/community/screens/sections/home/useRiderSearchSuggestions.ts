@@ -28,8 +28,8 @@ export function useRiderSearchSuggestions({
   const blurTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [activeField, setActiveField] = useState<SearchField | null>(null);
 
-  const fromSuggestions = usePlaceSuggestions(fromSearchQuery, 8, stateFilter);
-  const toSuggestions = usePlaceSuggestions(toSearchQuery, 8, stateFilter);
+  const fromSuggestions = usePlaceSuggestions(fromSearchQuery, 8, stateFilter, activeField === "from");
+  const toSuggestions = usePlaceSuggestions(toSearchQuery, 8, stateFilter, activeField === "to");
 
   const showFromSuggestions =
     activeField === "from" && fromSearchQuery.trim().length > 0 && fromSuggestions.length > 0;

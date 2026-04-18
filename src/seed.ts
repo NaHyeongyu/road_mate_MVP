@@ -18,6 +18,13 @@ type RouteTemplate = {
   note: string;
 };
 
+const parseBooleanEnv = (value: string | undefined) => {
+  const normalized = String(value ?? "").trim().toLowerCase();
+  return normalized === "1" || normalized === "true" || normalized === "yes" || normalized === "on";
+};
+
+export const isSeedPostCatalogEnabled = parseBooleanEnv(process.env.EXPO_PUBLIC_ENABLE_SEED_POSTS);
+
 const BASE_CREATED_AT = Date.parse("2026-03-10T05:00:00.000Z");
 const REGULAR_WAVE_OFFSETS = [0, 8, 16];
 const REGULAR_PICKUP_NOTES = [

@@ -7,7 +7,7 @@ import { getPlaceSuggestions } from "../utils/placeQuickSearch";
 import { normalizeEnglishPlaceInput } from "../utils/placeInput";
 
 const API_REQUEST_DEBOUNCE_MS = 180;
-const MIN_QUERY_LENGTH_FOR_API = 2;
+const MIN_QUERY_LENGTH_FOR_API = 3;
 
 const isPostcodeApiEnabled = () => process.env.NODE_ENV !== "test";
 const normalizeText = (value: string) =>
@@ -17,7 +17,12 @@ const normalizeText = (value: string) =>
     .replace(/\s+/g, " ")
     .trim();
 
-export function usePlaceSuggestions(query: string, limit = 8, stateFilter: StateFilter = "ALL") {
+export function usePlaceSuggestions(
+  query: string,
+  limit = 8,
+  stateFilter: StateFilter = "ALL",
+  isRemoteEnabled = true
+) {
   const [apiQuery, setApiQuery] = useState("");
   const [apiSuggestions, setApiSuggestions] = useState<string[]>([]);
 
@@ -42,7 +47,13 @@ export function usePlaceSuggestions(query: string, limit = 8, stateFilter: State
   useEffect(() => {
     setApiQuery(normalizedQuery);
 
-    if (!isPostcodeApiEnabled() || trimmedQuery.length < MIN_QUERY_LENGTH_FOR_API) {
+    const hasEnoughLocalSuggestions = fallbackSuggestions.length >= limit;
+    if (
+      !isRemoteEnabled ||
+      !isPostcodeApiEnabled() ||
+      trimmedQuery.length < MIN_QUERY_LENGTH_FOR_API ||
+      hasEnoughLocalSuggestions
+    ) {
       setApiSuggestions([]);
       return;
     }
@@ -77,7 +88,7 @@ export function usePlaceSuggestions(query: string, limit = 8, stateFilter: State
       clearTimeout(timeoutId);
       abortController.abort();
     };
-  }, [limit, normalizedQuery, stateFilter, trimmedQuery]);
+  }, [fallbackSuggestions.length, isRemoteEnabled, limit, normalizedQuery, stateFilter, trimmedQuery]);
 
   if (apiQuery === normalizedQuery && apiSuggestions.length > 0) {
     return apiSuggestions;

@@ -17,6 +17,7 @@ export function useAppOpenAd({ enabled }: UseAppOpenAdOptions) {
   useEffect(() => {
     const module = getMobileAdsModule();
     const mobileAdsFactory = module?.default;
+    const adUnitId = getAppOpenAdUnitId();
     if (!enabled) {
       isLoadedRef.current = false;
       isShowingRef.current = false;
@@ -26,13 +27,14 @@ export function useAppOpenAd({ enabled }: UseAppOpenAdOptions) {
     if (
       !enabled ||
       !isAdMobSupportedPlatform ||
+      !adUnitId ||
       !module ||
       typeof mobileAdsFactory !== "function"
     ) {
       return;
     }
 
-    const appOpenAd = module.AppOpenAd.createForAdRequest(getAppOpenAdUnitId(), {
+    const appOpenAd = module.AppOpenAd.createForAdRequest(adUnitId, {
       requestNonPersonalizedAdsOnly: true,
     });
 

@@ -10,7 +10,8 @@ type BottomBannerAdProps = {
 
 export function BottomBannerAd({ bottomInset = 0 }: BottomBannerAdProps) {
   const module = getMobileAdsModule();
-  if (!isAdMobSupportedPlatform || !module) {
+  const unitId = getBannerAdUnitId();
+  if (!isAdMobSupportedPlatform || !module || !unitId) {
     return null;
   }
 
@@ -32,7 +33,7 @@ export function BottomBannerAd({ bottomInset = 0 }: BottomBannerAdProps) {
       }}
     >
       <BannerAd
-        unitId={getBannerAdUnitId()}
+        unitId={unitId}
         size={module.BannerAdSize.ANCHORED_ADAPTIVE_BANNER}
         requestOptions={{ requestNonPersonalizedAdsOnly: true }}
       />

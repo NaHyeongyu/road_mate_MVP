@@ -28,6 +28,22 @@ const createPost = (patch: Partial<RoutePost> = {}): RoutePost => ({
 });
 
 describe("useCommunityCollections", () => {
+  it("does not expose demo seed posts unless they are explicitly enabled", () => {
+    const { result } = renderHook(() =>
+      useCommunityCollections({
+        currentUserId: "rider-1",
+        filter: "regular",
+        stateFilter: "QLD",
+        fromSearchQuery: "Brisbane CBD",
+        toSearchQuery: "St Lucia",
+        storedPosts: [],
+        savedPostKeys: [],
+      })
+    );
+
+    expect(result.current.visiblePosts).toEqual([]);
+  });
+
   it("hides visible posts until both from and to are provided", () => {
     const post = createPost();
 
