@@ -1,8 +1,9 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useRef } from "react";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Keyboard, Pressable, Text, TextInput, View, useWindowDimensions } from "react-native";
 
 import type { AppColors } from "../../../../../brandTheme";
+import { useAppCopy } from "../../../../../i18n/AppI18nContext";
 import type { RouteKind, RoutePost } from "../../../../../model";
 import type { AppStyles } from "../../../../../ui/types";
 import { AnimatedEntrance } from "../../../../shared/components/AnimatedEntrance";
@@ -37,7 +38,6 @@ type RiderFeedSectionProps = {
   isSearchResultsPageVisible: boolean;
   canLoadMoreSearchResults: boolean;
   onOpenSearchResultsPage: () => void;
-  onCloseSearchResultsPage: () => void;
   onLoadMoreSearchResults: () => void;
 };
 
@@ -59,26 +59,28 @@ export function RiderFeedSection({
   isSearchResultsPageVisible,
   canLoadMoreSearchResults,
   onOpenSearchResultsPage,
-  onCloseSearchResultsPage,
   onLoadMoreSearchResults,
 }: RiderFeedSectionProps) {
+  const copy = useAppCopy();
   const { width } = useWindowDimensions();
+  const isPhoneLayout = width < 430;
   const isCompactLayout = width < 390;
   const savedPostKeySet = useMemo(() => new Set(savedPostKeys), [savedPostKeys]);
   const hasStateSelected = stateFilter !== "ALL";
   const hasRoutePairQuery = Boolean(fromSearchQuery.trim() && toSearchQuery.trim());
   const isSearchReady = hasRoutePairQuery || hasStateSelected;
-  const [hasSearchRequested, setHasSearchRequested] = useState(false);
   const toInputRef = useRef<TextInput>(null);
   const stateFilterLabel = useMemo(
-    () => STATE_FILTER_OPTIONS.find((option) => option.value === stateFilter)?.label ?? "All states",
-    [stateFilter]
+    () =>
+      STATE_FILTER_OPTIONS.find((option) => option.value === stateFilter)?.label ??
+      copy.common.allStates,
+    [copy.common.allStates, stateFilter]
   );
   const routeSummary = useMemo(() => {
-    const fromLabel = fromSearchQuery.trim() || "Any origin";
-    const toLabel = toSearchQuery.trim() || "Any destination";
-    return `${fromLabel} → ${toLabel}`;
-  }, [fromSearchQuery, toSearchQuery]);
+    const fromLabel = fromSearchQuery.trim() || copy.common.anyOrigin;
+    const toLabel = toSearchQuery.trim() || copy.common.anyDestination;
+    return copy.community.searchScopeSummary(fromLabel, toLabel);
+  }, [copy, fromSearchQuery, toSearchQuery]);
 
   const {
     fromSuggestions,
@@ -113,8 +115,21 @@ export function RiderFeedSection({
     visiblePosts,
     currentUserId,
   });
-  const feedPosts = hasSearchRequested && isSearchReady ? matchedFeedPosts : [];
-  const isResultsPage = isSearchResultsPageVisible && hasSearchRequested && isSearchReady;
+  const hasSearchRequested = isSearchResultsPageVisible;
+  const feedPosts = isSearchResultsPageVisible && isSearchReady ? matchedFeedPosts : [];
+  const isResultsPage = isSearchResultsPageVisible && isSearchReady;
+  const searchStackStyle = [
+    styles.riderSearchStack,
+    isPhoneLayout ? styles.riderSearchStackCompact : null,
+  ];
+  const resultsStackStyle = [
+    styles.riderResultsStack,
+    isCompactLayout ? styles.riderResultsStackCompact : null,
+  ];
+  const feedListStyle = [
+    styles.riderFeedList,
+    isCompactLayout ? styles.riderFeedListCompact : null,
+  ];
   const compactSearchGridStyle = isCompactLayout ? { gap: 10 } : null;
   const compactSummaryCardStyle = isCompactLayout
     ? {
@@ -129,17 +144,11 @@ export function RiderFeedSection({
       }
     : null;
 
-  useEffect(() => {
-    setHasSearchRequested(false);
-    onCloseSearchResultsPage();
-  }, [filter, fromSearchQuery, onCloseSearchResultsPage, stateFilter, toSearchQuery]);
-
   const handleRunSearch = () => {
     if (!isSearchReady) {
       return;
     }
 
-    setHasSearchRequested(true);
     onOpenSearchResultsPage();
     Keyboard.dismiss();
   };
@@ -147,149 +156,177 @@ export function RiderFeedSection({
   if (isResultsPage) {
     return (
       <AnimatedEntrance delay={40} resetKey={`rider-results-${filter}-${stateFilter}`}>
-        <>
-        <View style={[styles.routeResultsSummaryCard, compactSummaryCardStyle]}>
-          <Text numberOfLines={2} style={styles.routeResultsSummaryText}>
-            {routeSummary}
-          </Text>
-          <Text style={styles.routeResultsSummaryMeta}>{stateFilterLabel}</Text>
-        </View>
+        <View style={resultsStackStyle}>
+          <View
+            style={[
+              styles.routeResultsSummaryCard,
+              styles.riderResultsSummaryCard,
+              compactSummaryCardStyle,
+            ]}
+          >
+            <Text numberOfLines={2} style={styles.routeResultsSummaryText}>
+              {routeSummary}
+            </Text>
+            <Text style={styles.routeResultsSummaryMeta}>{stateFilterLabel}</Text>
+          </View>
 
-        {isNoticeFilter ? (
-          <RiderNoticeScopeChips
-            styles={styles}
-            noticeScope={noticeScope}
-            onNoticeScopeChange={setNoticeScope}
-          />
-        ) : null}
+          {isNoticeFilter ? (
+            <RiderNoticeScopeChips
+              styles={styles}
+              noticeScope={noticeScope}
+              onNoticeScopeChange={setNoticeScope}
+            />
+          ) : null}
 
-        {isNoticeFilter && noticeScope === "upcoming" && pastNoticeCount > 0 ? (
-          <Text style={styles.cardBody}>{pastNoticeCount} past notices are hidden.</Text>
-        ) : null}
+          {isNoticeFilter && noticeScope === "upcoming" && pastNoticeCount > 0 ? (
+            <Text style={styles.riderResultsHelperText}>
+              {copy.community.noticeHiddenByScope(pastNoticeCount)}
+            </Text>
+          ) : null}
 
-        {feedPosts.length === 0 ? (
-          <RiderFeedEmptyState
-            styles={styles}
-            isSearchReady={isSearchReady}
-            hasSearchRequested={hasSearchRequested}
-            isNoticeFilter={isNoticeFilter}
-            noticeScope={noticeScope}
-            pastNoticeCount={pastNoticeCount}
-          />
-        ) : (
-          <>
-            {feedPosts.map((post) => (
-              <PostCard
-                key={post.id}
-                post={post}
+          {feedPosts.length === 0 ? (
+            <View style={styles.riderEmptyStateCard}>
+              <RiderFeedEmptyState
                 styles={styles}
-                isSaved={savedPostKeySet.has(getPostSaveKey(post))}
-                onToggleSave={() => onToggleSavedPost(post)}
-                extraContent={
-                  post.note.trim() ? (
-                    <View style={styles.postSummaryRow}>
-                      <Text style={styles.postSummaryText}>Note</Text>
-                      <Text numberOfLines={5} ellipsizeMode="tail" style={styles.postNote}>
-                        {post.note.trim()}
-                      </Text>
-                    </View>
-                  ) : undefined
-                }
+                isSearchReady={isSearchReady}
+                hasSearchRequested={hasSearchRequested}
+                isNoticeFilter={isNoticeFilter}
+                noticeScope={noticeScope}
+                pastNoticeCount={pastNoticeCount}
               />
-            ))}
-            {canLoadMoreSearchResults ? (
-              <Pressable
-                style={({ pressed }) => [
-                  styles.routeSearchActionButton,
-                  compactSearchButtonStyle,
-                  pressed ? styles.routeSearchActionButtonPressed : null,
-                ]}
-                onPress={onLoadMoreSearchResults}
-              >
-                <MaterialCommunityIcons name="plus-circle-outline" size={18} color={colors.heroText} />
-                <Text style={styles.routeSearchActionButtonText}>Load more results</Text>
-              </Pressable>
-            ) : null}
-          </>
-        )}
-        </>
+            </View>
+          ) : (
+            <View style={feedListStyle}>
+              {feedPosts.map((post) => (
+                <PostCard
+                  key={post.id}
+                  post={post}
+                  styles={styles}
+                  containerStyle={styles.riderFeedPostCard}
+                  isSaved={savedPostKeySet.has(getPostSaveKey(post))}
+                  onToggleSave={() => onToggleSavedPost(post)}
+                  extraContent={
+                    post.note.trim() ? (
+                      <View style={styles.postSummaryRow}>
+                        <Text style={styles.postSummaryText}>{copy.common.note}</Text>
+                        <Text numberOfLines={5} ellipsizeMode="tail" style={styles.postNote}>
+                          {post.note.trim()}
+                        </Text>
+                      </View>
+                    ) : undefined
+                  }
+                />
+              ))}
+              {canLoadMoreSearchResults ? (
+                <Pressable
+                  style={({ pressed }) => [
+                    styles.routeSearchActionButton,
+                    compactSearchButtonStyle,
+                    pressed ? styles.routeSearchActionButtonPressed : null,
+                  ]}
+                  onPress={onLoadMoreSearchResults}
+                >
+                  <MaterialCommunityIcons
+                    name="plus-circle-outline"
+                    size={18}
+                    color={colors.heroText}
+                  />
+                  <Text style={styles.routeSearchActionButtonText}>
+                    {copy.common.loadMoreResults}
+                  </Text>
+                </Pressable>
+              ) : null}
+            </View>
+          )}
+        </View>
       </AnimatedEntrance>
     );
   }
 
   return (
-    <AnimatedEntrance delay={40} resetKey={`rider-search-${filter}`}>
+    <AnimatedEntrance delay={40} resetKey={`rider-search-${filter}`} style={searchStackStyle}>
       <>
-      <RiderFeedTypeTabs colors={colors} styles={styles} filter={filter} onFilterChange={onFilterChange} />
-
-      <View style={[styles.routeSearchGrid, compactSearchGridStyle]}>
-        <RiderStateFilterSelect
-          colors={colors}
-          styles={styles}
-          stateFilter={stateFilter}
-          onStateFilterChange={onStateFilterChange}
-        />
-
-        <RiderSearchField
-          colors={colors}
-          styles={styles}
-          label="From"
-          leadingIconName="map-marker-outline"
-          value={fromSearchQuery}
-          placeholder="e.g. Collingwood, VIC 3066"
-          suggestions={fromSuggestions}
-          showSuggestions={showFromSuggestions}
-          returnKeyType="next"
-          blurOnSubmit={false}
-          onChangeText={(value) => onFromSearchQueryChange(normalizeEnglishPlaceInput(value))}
-          onFocus={handleFromFocus}
-          onBlur={handleFromBlur}
-          onSubmitEditing={() => toInputRef.current?.focus()}
-          onClear={handleClearFrom}
-          onSelectSuggestion={handleSelectFromSuggestion}
-        />
-
-        <RiderSearchField
-          colors={colors}
-          styles={styles}
-          label="To"
-          leadingIconName="map-marker"
-          value={toSearchQuery}
-          placeholder="e.g. Perth, WA 6000"
-          suggestions={toSuggestions}
-          showSuggestions={showToSuggestions}
-          returnKeyType="search"
-          inputRef={toInputRef}
-          onChangeText={(value) => onToSearchQueryChange(normalizeEnglishPlaceInput(value))}
-          onFocus={handleToFocus}
-          onBlur={handleToBlur}
-          onSubmitEditing={() => {
-            handleRunSearch();
-          }}
-          onClear={handleClearTo}
-          onSelectSuggestion={handleSelectToSuggestion}
-        />
-
-        <Pressable
-          style={({ pressed }) => [
-            styles.routeSearchActionButton,
-            compactSearchButtonStyle,
-            !isSearchReady ? styles.routeSearchActionButtonDisabled : null,
-            pressed ? styles.routeSearchActionButtonPressed : null,
-          ]}
-          disabled={!isSearchReady}
-          onPress={handleRunSearch}
-        >
-          <MaterialCommunityIcons
-            name={isNoticeFilter ? "bell-outline" : "magnify"}
-            size={18}
-            color={colors.heroText}
-          />
-          <Text style={styles.routeSearchActionButtonText}>
-            {isNoticeFilter ? "Search notices" : "Search rides"}
+        <View style={styles.riderSearchIntro}>
+          <Text style={styles.riderSearchTitle}>
+            {isNoticeFilter ? copy.community.searchNotices : copy.community.searchRides}
           </Text>
-        </Pressable>
-      </View>
+        </View>
+
+        <RiderFeedTypeTabs
+          colors={colors}
+          styles={styles}
+          filter={filter}
+          onFilterChange={onFilterChange}
+        />
+
+        <View style={[styles.riderSearchFieldsSection, styles.routeSearchGrid, compactSearchGridStyle]}>
+          <RiderStateFilterSelect
+            colors={colors}
+            styles={styles}
+            stateFilter={stateFilter}
+            onStateFilterChange={onStateFilterChange}
+          />
+
+          <RiderSearchField
+            colors={colors}
+            styles={styles}
+            label={copy.common.from}
+            leadingIconName="map-marker-outline"
+            value={fromSearchQuery}
+            placeholder="e.g. Collingwood, VIC 3066"
+            suggestions={fromSuggestions}
+            showSuggestions={showFromSuggestions}
+            returnKeyType="next"
+            blurOnSubmit={false}
+            onChangeText={(value) => onFromSearchQueryChange(normalizeEnglishPlaceInput(value))}
+            onFocus={handleFromFocus}
+            onBlur={handleFromBlur}
+            onSubmitEditing={() => toInputRef.current?.focus()}
+            onClear={handleClearFrom}
+            onSelectSuggestion={handleSelectFromSuggestion}
+          />
+
+          <RiderSearchField
+            colors={colors}
+            styles={styles}
+            label={copy.common.to}
+            leadingIconName="map-marker"
+            value={toSearchQuery}
+            placeholder="e.g. Perth, WA 6000"
+            suggestions={toSuggestions}
+            showSuggestions={showToSuggestions}
+            returnKeyType="search"
+            inputRef={toInputRef}
+            onChangeText={(value) => onToSearchQueryChange(normalizeEnglishPlaceInput(value))}
+            onFocus={handleToFocus}
+            onBlur={handleToBlur}
+            onSubmitEditing={() => {
+              handleRunSearch();
+            }}
+            onClear={handleClearTo}
+            onSelectSuggestion={handleSelectToSuggestion}
+          />
+
+          <Pressable
+            style={({ pressed }) => [
+              styles.routeSearchActionButton,
+              compactSearchButtonStyle,
+              !isSearchReady ? styles.routeSearchActionButtonDisabled : null,
+              pressed ? styles.routeSearchActionButtonPressed : null,
+            ]}
+            disabled={!isSearchReady}
+            onPress={handleRunSearch}
+          >
+            <MaterialCommunityIcons
+              name={isNoticeFilter ? "bell-outline" : "magnify"}
+              size={18}
+              color={colors.heroText}
+            />
+            <Text style={styles.routeSearchActionButtonText}>
+              {isNoticeFilter ? copy.community.searchNotices : copy.community.searchRides}
+            </Text>
+          </Pressable>
+        </View>
       </>
     </AnimatedEntrance>
   );

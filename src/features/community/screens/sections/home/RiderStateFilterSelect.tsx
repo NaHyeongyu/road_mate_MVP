@@ -5,6 +5,7 @@ import { Pressable, Text, View } from "react-native";
 import { STATE_FILTER_OPTIONS } from "../../../data/australianStates";
 import type { StateFilter } from "../../../types";
 import type { AppColors } from "../../../../../brandTheme";
+import { useAppCopy } from "../../../../../i18n/AppI18nContext";
 import type { AppStyles } from "../../../../../ui/types";
 
 type RiderStateFilterSelectProps = {
@@ -20,16 +21,21 @@ export function RiderStateFilterSelect({
   stateFilter,
   onStateFilterChange,
 }: RiderStateFilterSelectProps) {
+  const copy = useAppCopy();
   const [isOpen, setIsOpen] = useState(false);
 
   const selectedLabel = useMemo(
-    () => STATE_FILTER_OPTIONS.find((option) => option.value === stateFilter)?.label ?? "All states",
-    [stateFilter]
+    () =>
+      STATE_FILTER_OPTIONS.find((option) => option.value === stateFilter)?.value === "ALL"
+        ? copy.common.allStates
+        : STATE_FILTER_OPTIONS.find((option) => option.value === stateFilter)?.label ??
+          copy.common.allStates,
+    [copy.common.allStates, stateFilter]
   );
 
   return (
     <View style={styles.routeSearchField}>
-      <Text style={styles.routeSearchLabel}>State</Text>
+      <Text style={styles.routeSearchLabel}>{copy.common.state}</Text>
 
       <Pressable
         style={({ pressed }) => [
@@ -42,9 +48,11 @@ export function RiderStateFilterSelect({
         <View style={styles.routeSearchInputLeadingIcon}>
           <MaterialCommunityIcons name="map-marker-outline" size={16} color={colors.subtext} />
         </View>
-        <Text numberOfLines={1} style={styles.routeSearchInputField}>
-          {selectedLabel}
-        </Text>
+        <View style={styles.routeSearchSelectValueWrap}>
+          <Text numberOfLines={1} style={styles.routeSearchSelectValueText}>
+            {selectedLabel}
+          </Text>
+        </View>
         <View style={styles.routeSearchClearButton}>
           <MaterialCommunityIcons
             name={isOpen ? "chevron-up" : "chevron-down"}
@@ -77,7 +85,7 @@ export function RiderStateFilterSelect({
                     option.value === stateFilter ? styles.routeSuggestionTextSelected : null,
                   ]}
                 >
-                  {option.label}
+                  {option.value === "ALL" ? copy.common.allStates : option.label}
                 </Text>
                 <View style={styles.routeSuggestionAccessory}>
                   {option.value === stateFilter ? (

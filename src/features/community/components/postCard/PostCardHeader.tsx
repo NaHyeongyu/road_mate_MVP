@@ -1,9 +1,9 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Text, View } from "react-native";
 
+import { useAppCopy } from "../../../../i18n/AppI18nContext";
 import type { RoutePost } from "../../../../model";
 import type { AppStyles } from "../../../../ui/types";
-import { kindLabel } from "../../utils/storage";
 
 type PostCardHeaderProps = {
   post: RoutePost;
@@ -11,6 +11,7 @@ type PostCardHeaderProps = {
   isRegular: boolean;
   seatsLabel?: string;
   noticeDateLabel?: string;
+  returnDateLabel?: string;
   noticeTripTypeLabel?: string;
   noticeCountdownLabel?: string;
   noticeCountdownTone?: "upcoming" | "past" | "unknown";
@@ -22,10 +23,12 @@ export function PostCardHeader({
   isRegular,
   seatsLabel,
   noticeDateLabel,
+  returnDateLabel,
   noticeTripTypeLabel,
   noticeCountdownLabel,
   noticeCountdownTone = "unknown",
 }: PostCardHeaderProps) {
+  const copy = useAppCopy();
   const typeIconColor = isRegular ? "#0B0F14" : "#475569";
   const isPastNotice = noticeCountdownTone === "past";
   const isUpcomingNotice = noticeCountdownTone === "upcoming";
@@ -49,7 +52,7 @@ export function PostCardHeader({
             isRegular ? styles.postTypePillTextRegular : styles.postTypePillTextOneTime,
           ]}
         >
-          {kindLabel(post.kind)}
+          {post.kind === "regular" ? copy.common.regular : copy.common.notices}
         </Text>
       </View>
       {isRegular && seatsLabel ? (
@@ -58,22 +61,30 @@ export function PostCardHeader({
           <Text style={[styles.postMetaBadgeText, styles.postMetaBadgeTextPrimary]}>{seatsLabel}</Text>
         </View>
       ) : null}
+      {!isRegular && noticeTripTypeLabel ? (
+        <View style={styles.postMetaBadge}>
+          <MaterialCommunityIcons
+            name={noticeTripTypeLabel === copy.tripTypes.roundTrip ? "swap-horizontal" : "arrow-right"}
+            size={14}
+            color="#64748B"
+          />
+          <Text style={styles.postMetaBadgeText}>{noticeTripTypeLabel}</Text>
+        </View>
+      ) : null}
       {!isRegular && noticeDateLabel ? (
         <View style={[styles.postMetaBadge, styles.postMetaBadgePrimary]}>
-          <MaterialCommunityIcons name="calendar-month-outline" size={14} color="#1D4ED8" />
+          <MaterialCommunityIcons name="calendar-start-outline" size={14} color="#1D4ED8" />
           <Text style={[styles.postMetaBadgeText, styles.postMetaBadgeTextPrimary]}>
             {noticeDateLabel}
           </Text>
         </View>
       ) : null}
-      {!isRegular && noticeTripTypeLabel ? (
-        <View style={styles.postMetaBadge}>
-          <MaterialCommunityIcons
-            name={noticeTripTypeLabel === "Round-trip" ? "swap-horizontal" : "arrow-right"}
-            size={14}
-            color="#64748B"
-          />
-          <Text style={styles.postMetaBadgeText}>{noticeTripTypeLabel}</Text>
+      {!isRegular && returnDateLabel ? (
+        <View style={[styles.postMetaBadge, styles.postMetaBadgePrimary]}>
+          <MaterialCommunityIcons name="calendar-end-outline" size={14} color="#1D4ED8" />
+          <Text style={[styles.postMetaBadgeText, styles.postMetaBadgeTextPrimary]}>
+            {returnDateLabel}
+          </Text>
         </View>
       ) : null}
       {!isRegular && noticeCountdownLabel ? (

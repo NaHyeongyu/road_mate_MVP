@@ -1,6 +1,7 @@
 import { Pressable, Text, TextInput, View } from "react-native";
 
 import type { AppColors } from "../../../../../brandTheme";
+import { useAppCopy } from "../../../../../i18n/AppI18nContext";
 import type { VehicleInfo } from "../../../../../model";
 import type { AppStyles } from "../../../../../ui/types";
 import { Label } from "../../../../shared/components/Label";
@@ -22,16 +23,19 @@ export function DriverGarageSection({
   onVehicleDraftChange,
   onSaveVehicle,
 }: DriverGarageSectionProps) {
+  const copy = useAppCopy();
   return (
     <View style={styles.card}>
-      <Text style={styles.cardTitle}>{hasVehicle ? "My car" : "Driver registration"}</Text>
+      <Text style={styles.cardTitle}>
+        {hasVehicle ? copy.community.myCar : copy.community.driverRegistration}
+      </Text>
       <Text style={styles.cardBody}>
         {hasVehicle
-          ? "One driver profile only. Vehicle and contact info are auto-applied to regular and one-time posts."
-          : "Before using driver mode, register your vehicle and contact profile first."}
+          ? copy.community.driverGarageFilled
+          : copy.community.driverGarageEmpty}
       </Text>
 
-      <Label text="Car model" styles={styles} />
+      <Label text={copy.community.carModel} styles={styles} />
       <TextInput
         value={vehicleDraft.model}
         onChangeText={(value) => onVehicleDraftChange({ ...vehicleDraft, model: value })}
@@ -40,7 +44,7 @@ export function DriverGarageSection({
         style={styles.input}
       />
 
-      <Label text="Plate number" styles={styles} />
+      <Label text={copy.community.plateNumber} styles={styles} />
       <TextInput
         value={vehicleDraft.plate}
         onChangeText={(value) => onVehicleDraftChange({ ...vehicleDraft, plate: value })}
@@ -50,7 +54,7 @@ export function DriverGarageSection({
         style={styles.input}
       />
 
-      <Label text="Car note" optional styles={styles} />
+      <Label text={copy.common.carNote} optional styles={styles} />
       <TextInput
         value={vehicleDraft.note}
         onChangeText={(value) => onVehicleDraftChange({ ...vehicleDraft, note: value })}
@@ -60,7 +64,7 @@ export function DriverGarageSection({
         multiline
       />
 
-      <Label text="Contact phone" optional styles={styles} />
+      <Label text={copy.community.contactPhone} optional styles={styles} />
       <TextInput
         value={vehicleDraft.contactPhone}
         onChangeText={(value) => onVehicleDraftChange({ ...vehicleDraft, contactPhone: value })}
@@ -70,7 +74,7 @@ export function DriverGarageSection({
         style={styles.input}
       />
 
-      <Label text="Chat link (WhatsApp/Kakao/Telegram)" optional styles={styles} />
+      <Label text={copy.community.chatLink} optional styles={styles} />
       <TextInput
         value={vehicleDraft.contactLink}
         onChangeText={(value) => onVehicleDraftChange({ ...vehicleDraft, contactLink: value })}
@@ -82,7 +86,9 @@ export function DriverGarageSection({
       />
 
       <Pressable style={styles.primaryButton} onPress={onSaveVehicle}>
-        <Text style={styles.primaryButtonText}>{hasVehicle ? "Save vehicle" : "Complete registration"}</Text>
+        <Text style={styles.primaryButtonText}>
+          {hasVehicle ? copy.community.saveVehicle : copy.community.completeRegistration}
+        </Text>
       </Pressable>
     </View>
   );

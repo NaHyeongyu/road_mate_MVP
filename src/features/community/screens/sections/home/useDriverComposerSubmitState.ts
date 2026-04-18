@@ -51,13 +51,12 @@ export function useDriverComposerSubmitState({
   const hasFrom = Boolean(routeDraft.from.trim());
   const hasTo = Boolean(routeDraft.to.trim());
   const hasNoticeDate = isRouteDateValue(routeDraft.noticeDate);
+  const hasReturnDate = isRouteDateValue(routeDraft.returnDate ?? "");
   const hasDepartureTime = isRouteTimeValue(routeDraft.schedule);
   const hasReturnTime = isRouteTimeValue(routeDraft.returnSchedule);
   const hasSeats = currentSeatCount >= minSeats;
   const hasOperatingDays = routeDraft.operatingDays.length > 0;
-  const hasProfileContactMethod = Boolean(savedVehicle.contactPhone.trim() || savedVehicle.contactLink.trim());
-  const hasDraftContactMethod = Boolean(routeDraft.contactPhone.trim() || routeDraft.contactLink.trim());
-  const hasContactMethod = hasProfileContactMethod || hasDraftContactMethod;
+  const hasContactMethod = Boolean(savedVehicle.contactPhone.trim() || savedVehicle.contactLink.trim());
 
   const requiredChecks = buildRequiredChecks({
     isOneTimeRoute,
@@ -66,6 +65,7 @@ export function useDriverComposerSubmitState({
     hasFrom,
     hasTo,
     hasNoticeDate,
+    hasReturnDate,
     hasDepartureTime,
     hasReturnTime,
     hasSeats,

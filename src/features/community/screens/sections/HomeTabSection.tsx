@@ -1,9 +1,8 @@
 import type { AppNotice } from "../../../../app/types";
 import type { AppColors } from "../../../../brandTheme";
-import type { RouteDraft, RouteKind, RoutePost } from "../../../../model";
+import type { RouteDraft, RouteKind, RoutePost, VehicleInfo } from "../../../../model";
 import type { AppStyles } from "../../../../ui/types";
 import { AnimatedEntrance } from "../../../shared/components/AnimatedEntrance";
-import { NoticeBanner } from "../../../shared/components/NoticeBanner";
 import type { Mode, StateFilter } from "../../types";
 import { DriverHomeSection } from "./home/DriverHomeSection";
 import { RiderFeedSection } from "./home/RiderFeedSection";
@@ -22,6 +21,7 @@ type HomeTabSectionProps = {
   myPosts: RoutePost[];
   savedPostKeys: string[];
   routeDraft: RouteDraft;
+  savedVehicle: VehicleInfo;
   hasDriverContactMethod: boolean;
   currentUserId: string;
   onFilterChange: (filter: RouteKind) => void;
@@ -35,11 +35,11 @@ type HomeTabSectionProps = {
     isPublic: boolean;
   }) => Promise<void>;
   onOpenDriverRegistrationPage: () => void;
+  onRemoveRoute: (id: string) => void;
   onToggleSavedPost: (post: RoutePost) => void;
   isRiderSearchResultsPageVisible: boolean;
   canLoadMoreRiderSearchResults: boolean;
   onOpenRiderSearchResultsPage: () => void;
-  onCloseRiderSearchResultsPage: () => void;
   onLoadMoreRiderSearchResults: () => void;
 };
 
@@ -57,6 +57,7 @@ export function HomeTabSection({
   myPosts,
   savedPostKeys,
   routeDraft,
+  savedVehicle,
   hasDriverContactMethod,
   currentUserId,
   onFilterChange,
@@ -66,30 +67,28 @@ export function HomeTabSection({
   onRouteDraftChange,
   onSaveRouteQuickSettings,
   onOpenDriverRegistrationPage,
+  onRemoveRoute,
   onToggleSavedPost,
   isRiderSearchResultsPageVisible,
   canLoadMoreRiderSearchResults,
   onOpenRiderSearchResultsPage,
-  onCloseRiderSearchResultsPage,
   onLoadMoreRiderSearchResults,
 }: HomeTabSectionProps) {
   return (
     <>
-      <AnimatedEntrance delay={20} resetKey={`notice-${mode}`}>
-        <NoticeBanner notice={notice} styles={styles} />
-      </AnimatedEntrance>
-
-      <AnimatedEntrance delay={95} resetKey={`home-section-${mode}-${driverRouteKind}`}>
+      <AnimatedEntrance delay={40} resetKey={`home-section-${mode}-${driverRouteKind}`}>
         {mode === "driver" ? (
           <DriverHomeSection
             styles={styles}
             driverRouteKind={driverRouteKind}
             routeDraft={routeDraft}
+            savedVehicle={savedVehicle}
             hasDriverContactMethod={hasDriverContactMethod}
             myPosts={myPosts}
             onRouteDraftChange={onRouteDraftChange}
             onSaveRouteQuickSettings={onSaveRouteQuickSettings}
             onOpenRouteRegistrationPage={onOpenDriverRegistrationPage}
+            onRemoveRoute={onRemoveRoute}
           />
         ) : (
           <RiderFeedSection
@@ -110,7 +109,6 @@ export function HomeTabSection({
             isSearchResultsPageVisible={isRiderSearchResultsPageVisible}
             canLoadMoreSearchResults={canLoadMoreRiderSearchResults}
             onOpenSearchResultsPage={onOpenRiderSearchResultsPage}
-            onCloseSearchResultsPage={onCloseRiderSearchResultsPage}
             onLoadMoreSearchResults={onLoadMoreRiderSearchResults}
           />
         )}

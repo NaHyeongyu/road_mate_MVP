@@ -1,5 +1,6 @@
 import { Text, View } from "react-native";
 
+import { useAppCopy } from "../../../i18n/AppI18nContext";
 import { BrandLogo } from "../../shared/components/BrandLogo";
 import type { AppStyles } from "../../../ui/types";
 
@@ -9,6 +10,8 @@ type AuthConfigScreenProps = {
 };
 
 export function AuthConfigScreen({ logoSource, styles }: AuthConfigScreenProps) {
+  const copy = useAppCopy();
+
   return (
     <View style={styles.authPageContent}>
       <View style={styles.authHero}>
@@ -18,23 +21,19 @@ export function AuthConfigScreen({ logoSource, styles }: AuthConfigScreenProps) 
           <BrandLogo source={logoSource} width={34} height={34} />
           <View style={styles.brandBadgeTextBlock}>
             <Text style={styles.brandBadgeTitle}>Roadmate</Text>
-            <Text style={styles.brandBadgeCaption}>MVP Supabase hookup</Text>
+            <Text style={styles.brandBadgeCaption}>{copy.config.badgeCaption}</Text>
           </View>
         </View>
 
-        <Text style={styles.authHeroEyebrow}>Configuration required</Text>
-        <Text style={styles.authHeroTitle}>Connect this MVP to your new Supabase project.</Text>
-        <Text style={styles.authHeroBody}>
-          Add your MVP project URL and anon key to `rodemate_mvp/.env`, then restart Expo.
-        </Text>
+        <Text style={styles.authHeroEyebrow}>{copy.config.eyebrow}</Text>
+        <Text style={styles.authHeroTitle}>{copy.config.title}</Text>
+        <Text style={styles.authHeroBody}>{copy.config.body}</Text>
       </View>
 
       <View style={styles.authCard}>
         <View style={styles.authCardHeader}>
-          <Text style={styles.authTitle}>Missing Supabase env</Text>
-          <Text style={styles.authSubtitle}>
-            Create `.env` from `.env.example` and set the two public values below.
-          </Text>
+          <Text style={styles.authTitle}>{copy.config.missingEnvTitle}</Text>
+          <Text style={styles.authSubtitle}>{copy.config.missingEnvBody}</Text>
         </View>
 
         <View style={styles.configBlock}>
@@ -42,10 +41,7 @@ export function AuthConfigScreen({ logoSource, styles }: AuthConfigScreenProps) 
           <Text style={styles.configCode}>EXPO_PUBLIC_SUPABASE_ANON_KEY=...</Text>
         </View>
 
-        <Text style={styles.authHint}>
-          Once those values are set, this login page will use real Supabase Auth instead of the
-          previous local-only mock.
-        </Text>
+        <Text style={styles.authHint}>{copy.config.hint}</Text>
       </View>
     </View>
   );

@@ -1,5 +1,7 @@
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Pressable, Text, View } from "react-native";
 
+import { useAppCopy } from "../../../../i18n/AppI18nContext";
 import type { AppStyles } from "../../../../ui/types";
 
 type AuthModeSwitchProps = {
@@ -9,33 +11,71 @@ type AuthModeSwitchProps = {
 };
 
 export function AuthModeSwitch({ styles, authMode, onChangeAuthMode }: AuthModeSwitchProps) {
+  const copy = useAppCopy();
+
   return (
     <View style={styles.authModeRow}>
       <Pressable
         onPress={() => onChangeAuthMode("signIn")}
-        style={[styles.authModeButton, authMode === "signIn" ? styles.authModeButtonActive : null]}
+        style={({ pressed }) => [
+          styles.authModeButton,
+          authMode === "signIn" ? styles.authModeButtonActive : null,
+          pressed && authMode !== "signIn" ? styles.authModeButtonPressed : null,
+        ]}
       >
-        <Text
-          style={[
-            styles.authModeButtonText,
-            authMode === "signIn" ? styles.authModeButtonTextActive : null,
-          ]}
-        >
-          Sign In
-        </Text>
+        <View style={styles.authModeButtonContent}>
+          <View
+            style={[
+              styles.authModeButtonIndicator,
+              authMode === "signIn" ? styles.authModeButtonIndicatorActive : null,
+            ]}
+          >
+            <MaterialCommunityIcons
+              name="login"
+              size={14}
+              color={authMode === "signIn" ? "#0B0F14" : "#64748B"}
+            />
+          </View>
+          <Text
+            style={[
+              styles.authModeButtonText,
+              authMode === "signIn" ? styles.authModeButtonTextActive : null,
+            ]}
+          >
+            {copy.auth.signIn}
+          </Text>
+        </View>
       </Pressable>
       <Pressable
         onPress={() => onChangeAuthMode("signUp")}
-        style={[styles.authModeButton, authMode === "signUp" ? styles.authModeButtonActive : null]}
+        style={({ pressed }) => [
+          styles.authModeButton,
+          authMode === "signUp" ? styles.authModeButtonActive : null,
+          pressed && authMode !== "signUp" ? styles.authModeButtonPressed : null,
+        ]}
       >
-        <Text
-          style={[
-            styles.authModeButtonText,
-            authMode === "signUp" ? styles.authModeButtonTextActive : null,
-          ]}
-        >
-          Sign Up
-        </Text>
+        <View style={styles.authModeButtonContent}>
+          <View
+            style={[
+              styles.authModeButtonIndicator,
+              authMode === "signUp" ? styles.authModeButtonIndicatorActive : null,
+            ]}
+          >
+            <MaterialCommunityIcons
+              name="account-plus-outline"
+              size={14}
+              color={authMode === "signUp" ? "#0B0F14" : "#64748B"}
+            />
+          </View>
+          <Text
+            style={[
+              styles.authModeButtonText,
+              authMode === "signUp" ? styles.authModeButtonTextActive : null,
+            ]}
+          >
+            {copy.auth.signUp}
+          </Text>
+        </View>
       </Pressable>
     </View>
   );

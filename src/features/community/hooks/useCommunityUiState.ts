@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import type { AppNotice } from "../../../app/types";
 import { EMPTY_ROUTE_DRAFT, type RouteDraft } from "../../../model";
@@ -29,11 +29,43 @@ export function useCommunityUiState() {
   const [toSearchQuery, setToSearchQuery] = useState("");
   const [regularRouteDraft, setRegularRouteDraft] = useState<RouteDraft>(EMPTY_REGULAR_ROUTE_DRAFT);
   const [oneTimeRouteDraft, setOneTimeRouteDraft] = useState<RouteDraft>(EMPTY_ONE_TIME_ROUTE_DRAFT);
-  const [notice, setNotice] = useState<AppNotice>(EMPTY_NOTICE);
+  const [notice, setNoticeState] = useState<AppNotice>(EMPTY_NOTICE);
+  const noticeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const clearNoticeTimer = useCallback(() => {
+    if (noticeTimerRef.current) {
+      clearTimeout(noticeTimerRef.current);
+      noticeTimerRef.current = null;
+    }
+  }, []);
+
+  const setNotice = useCallback(
+    (nextNotice: AppNotice) => {
+      clearNoticeTimer();
+      setNoticeState(nextNotice);
+
+      if (!nextNotice.text) {
+        return;
+      }
+
+      noticeTimerRef.current = setTimeout(() => {
+        setNoticeState(EMPTY_NOTICE);
+        noticeTimerRef.current = null;
+      }, 2600);
+    },
+    [clearNoticeTimer]
+  );
 
   const handleLoadError = useCallback((nextNotice: AppNotice) => {
     setNotice(nextNotice);
   }, []);
+
+  useEffect(
+    () => () => {
+      clearNoticeTimer();
+    },
+    [clearNoticeTimer]
+  );
 
   const resetAllRouteDrafts = useCallback(() => {
     setRegularRouteDraft(EMPTY_REGULAR_ROUTE_DRAFT);

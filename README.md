@@ -22,10 +22,9 @@ Run:
 
 ```bash
 npm install
-cp .env.example .env
 ```
 
-Set:
+Create or update `.env` with:
 
 ```bash
 EXPO_PUBLIC_ENABLE_SEED_POSTS=false
@@ -71,6 +70,7 @@ Release pipeline note:
 
 - Because `ios/` is checked in, run `npm run sync:native` before store builds so `app.config.js` changes are pushed into native files.
 - EAS build profiles are defined in `eas.json`
+- Keep EAS environment variables aligned with the same values in local `.env` for remote builds.
 - Preview builds: `npm run build:preview:ios` / `npm run build:preview:android`
 - Production builds: `npm run build:production:ios` / `npm run build:production:android`
 - iOS TestFlight auto-submit: `npm run deploy:ios:testflight`

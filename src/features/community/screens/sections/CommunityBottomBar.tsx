@@ -2,6 +2,7 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Pressable, Text, View, useWindowDimensions } from "react-native";
 
 import type { AppColors } from "../../../../brandTheme";
+import { useAppCopy } from "../../../../i18n/AppI18nContext";
 import type { AppStyles } from "../../../../ui/types";
 import type { MainTab } from "../../types";
 
@@ -22,12 +23,13 @@ export function CommunityBottomBar({
   bottomInset,
   onMainTabChange,
 }: CommunityBottomBarProps) {
+  const copy = useAppCopy();
   const { width } = useWindowDimensions();
   const isCompactLayout = width < 390;
   const homeIconName = isRiderMode ? "home-variant" : "calendar-week";
-  const homeLabel = isRiderMode ? "Home" : "Regular";
+  const homeLabel = isRiderMode ? copy.common.home : copy.common.regular;
   const middleIconName = isRiderMode ? "bookmark-multiple-outline" : "clock-outline";
-  const middleLabel = isRiderMode ? "Saved" : "One-time";
+  const middleLabel = isRiderMode ? copy.common.saved : copy.common.oneTime;
 
   return (
     <View
@@ -151,7 +153,7 @@ export function CommunityBottomBar({
               : null,
           ]}
         >
-          My Page
+          {copy.common.myPage}
         </Text>
       </Pressable>
     </View>

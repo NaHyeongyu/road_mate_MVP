@@ -1,14 +1,17 @@
 import { useMemo } from "react";
-import { useColorScheme } from "react-native";
+import { useColorScheme, View } from "react-native";
 
 import RoadmateLogoDark from "./assets/branding/logo_dark.svg";
 import RoadmateLogoLight from "./assets/branding/logo_light.svg";
 import { AppAuthExperienceScreen } from "./src/app/screens/AppAuthExperienceScreen";
 import { AppCommunityExperienceScreen } from "./src/app/screens/AppCommunityExperienceScreen";
+import { AppLanguageSelectionScreen } from "./src/app/screens/AppLanguageSelectionScreen";
 import { AppLoadingScreen } from "./src/app/screens/AppLoadingScreen";
 import { useAppOpenAd } from "./src/features/ads/hooks/useAppOpenAd";
+import { NoticeBanner } from "./src/features/shared/components/NoticeBanner";
 import { useRoadmateAppState } from "./src/app/useRoadmateAppState";
 import { brandPalette } from "./src/brandTheme";
+import { AppI18nProvider } from "./src/i18n/AppI18nContext";
 import { supabase } from "./src/lib/supabase";
 import { createStyles } from "./src/ui/createStyles";
 
@@ -18,13 +21,15 @@ export default function App() {
   const appState = useRoadmateAppState();
 
   const isSupabaseReady = appState.isSupabaseConfigured && Boolean(supabase);
+  const isLanguageSelectionExperience = !appState.hasCompletedLanguageSelection;
   const isAuthExperience = appState.authEntryMethod !== "options";
-  const colors = isAuthExperience
+  const shouldUseLightShell = isLanguageSelectionExperience || isAuthExperience;
+  const colors = shouldUseLightShell
     ? brandPalette.light
     : isDarkMode
       ? brandPalette.dark
       : brandPalette.light;
-  const logoSource = isAuthExperience
+  const logoSource = shouldUseLightShell
     ? (RoadmateLogoLight as unknown)
     : isDarkMode
       ? (RoadmateLogoDark as unknown)
@@ -32,28 +37,32 @@ export default function App() {
   const styles = useMemo(() => createStyles(colors), [colors]);
   useAppOpenAd({ enabled: Boolean(appState.currentUser) });
 
-  if (appState.loading || (appState.currentUserId && appState.isVehicleLoading)) {
-    return <AppLoadingScreen colors={colors} styles={styles} scheme={scheme} />;
-  }
-
-  if (isAuthExperience) {
-    return (
-      <AppAuthExperienceScreen
-        appState={appState}
-        colors={colors}
-        styles={styles}
-        logoSource={logoSource}
-        isSupabaseReady={isSupabaseReady}
-      />
-    );
-  }
-
   return (
-    <AppCommunityExperienceScreen
-      appState={appState}
-      colors={colors}
-      styles={styles}
-      scheme={scheme}
-    />
+    <AppI18nProvider language={appState.appLanguage} onChangeLanguage={appState.setAppLanguage}>
+      <View style={{ flex: 1 }}>
+        {appState.loading || (appState.currentUserId && appState.isVehicleLoading) ? (
+          <AppLoadingScreen colors={colors} styles={styles} scheme={scheme} />
+        ) : isLanguageSelectionExperience ? (
+          <AppLanguageSelectionScreen colors={colors} styles={styles} />
+        ) : isAuthExperience ? (
+          <AppAuthExperienceScreen
+            appState={appState}
+            colors={colors}
+            styles={styles}
+            logoSource={logoSource}
+            isSupabaseReady={isSupabaseReady}
+          />
+        ) : (
+          <AppCommunityExperienceScreen
+            appState={appState}
+            colors={colors}
+            styles={styles}
+            scheme={scheme}
+          />
+        )}
+
+        <NoticeBanner notice={appState.notice} styles={styles} />
+      </View>
+    </AppI18nProvider>
   );
 }

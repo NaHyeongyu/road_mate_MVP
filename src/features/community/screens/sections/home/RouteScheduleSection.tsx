@@ -12,7 +12,8 @@ type RouteScheduleSectionProps = {
   routeDraft: RouteDraft;
   isOneTimeRoute: boolean;
   isOneTimeRoundTrip: boolean;
-  onPressDate: () => void;
+  onPressDepartureDate: () => void;
+  onPressReturnDate: () => void;
   onChangeOneTimeTripType: (tripType: OneTimeTripType) => void;
   onPressScheduleTime: () => void;
   onPressReturnTime: () => void;
@@ -23,23 +24,14 @@ export function RouteScheduleSection({
   routeDraft,
   isOneTimeRoute,
   isOneTimeRoundTrip,
-  onPressDate,
+  onPressDepartureDate,
+  onPressReturnDate,
   onChangeOneTimeTripType,
   onPressScheduleTime,
   onPressReturnTime,
 }: RouteScheduleSectionProps) {
   return (
     <>
-      {isOneTimeRoute ? (
-        <RouteDateField
-          styles={styles}
-          label="Date"
-          value={routeDraft.noticeDate}
-          placeholder="Select notice date"
-          onPress={onPressDate}
-        />
-      ) : null}
-
       {isOneTimeRoute ? (
         <>
           <Label text="Trip type" styles={styles} />
@@ -57,14 +49,32 @@ export function RouteScheduleSection({
               styles={styles}
             />
           </View>
+
+          <RouteDateField
+            styles={styles}
+            label="Departure date"
+            value={routeDraft.noticeDate}
+            placeholder="Select departure date"
+            onPress={onPressDepartureDate}
+          />
+
+          {isOneTimeRoundTrip ? (
+            <RouteDateField
+              styles={styles}
+              label="Return date"
+              value={routeDraft.returnDate ?? ""}
+              placeholder="Select return date"
+              onPress={onPressReturnDate}
+            />
+          ) : null}
         </>
       ) : null}
 
       <RouteTimeField
         styles={styles}
-        label={isOneTimeRoute ? "Time" : "Departure time"}
+        label={isOneTimeRoute ? "Departure time" : "Departure time"}
         value={routeDraft.schedule}
-        placeholder={isOneTimeRoute ? "Select time" : "Select departure time"}
+        placeholder={isOneTimeRoute ? "Select departure time" : "Select departure time"}
         onPress={onPressScheduleTime}
       />
       {!isOneTimeRoute || isOneTimeRoundTrip ? (

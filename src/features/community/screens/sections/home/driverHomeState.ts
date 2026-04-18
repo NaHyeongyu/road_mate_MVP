@@ -15,10 +15,13 @@ export const getDriverHomeMissingRequiredLabels = (
     const checks = [
       { label: "From", done: Boolean(routeDraft.from.trim()) },
       { label: "To", done: Boolean(routeDraft.to.trim()) },
-      { label: "Date", done: isRouteDateValue(routeDraft.noticeDate) },
-      { label: "Time", done: isRouteTimeValue(routeDraft.schedule) },
+      { label: "Departure date", done: isRouteDateValue(routeDraft.noticeDate) },
+      { label: "Departure time", done: isRouteTimeValue(routeDraft.schedule) },
       ...(routeDraft.oneTimeTripType === "round_trip"
-        ? [{ label: "Return time", done: isRouteTimeValue(routeDraft.returnSchedule) }]
+        ? [
+            { label: "Return date", done: isRouteDateValue(routeDraft.returnDate ?? "") },
+            { label: "Return time", done: isRouteTimeValue(routeDraft.returnSchedule) },
+          ]
         : []),
     ];
 
@@ -30,10 +33,7 @@ export const getDriverHomeMissingRequiredLabels = (
     { label: "To", done: Boolean(routeDraft.to.trim()) },
     { label: "Departure time", done: isRouteTimeValue(routeDraft.schedule) },
     { label: "Arrival time", done: isRouteTimeValue(routeDraft.returnSchedule) },
-    {
-      label: "Contact",
-      done: Boolean(hasDriverContactMethod || routeDraft.contactPhone.trim() || routeDraft.contactLink.trim()),
-    },
+    { label: "Contact", done: hasDriverContactMethod },
   ];
 
   return checks.filter((check) => !check.done).map((check) => check.label);

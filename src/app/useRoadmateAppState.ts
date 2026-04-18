@@ -1,3 +1,4 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { deriveDisplayName } from "../features/auth/utils/authHelpers";
 import { useAuthFlow } from "../features/auth/hooks/useAuthFlow";
@@ -6,14 +7,45 @@ import { useCommunityCollections } from "../features/community/hooks/useCommunit
 import { useCommunityUiState } from "../features/community/hooks/useCommunityUiState";
 import { useUserCommunityStorageState } from "../features/community/hooks/useUserCommunityStorageState";
 import type { FetchRoutePostsQuery } from "../features/community/data/routePostRepository";
+import { getAppCopy } from "../i18n/copy";
+import type { AppLanguage } from "../i18n/types";
 import { isSupabaseConfigured } from "../lib/supabase";
 import { useDriverRouteDraftState } from "./hooks/useDriverRouteDraftState";
 import { useSavedPostKeysCleanup } from "./hooks/useSavedPostKeysCleanup";
 import { useSessionState } from "./hooks/useSessionState";
 import { useStoredPostsState } from "./hooks/useStoredPostsState";
 
-const DRIVER_REMOTE_POST_LIMIT = 8;
 const RIDER_SEARCH_RESULTS_PAGE_SIZE = 40;
+const APP_LANGUAGE_STORAGE_KEY = "roadmate_mvp.app_language";
+const SUPPORTED_APP_LANGUAGES = ["en", "fr", "ko", "ja", "zh"] as const satisfies readonly AppLanguage[];
+
+function isSupportedAppLanguage(value: string): value is AppLanguage {
+  return SUPPORTED_APP_LANGUAGES.includes(value as AppLanguage);
+}
+
+function getPreferredAppLanguage(): AppLanguage {
+  try {
+    const locale = Intl.DateTimeFormat().resolvedOptions().locale;
+    const normalizedLocale = String(locale ?? "").trim().toLowerCase();
+    const languageCode = normalizedLocale.split("-")[0] ?? "";
+
+    if (isSupportedAppLanguage(languageCode)) {
+      return languageCode;
+    }
+  } catch {
+    // Fall back to English when locale detection is unavailable.
+  }
+
+  return "en";
+}
+
+type AccountRequiredReason =
+  | "driverRegistration"
+  | "routePosting"
+  | "savingRides"
+  | "updatingRouteSettings"
+  | "driverMode"
+  | "accountAccess";
 
 export function useRoadmateAppState() {
   const {
@@ -38,10 +70,45 @@ export function useRoadmateAppState() {
     setNotice,
     handleLoadError,
   } = useCommunityUiState();
+  const [appLanguage, setAppLanguageState] = useState<AppLanguage>(() => getPreferredAppLanguage());
+  const [hasCompletedLanguageSelection, setHasCompletedLanguageSelection] = useState(false);
+  const [isAppLanguageLoading, setIsAppLanguageLoading] = useState(true);
   const [isRiderSearchResultsPageVisible, setIsRiderSearchResultsPageVisible] = useState(false);
   const [riderSearchResultsLimit, setRiderSearchResultsLimit] = useState(
     RIDER_SEARCH_RESULTS_PAGE_SIZE
   );
+  const copy = useMemo(() => getAppCopy(appLanguage), [appLanguage]);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    void (async () => {
+      try {
+        const storedLanguage = await AsyncStorage.getItem(APP_LANGUAGE_STORAGE_KEY);
+        if (isMounted && storedLanguage && isSupportedAppLanguage(storedLanguage)) {
+          setAppLanguageState(storedLanguage);
+          setHasCompletedLanguageSelection(true);
+        }
+      } catch {
+        // Keep the locale-derived default when stored preference cannot be read.
+      } finally {
+        if (isMounted) {
+          setIsAppLanguageLoading(false);
+        }
+      }
+    })();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const setAppLanguage = useCallback((nextLanguage: AppLanguage) => {
+    setAppLanguageState(nextLanguage);
+    setHasCompletedLanguageSelection(true);
+    void AsyncStorage.setItem(APP_LANGUAGE_STORAGE_KEY, nextLanguage);
+  }, []);
+
   const openRiderSearchResultsPage = useCallback(() => {
     setRiderSearchResultsLimit(RIDER_SEARCH_RESULTS_PAGE_SIZE);
     setIsRiderSearchResultsPageVisible(true);
@@ -66,7 +133,6 @@ export function useRoadmateAppState() {
       return currentUserId
         ? {
             ownerUserId: currentUserId,
-            limit: DRIVER_REMOTE_POST_LIMIT,
           }
         : undefined;
     }
@@ -127,7 +193,7 @@ export function useRoadmateAppState() {
   const hasDriverContactMethod = Boolean(
     savedVehicle.contactPhone.trim() || savedVehicle.contactLink.trim()
   );
-  const loading = isSessionLoading || isPostsLoading;
+  const loading = isAppLanguageLoading || isSessionLoading || isPostsLoading;
   const { routeDraft, setRouteDraft } = useDriverRouteDraftState({
     mode,
     mainTab,
@@ -214,6 +280,7 @@ export function useRoadmateAppState() {
     saveRouteQuickSettings,
     resetSignedInExperience,
   } = useCommunityActions({
+    copy,
     currentUserId,
     currentUserName,
     mainTab,
@@ -240,20 +307,41 @@ export function useRoadmateAppState() {
   const {
     authMode,
     authEntryMethod,
-    authDisplayName,
     authEmail,
     authPassword,
+    authPasswordConfirm,
     isAuthSubmitting,
+    pendingVerificationEmail,
+    isResendingVerification,
+    isPasswordRecoveryMode,
+    isPasswordResetEmailSending,
+    isPasswordResetSubmitting,
+    passwordResetEmailStatus,
+    passwordResetSentEmail,
+    passwordResetEmailCooldownSeconds,
+    isPasswordResetReadyToChange,
+    isCheckingPasswordResetEmail,
+    emailDuplicateCheckStatus,
+    isCheckingEmailDuplicate,
     setAuthMode,
     setAuthEntryMethod,
-    setAuthDisplayName,
     setAuthEmail,
     setAuthPassword,
+    setAuthPasswordConfirm,
     handleSubmitAuth,
+    handleCheckEmailDuplicate,
+    handleCheckPasswordResetEmail,
+    handleOpenPasswordReset,
+    handleStartPasswordResetRecovery,
+    handleRequestPasswordReset,
+    handleCloseEmailAuth,
+    handleResendVerificationEmail,
+    handleCompletePasswordReset,
     handleOAuthSignIn,
     handleSignOut,
     oauthProviderPending,
   } = useAuthFlow({
+    copy,
     onNotice: setNotice,
     onResetSignedInExperience: resetSignedInExperience,
   });
@@ -270,20 +358,26 @@ export function useRoadmateAppState() {
     }
   }, [mainTab, mode]);
 
+  useEffect(() => {
+    if (isAuthenticated && authEntryMethod !== "options" && !isPasswordRecoveryMode) {
+      setAuthEntryMethod("options");
+    }
+  }, [authEntryMethod, isAuthenticated, isPasswordRecoveryMode, setAuthEntryMethod]);
+
   const openEmailAuthGate = useCallback(
-    (reason: string) => {
+    (reason: AccountRequiredReason) => {
       setAuthMode("signUp");
       setAuthEntryMethod("email");
       setNotice({
         tone: "info",
-        text: `${reason} requires an account. Verify your email and set a password to continue.`,
+        text: copy.notices.accountRequired(copy.reasons[reason]),
       });
     },
-    [setAuthEntryMethod, setAuthMode, setNotice]
+    [copy, setAuthEntryMethod, setAuthMode, setNotice]
   );
 
   const ensureAuthenticated = useCallback(
-    (reason: string) => {
+    (reason: AccountRequiredReason) => {
       if (isAuthenticated) {
         return true;
       }
@@ -294,14 +388,14 @@ export function useRoadmateAppState() {
   );
 
   const handleSaveVehicle = useCallback(() => {
-    if (!ensureAuthenticated("Driver registration")) {
+    if (!ensureAuthenticated("driverRegistration")) {
       return;
     }
     void saveVehicle();
   }, [ensureAuthenticated, saveVehicle]);
 
   const handlePostRoute = useCallback(async () => {
-    if (!ensureAuthenticated("Route posting")) {
+    if (!ensureAuthenticated("routePosting")) {
       return false;
     }
     return postRoute();
@@ -309,7 +403,7 @@ export function useRoadmateAppState() {
 
   const handleToggleSavedPost = useCallback(
     (post: Parameters<typeof toggleSavedPost>[0]) => {
-      if (!ensureAuthenticated("Saving rides")) {
+      if (!ensureAuthenticated("savingRides")) {
         return;
       }
       void toggleSavedPost(post);
@@ -319,7 +413,7 @@ export function useRoadmateAppState() {
 
   const handleSaveRouteQuickSettings = useCallback(
     async (input: Parameters<typeof saveRouteQuickSettings>[0]) => {
-      if (!ensureAuthenticated("Updating route settings")) {
+      if (!ensureAuthenticated("updatingRouteSettings")) {
         return;
       }
       await saveRouteQuickSettings(input);
@@ -329,7 +423,7 @@ export function useRoadmateAppState() {
 
   const handleModeChangeWithAuth = useCallback(
     (nextMode: Parameters<typeof handleModeChange>[0]) => {
-      if (nextMode === "driver" && !ensureAuthenticated("Driver mode")) {
+      if (nextMode === "driver" && !ensureAuthenticated("driverMode")) {
         return;
       }
       closeRiderSearchResultsPage();
@@ -343,11 +437,13 @@ export function useRoadmateAppState() {
     authEmail,
     authMode,
     authPassword,
-    authDisplayName,
+    authPasswordConfirm,
     currentUser,
     currentUserEmail,
     currentUserId,
     currentUserName,
+    appLanguage,
+    hasCompletedLanguageSelection,
     isAuthenticated,
     filter,
     stateFilter,
@@ -355,11 +451,24 @@ export function useRoadmateAppState() {
     hasVehicle,
     hasDriverContactMethod,
     isAuthSubmitting,
+    pendingVerificationEmail,
+    isResendingVerification,
+    isPasswordRecoveryMode,
+    isPasswordResetEmailSending,
+    isPasswordResetSubmitting,
+    passwordResetEmailStatus,
+    passwordResetSentEmail,
+    passwordResetEmailCooldownSeconds,
+    isPasswordResetReadyToChange,
+    isCheckingPasswordResetEmail,
+    emailDuplicateCheckStatus,
+    isCheckingEmailDuplicate,
     oauthProviderPending,
     isVehicleLoading,
     isRiderSearchResultsPageVisible,
     loading,
     canLoadMoreRiderSearchResults,
+    copy,
     mainTab,
     mode,
     myPosts,
@@ -372,6 +481,7 @@ export function useRoadmateAppState() {
     vehicleDraft,
     visiblePosts,
 
+    setAppLanguage,
     handleModeChange: handleModeChangeWithAuth,
     openRiderSearchResultsPage,
     closeRiderSearchResultsPage,
@@ -379,6 +489,14 @@ export function useRoadmateAppState() {
     handleSignOut,
     openEmailAuthGate,
     handleSubmitAuth,
+    handleCheckEmailDuplicate,
+    handleCheckPasswordResetEmail,
+    handleOpenPasswordReset,
+    handleStartPasswordResetRecovery,
+    handleRequestPasswordReset,
+    handleCloseEmailAuth,
+    handleResendVerificationEmail,
+    handleCompletePasswordReset,
     handleOAuthSignIn,
     postRoute: handlePostRoute,
     removeRoute,
@@ -387,7 +505,7 @@ export function useRoadmateAppState() {
     setAuthEntryMethod,
     setAuthMode,
     setAuthPassword,
-    setAuthDisplayName,
+    setAuthPasswordConfirm,
     setFilter: handleFilterChange,
     setStateFilter: handleStateFilterChange,
     setFromSearchQuery: handleFromSearchQueryChange,

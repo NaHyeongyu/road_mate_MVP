@@ -49,9 +49,9 @@ export function RoutePlaceField({
   onSelectSuggestion,
 }: RoutePlaceFieldProps) {
   return (
-    <>
+    <View style={styles.routeSearchField}>
       <Label text={label} styles={styles} />
-      <View style={styles.routeSearchInput}>
+      <View style={[styles.routeSearchInput, showSuggestions ? styles.routeSearchInputActive : null]}>
         <TextInput
           ref={inputRef}
           value={value}
@@ -68,7 +68,7 @@ export function RoutePlaceField({
           onSubmitEditing={onSubmitEditing}
         />
         {value.trim() ? (
-          <Pressable style={styles.routeSearchClearButton} onPress={onClear}>
+          <Pressable style={styles.routeSearchClearButton} onPressIn={onClear}>
             <MaterialCommunityIcons name="close-circle" size={18} color="#64748B" />
           </Pressable>
         ) : null}
@@ -84,11 +84,14 @@ export function RoutePlaceField({
                 pressed ? styles.routeSuggestionItemPressed : null,
               ]}
             >
-              <Text style={styles.routeSuggestionText}>{suggestion}</Text>
+              <View style={styles.routeSuggestionRow}>
+                <MaterialCommunityIcons name="map-marker-outline" size={16} color={colors.subtext} />
+                <Text style={styles.routeSuggestionText}>{suggestion}</Text>
+              </View>
             </Pressable>
           ))}
         </View>
       ) : null}
-    </>
+    </View>
   );
 }

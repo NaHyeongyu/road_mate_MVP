@@ -5,10 +5,15 @@ import type { AppColors } from "../../brandTheme";
 import { AuthConfigScreen } from "../../features/auth/screens/AuthConfigScreen";
 import { AuthEmailScreen } from "../../features/auth/screens/AuthEmailScreen";
 import { AuthOptionsScreen } from "../../features/auth/screens/AuthOptionsScreen";
+import { AuthPasswordResetScreen } from "../../features/auth/screens/AuthPasswordResetScreen";
 import { APP_BAR_BG } from "../../ui/styleFragments/layout/constants";
 import type { AppStyles } from "../../ui/types";
 import type { RoadmateAppState } from "../useRoadmateAppState";
-import { buildAuthEmailScreenProps, buildAuthOptionsScreenProps } from "./screenBindings";
+import {
+  buildAuthEmailScreenProps,
+  buildAuthOptionsScreenProps,
+  buildAuthPasswordResetScreenProps,
+} from "./screenBindings";
 
 type AppAuthExperienceScreenProps = {
   appState: RoadmateAppState;
@@ -27,6 +32,11 @@ export function AppAuthExperienceScreen({
 }: AppAuthExperienceScreenProps) {
   const authOptionsScreenProps = buildAuthOptionsScreenProps({ appState, styles, logoSource });
   const authEmailScreenProps = buildAuthEmailScreenProps({ appState, colors, styles });
+  const authPasswordResetScreenProps = buildAuthPasswordResetScreenProps({
+    appState,
+    colors,
+    styles,
+  });
   const authContentStyle =
     appState.authEntryMethod === "options" ? styles.authPageContent : styles.authPageFrame;
 
@@ -48,6 +58,8 @@ export function AppAuthExperienceScreen({
       >
         {appState.authEntryMethod === "options" ? (
           <AuthOptionsScreen {...authOptionsScreenProps} />
+        ) : appState.authEntryMethod === "passwordReset" ? (
+          <AuthPasswordResetScreen {...authPasswordResetScreenProps} />
         ) : (
           <AuthEmailScreen {...authEmailScreenProps} />
         )}

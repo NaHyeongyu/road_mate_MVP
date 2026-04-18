@@ -12,8 +12,10 @@ export type VehicleInfo = {
 export type RoutePost = {
   id: string;
   kind: RouteKind;
+  isActive?: boolean;
   oneTimeTripType?: OneTimeTripType;
   noticeDate?: string;
+  returnDate?: string;
   from: string;
   to: string;
   schedule: string;
@@ -35,6 +37,7 @@ export type RouteDraft = {
   kind: RouteKind;
   oneTimeTripType: OneTimeTripType;
   noticeDate: string;
+  returnDate?: string;
   from: string;
   to: string;
   schedule: string;
@@ -59,6 +62,7 @@ export const EMPTY_ROUTE_DRAFT: RouteDraft = {
   kind: "regular" as RouteKind,
   oneTimeTripType: "round_trip",
   noticeDate: "",
+  returnDate: "",
   from: "",
   to: "",
   schedule: "",

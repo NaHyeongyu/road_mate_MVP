@@ -1,10 +1,22 @@
 import { useState, type ReactNode } from "react";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { Pressable, Text, View, useWindowDimensions } from "react-native";
+import {
+  Pressable,
+  Text,
+  View,
+  useWindowDimensions,
+  type StyleProp,
+  type ViewStyle,
+} from "react-native";
 
+import { useAppCopy } from "../../../i18n/AppI18nContext";
+import {
+  formatLocalizedNoticeCountdown,
+  formatLocalizedNoticeDate,
+  getLocalizedNoticeDayDelta,
+} from "../../../i18n/formatters";
 import type { RoutePost } from "../../../model";
 import type { AppStyles } from "../../../ui/types";
-import { formatNoticeCountdown, formatNoticeDate, getNoticeDayDelta } from "../utils/storage";
 import { RoutePostDetailModal } from "./RoutePostDetailModal";
 import { PostCardActions } from "./postCard/PostCardActions";
 import { PostCardContactRow } from "./postCard/PostCardContactRow";
@@ -19,6 +31,7 @@ type PostCardProps = {
   isSaved?: boolean;
   viewDetailsLabel?: string;
   disableDetailModal?: boolean;
+  containerStyle?: StyleProp<ViewStyle>;
   onViewDetails?: () => void;
   extraContent?: ReactNode;
   onToggleSave?: () => void;
@@ -32,23 +45,35 @@ export function PostCard({
   isSaved = false,
   viewDetailsLabel,
   disableDetailModal = false,
+  containerStyle,
   onViewDetails,
   extraContent,
   onToggleSave,
   onDelete,
 }: PostCardProps) {
+  const copy = useAppCopy();
   const { width } = useWindowDimensions();
   const isCompactLayout = width < 390;
   const isRegular = post.kind === "regular";
-  const seatsLabel = isRegular ? `${post.availableSeats} seats left` : undefined;
-  const noticeDateLabel = isRegular ? undefined : formatNoticeDate(post.noticeDate, post.createdAt);
+  const seatsLabel = isRegular ? copy.community.seatsLeft(post.availableSeats) : undefined;
+  const noticeDateLabel = isRegular
+    ? undefined
+    : formatLocalizedNoticeDate(copy, post.noticeDate, post.createdAt);
+  const returnDateLabel =
+    isRegular || !(post.oneTimeTripType === "round_trip" || Boolean(post.returnSchedule))
+      ? undefined
+      : formatLocalizedNoticeDate(copy, post.returnDate ?? post.noticeDate, post.createdAt);
   const noticeTripTypeLabel = isRegular
     ? undefined
     : post.oneTimeTripType === "round_trip" || Boolean(post.returnSchedule)
-      ? "Round-trip"
-      : "One-way";
-  const noticeDayDelta = isRegular ? null : getNoticeDayDelta(post.noticeDate, post.createdAt);
-  const noticeCountdownLabel = isRegular ? undefined : formatNoticeCountdown(noticeDayDelta);
+      ? copy.tripTypes.roundTrip
+      : copy.tripTypes.oneWay;
+  const noticeDayDelta = isRegular
+    ? null
+    : getLocalizedNoticeDayDelta(post.noticeDate, post.createdAt);
+  const noticeCountdownLabel = isRegular
+    ? undefined
+    : formatLocalizedNoticeCountdown(copy, noticeDayDelta);
   const noticeCountdownTone = isRegular
     ? "unknown"
     : noticeDayDelta === null
@@ -56,6 +81,12 @@ export function PostCard({
       : noticeDayDelta < 0
         ? "past"
         : "upcoming";
+  const oneTimeSummaryLabel =
+    !isRegular && noticeDateLabel
+      ? returnDateLabel && noticeDateLabel !== returnDateLabel
+        ? `${noticeDateLabel} -> ${returnDateLabel}`
+        : copy.community.noticeFor(noticeDateLabel)
+      : "";
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const handleViewDetails = () => {
     if (onViewDetails) {
@@ -70,7 +101,7 @@ export function PostCard({
   const canOpenDetails = Boolean(onViewDetails || !disableDetailModal);
   const shouldShowEditAction = isOwnedByCurrentUser && canOpenDetails && Boolean(onDelete || onViewDetails);
   const shouldShowSaveAction = !isOwnedByCurrentUser && Boolean(onToggleSave);
-  const editLabel = viewDetailsLabel ?? "Edit";
+  const editLabel = viewDetailsLabel ?? copy.common.edit;
 
   const cardBodyContent = (
     <>
@@ -82,6 +113,7 @@ export function PostCard({
             isRegular={isRegular}
             seatsLabel={seatsLabel}
             noticeDateLabel={noticeDateLabel}
+            returnDateLabel={returnDateLabel}
             noticeTripTypeLabel={noticeTripTypeLabel}
             noticeCountdownLabel={noticeCountdownLabel}
             noticeCountdownTone={noticeCountdownTone}
@@ -142,7 +174,7 @@ export function PostCard({
       ) : (
         <View style={styles.postSummaryRow}>
           <Text numberOfLines={1} style={styles.postSummaryText}>
-            {`Notice for ${noticeDateLabel}`}
+            {oneTimeSummaryLabel}
           </Text>
         </View>
       )}
@@ -158,6 +190,7 @@ export function PostCard({
       <View
         style={[
           styles.postCard,
+          containerStyle,
           isCompactLayout
             ? {
                 padding: 14,

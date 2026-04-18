@@ -3,6 +3,7 @@ import type { DateTimePickerEvent } from "@react-native-community/datetimepicker
 
 import type { RouteDraft } from "../../../../../model";
 import {
+  isRouteDateValue,
   isRouteTimeValue,
   toDateFromRouteDate,
   toDateFromRouteTime,
@@ -11,6 +12,7 @@ import {
 } from "../../../../community/utils/routeForm";
 
 type TimeField = "schedule" | "returnSchedule";
+type DateField = "noticeDate" | "returnDate";
 
 type UseRouteComposerPickersOptions = {
   routeDraft: RouteDraft;
@@ -26,6 +28,7 @@ export function useRouteComposerPickers({
   onPatchDraft,
 }: UseRouteComposerPickersOptions) {
   const [activeTimeField, setActiveTimeField] = useState<TimeField | null>(null);
+  const [activeDateField, setActiveDateField] = useState<DateField>("noticeDate");
   const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
   const [iosTimePickerValue, setIosTimePickerValue] = useState<Date>(new Date());
   const [iosDatePickerValue, setIosDatePickerValue] = useState<Date>(new Date());
@@ -36,9 +39,24 @@ export function useRouteComposerPickers({
     setActiveTimeField(field);
   };
 
-  const openDatePicker = () => {
+  const buildDatePatch = (field: DateField, date: Date) => {
+    const nextDate = toRouteDateFromDate(date);
+    if (field === "returnDate") {
+      return { returnDate: nextDate };
+    }
+
+    return {
+      noticeDate: nextDate,
+      ...(isOneTimeRoundTrip && !isRouteDateValue(routeDraft.returnDate ?? "")
+        ? { returnDate: nextDate }
+        : {}),
+    };
+  };
+
+  const openDatePicker = (field: DateField = "noticeDate") => {
     setActiveTimeField(null);
-    setIosDatePickerValue(toDateFromRouteDate(routeDraft.noticeDate));
+    setActiveDateField(field);
+    setIosDatePickerValue(toDateFromRouteDate(routeDraft[field] ?? ""));
     setIsDatePickerOpen(true);
   };
 
@@ -94,9 +112,9 @@ export function useRouteComposerPickers({
       return;
     }
 
-    onPatchDraft({ noticeDate: toRouteDateFromDate(selectedDate) });
+    onPatchDraft(buildDatePatch(activeDateField, selectedDate));
     setIsDatePickerOpen(false);
-    if (!isRouteTimeValue(routeDraft.schedule)) {
+    if (activeDateField === "noticeDate" && !isRouteTimeValue(routeDraft.schedule)) {
       openTimePicker("schedule");
     }
   };
@@ -105,6 +123,22 @@ export function useRouteComposerPickers({
     if (selectedDate) {
       setIosDatePickerValue(selectedDate);
     }
+  };
+
+  const handleNativeTimeChange = (field: TimeField, selectedDate?: Date) => {
+    if (!selectedDate) {
+      return;
+    }
+
+    applySelectedTime(field, selectedDate);
+  };
+
+  const handleNativeDateChange = (field: DateField, selectedDate?: Date) => {
+    if (!selectedDate) {
+      return;
+    }
+
+    onPatchDraft(buildDatePatch(field, selectedDate));
   };
 
   const handleConfirmIosTime = () => {
@@ -124,15 +158,16 @@ export function useRouteComposerPickers({
   };
 
   const handleConfirmIosDate = () => {
-    onPatchDraft({ noticeDate: toRouteDateFromDate(iosDatePickerValue) });
+    onPatchDraft(buildDatePatch(activeDateField, iosDatePickerValue));
     setIsDatePickerOpen(false);
-    if (!isRouteTimeValue(routeDraft.schedule)) {
+    if (activeDateField === "noticeDate" && !isRouteTimeValue(routeDraft.schedule)) {
       openTimePicker("schedule");
     }
   };
 
   return {
     activeTimeField,
+    activeDateField,
     isDatePickerOpen,
     iosTimePickerValue,
     iosDatePickerValue,
@@ -144,6 +179,8 @@ export function useRouteComposerPickers({
     handleIosTimePickerChange,
     handleAndroidDatePickerChange,
     handleIosDatePickerChange,
+    handleNativeTimeChange,
+    handleNativeDateChange,
     handleConfirmIosTime,
     handleConfirmIosDate,
   };

@@ -3,6 +3,7 @@ import type { ColorSchemeName } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import type { AppColors } from "../../brandTheme";
+import { useAppCopy } from "../../i18n/AppI18nContext";
 import type { AppStyles } from "../../ui/types";
 
 type AppLoadingScreenProps = {
@@ -12,12 +13,14 @@ type AppLoadingScreenProps = {
 };
 
 export function AppLoadingScreen({ colors, styles, scheme }: AppLoadingScreenProps) {
+  const copy = useAppCopy();
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle={scheme === "dark" ? "light-content" : "dark-content"} />
       <View style={styles.loadingWrap}>
         <ActivityIndicator size="large" color={colors.brand} />
-        <Text style={styles.loadingText}>Loading Roadmate...</Text>
+        <Text style={styles.loadingText}>{copy.loading.title}</Text>
       </View>
     </SafeAreaView>
   );

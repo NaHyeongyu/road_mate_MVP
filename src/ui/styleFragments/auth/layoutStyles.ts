@@ -19,6 +19,15 @@ export const createAuthLayoutStyles = (colors: AppColors) =>
       flex: 1,
       backgroundColor: AUTH_PAGE_BACKGROUND,
     },
+    authPageScroll: {
+      flex: 1,
+    },
+    authPageScrollContent: {
+      paddingHorizontal: 18,
+      paddingTop: 18,
+      paddingBottom: 28,
+      gap: 16,
+    },
     authSimpleHero: {
       alignItems: "center",
       paddingHorizontal: 18,
@@ -34,12 +43,12 @@ export const createAuthLayoutStyles = (colors: AppColors) =>
       paddingBottom: 12,
     },
     authEmailBody: {
-      flex: 1,
+      flexGrow: 1,
       justifyContent: "flex-start",
       gap: 14,
       paddingHorizontal: 18,
       paddingTop: 16,
-      paddingBottom: 20,
+      paddingBottom: 24,
     },
     authBackButton: {
       alignSelf: "flex-start",
@@ -82,10 +91,23 @@ export const createAuthLayoutStyles = (colors: AppColors) =>
       letterSpacing: -0.7,
     },
     authChooserCard: {
+      borderRadius: 28,
+      borderWidth: 1,
+      borderColor: colors.border,
+      backgroundColor: colors.panel,
+      paddingHorizontal: 18,
+      paddingVertical: 18,
       gap: 14,
-      marginHorizontal: 8,
       width: "100%",
       maxWidth: 420,
       alignSelf: "center",
+      shadowColor: colors.shadow,
+      shadowOpacity: 0.08,
+      shadowRadius: 14,
+      shadowOffset: { width: 0, height: 4 },
+      elevation: 3,
+    },
+    authChooserHeader: {
+      gap: 6,
     },
   }) satisfies StyleMap;

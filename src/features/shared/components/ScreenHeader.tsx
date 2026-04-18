@@ -31,11 +31,18 @@ export function ScreenHeader({
       <View style={styles.appBarSide}>
         {leftActionLabel && onLeftActionPress ? (
           <Pressable
-            style={({ pressed }) => [styles.appBarAction, pressed ? styles.appBarActionPressed : null]}
+            style={({ pressed }) => [
+              styles.appBarAction,
+              isBackAction ? styles.appBarActionBack : styles.appBarActionGhost,
+              pressed ? styles.appBarActionPressed : null,
+            ]}
             onPress={onLeftActionPress}
           >
-            {isBackAction ? <Text style={styles.appBarBackIcon}>‹</Text> : null}
-            <Text style={styles.appBarActionText}>{leftActionLabel}</Text>
+            {isBackAction ? (
+              <Text style={styles.appBarBackIcon}>‹</Text>
+            ) : (
+              <Text style={styles.appBarActionText}>{leftActionLabel}</Text>
+            )}
           </Pressable>
         ) : (
           <View style={styles.appBarSpacer} />
@@ -43,11 +50,11 @@ export function ScreenHeader({
       </View>
 
       <View style={styles.appBarCenter}>
-        <Text numberOfLines={1} style={styles.appBarTitle}>
+        <Text style={styles.appBarTitle}>
           {title}
         </Text>
         {subtitle ? (
-          <Text numberOfLines={1} style={styles.appBarSubtitle}>
+          <Text style={styles.appBarSubtitle}>
             {subtitle}
           </Text>
         ) : null}
@@ -56,7 +63,11 @@ export function ScreenHeader({
       <View style={[styles.appBarSide, styles.appBarSideRight]}>
         {rightActionLabel && onRightActionPress ? (
           <Pressable
-            style={({ pressed }) => [styles.appBarAction, pressed ? styles.appBarActionPressed : null]}
+            style={({ pressed }) => [
+              styles.appBarAction,
+              styles.appBarActionGhost,
+              pressed ? styles.appBarActionPressed : null,
+            ]}
             onPress={onRightActionPress}
           >
             <Text style={styles.appBarActionText}>{rightActionLabel}</Text>

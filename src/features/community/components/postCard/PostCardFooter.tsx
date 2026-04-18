@@ -1,6 +1,7 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Text, View } from "react-native";
 
+import { useAppCopy } from "../../../../i18n/AppI18nContext";
 import type { RoutePost } from "../../../../model";
 import type { AppStyles } from "../../../../ui/types";
 
@@ -10,13 +11,15 @@ type PostCardFooterProps = {
 };
 
 export function PostCardFooter({ post, styles }: PostCardFooterProps) {
+  const copy = useAppCopy();
+
   return (
     <View style={styles.postFooterCard}>
       <View style={styles.postFooterItemRow}>
         <View style={styles.postRouteLeadIconSlot}>
           <MaterialCommunityIcons name="account-circle-outline" size={15} color="#64748B" />
         </View>
-        <Text style={styles.postFooterLabel}>Driver</Text>
+        <Text style={styles.postFooterLabel}>{copy.community.ownerDriver}</Text>
         <Text numberOfLines={1} style={styles.postFooterValue}>
           {post.ownerName}
         </Text>
@@ -26,7 +29,7 @@ export function PostCardFooter({ post, styles }: PostCardFooterProps) {
         <View style={styles.postRouteLeadIconSlot}>
           <MaterialCommunityIcons name="car-outline" size={15} color="#64748B" />
         </View>
-        <Text style={styles.postFooterLabel}>Vehicle</Text>
+        <Text style={styles.postFooterLabel}>{copy.community.ownerVehicle}</Text>
         <Text numberOfLines={1} style={[styles.postFooterValue, styles.postFooterValueSecondary]}>
           {post.vehicleModel} · {post.vehiclePlate}
         </Text>

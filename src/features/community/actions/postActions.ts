@@ -1,13 +1,20 @@
 import type { RoutePost } from "../../../model";
 import {
+  deactivateOneTimeRoutePostsInDb,
   deleteRoutePostInDb,
   getDefaultRoutePostId,
+  getNextRoutePostId,
   isRoutePostRepositoryEnabled,
   updateRouteQuickSettingsInDb,
   upsertRoutePostInDb,
 } from "../data/routePostRepository";
 import { buildRoutePost, validateRoutePost } from "../utils/routeDraft";
-import { getPostSaveKey, kindLabel, sortByNewest } from "../utils/storage";
+import {
+  getPostSaveKey,
+  isActiveOneTimePost,
+  kindLabel,
+  sortByNewest,
+} from "../utils/storage";
 import type { CommunityActionsContext, RouteQuickSettingsInput } from "./types";
 
 const describeRouteDbError = (error: unknown) => {
@@ -25,16 +32,21 @@ const describeRouteDbError = (error: unknown) => {
   if (message.includes("route_posts_owner_kind_key")) {
     return "Route uniqueness conflict detected. Retry once after app refresh.";
   }
+  if (message.includes("route_posts_owner_active_one_time_key")) {
+    return "Only one active one-time notice can be kept at a time.";
+  }
 
   return message;
 };
 
 export const createCommunityPostActions = (context: CommunityActionsContext) => {
+  const { copy } = context;
+
   const postRoute = async (): Promise<boolean> => {
     if (!context.currentUserId) {
       context.onNotice({
         tone: "error",
-        text: "Sign in before posting a route.",
+        text: copy.notices.signInBeforePosting,
       });
       return false;
     }
@@ -42,7 +54,7 @@ export const createCommunityPostActions = (context: CommunityActionsContext) => 
     if (!context.savedVehicle.model || !context.savedVehicle.plate) {
       context.onNotice({
         tone: "error",
-        text: "Save vehicle info first.",
+        text: copy.notices.saveVehicleInfoFirst,
       });
       return false;
     }
@@ -62,46 +74,81 @@ export const createCommunityPostActions = (context: CommunityActionsContext) => 
       return false;
     }
 
-    const existingRoute = context.storedPosts.find(
-      (post) => post.ownerUserId === context.currentUserId && post.kind === nextRoute.kind
-    );
-    const routeToPersist = {
+    const existingRoute =
+      nextRoute.kind === "one_time"
+        ? context.storedPosts.find(
+            (post) =>
+              post.ownerUserId === context.currentUserId && isActiveOneTimePost(post)
+          )
+        : context.storedPosts.find(
+            (post) => post.ownerUserId === context.currentUserId && post.kind === nextRoute.kind
+          );
+    const createdAt = existingRoute?.createdAt ?? new Date().toISOString();
+    const shouldArchiveExistingOneTimePosts = nextRoute.kind === "one_time" && !existingRoute;
+    const routeToPersist: RoutePost = {
       ...nextRoute,
-      id: getDefaultRoutePostId(context.currentUserId, nextRoute.kind),
-      createdAt: new Date().toISOString(),
+      id:
+        existingRoute?.id ??
+        (nextRoute.kind === "regular"
+          ? getDefaultRoutePostId(context.currentUserId, nextRoute.kind)
+          : getNextRoutePostId(context.currentUserId, nextRoute.kind, createdAt)),
+      isActive: nextRoute.kind === "one_time" ? true : undefined,
+      createdAt,
     };
 
     let syncedRoute = routeToPersist;
     let isDbSynced = false;
     if (isRoutePostRepositoryEnabled()) {
       try {
+        if (shouldArchiveExistingOneTimePosts) {
+          await deactivateOneTimeRoutePostsInDb(context.currentUserId);
+        }
         syncedRoute = await upsertRoutePostInDb(routeToPersist);
         isDbSynced = true;
       } catch (error) {
         context.onNotice({
           tone: "error",
-          text: `DB sync failed. Saved only on this device. (${describeRouteDbError(error)})`,
+          text: copy.notices.localDbSyncFailed(describeRouteDbError(error)),
         });
       }
     }
 
     const nextPosts = sortByNewest([
       syncedRoute,
-      ...context.storedPosts.filter(
-        (post) =>
-          !(post.ownerUserId === context.currentUserId && post.kind === syncedRoute.kind)
-      ),
+      ...context.storedPosts
+        .filter((post) => {
+          if (syncedRoute.kind === "regular") {
+            return !(post.ownerUserId === context.currentUserId && post.kind === "regular");
+          }
+
+          return post.id !== syncedRoute.id;
+        })
+        .map((post) => {
+          if (
+            shouldArchiveExistingOneTimePosts &&
+            post.ownerUserId === context.currentUserId &&
+            post.kind === "one_time" &&
+            post.isActive !== false
+          ) {
+            return {
+              ...post,
+              isActive: false,
+            };
+          }
+
+          return post;
+        }),
     ]);
     await context.persistPosts(nextPosts);
     if (isDbSynced || !isRoutePostRepositoryEnabled()) {
       const successText =
         syncedRoute.kind === "one_time"
           ? existingRoute
-            ? "One-time notice updated and shared to riders."
-            : "One-time notice posted and shared to riders."
+            ? copy.notices.oneTimeNoticeUpdated
+            : copy.notices.oneTimeNoticePosted
           : existingRoute
-            ? `${kindLabel(syncedRoute.kind)} registration updated and shared to riders.`
-            : `${kindLabel(syncedRoute.kind)} registration saved and shared to riders.`;
+            ? copy.notices.registrationUpdated(kindLabel(syncedRoute.kind))
+            : copy.notices.registrationSaved(kindLabel(syncedRoute.kind));
       context.onNotice({
         tone: "success",
         text: successText,
@@ -126,7 +173,7 @@ export const createCommunityPostActions = (context: CommunityActionsContext) => 
       } catch (error) {
         context.onNotice({
           tone: "error",
-          text: `Route delete failed in DB. Local list updated only. (${describeRouteDbError(error)})`,
+          text: copy.notices.routeDeleteFailed(describeRouteDbError(error)),
         });
       }
     }
@@ -134,7 +181,7 @@ export const createCommunityPostActions = (context: CommunityActionsContext) => 
     await context.persistPosts(nextPosts);
     context.onNotice({
       tone: "info",
-      text: "Route removed.",
+      text: copy.notices.routeRemoved,
     });
   };
 
@@ -142,7 +189,7 @@ export const createCommunityPostActions = (context: CommunityActionsContext) => 
     if (!context.currentUserId) {
       context.onNotice({
         tone: "error",
-        text: "Sign in before saving rides.",
+        text: copy.notices.signInBeforeSavingRides,
       });
       return;
     }
@@ -166,12 +213,15 @@ export const createCommunityPostActions = (context: CommunityActionsContext) => 
 
     const normalizedSeats = Math.min(Math.max(availableSeats, 1), 8);
     const targetPost = context.storedPosts.find(
-      (post) => post.ownerUserId === context.currentUserId && post.kind === kind
+      (post) =>
+        post.ownerUserId === context.currentUserId &&
+        post.kind === kind &&
+        (kind !== "one_time" || isActiveOneTimePost(post))
     );
     if (!targetPost) {
       context.onNotice({
         tone: "info",
-        text: "Save registration first before changing seats or visibility.",
+        text: copy.notices.saveRegistrationBeforeSettings,
       });
       return;
     }
@@ -202,7 +252,7 @@ export const createCommunityPostActions = (context: CommunityActionsContext) => 
       } catch (error) {
         context.onNotice({
           tone: "error",
-          text: `Route update failed in DB. Local values updated only. (${describeRouteDbError(error)})`,
+          text: copy.notices.routeUpdateFailed(describeRouteDbError(error)),
         });
       }
     }
@@ -212,7 +262,7 @@ export const createCommunityPostActions = (context: CommunityActionsContext) => 
     } catch (error) {
       context.onNotice({
         tone: "error",
-        text: `Route quick settings could not be saved locally. (${describeRouteDbError(error)})`,
+        text: copy.notices.routeQuickSettingsSaveFailed(describeRouteDbError(error)),
       });
     }
   };

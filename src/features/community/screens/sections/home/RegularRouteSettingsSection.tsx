@@ -1,5 +1,4 @@
-import { useRef } from "react";
-import { Pressable, Text, TextInput, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 
 import type { AppColors } from "../../../../../brandTheme";
 import type { RouteDraft } from "../../../../../model";
@@ -8,7 +7,6 @@ import { WEEKDAY_OPTIONS } from "../../../../community/utils/routeForm";
 import { Label } from "../../../../shared/components/Label";
 import { ToggleChip } from "../../../../shared/components/ToggleChip";
 import { OperatingDaysChips } from "./OperatingDaysChips";
-import { RouteDraftTextField } from "./RouteDraftTextField";
 import { hasSameDays } from "./driverRouteComposerState";
 
 type RegularRouteSettingsSectionProps = {
@@ -20,8 +18,6 @@ type RegularRouteSettingsSectionProps = {
   onIncreaseSeats: () => void;
   onApplyOperatingDays: (days: readonly string[]) => void;
   onRouteDraftChange: (draft: RouteDraft) => void;
-  onChangeContactPhone: (value: string) => void;
-  onChangeContactLink: (value: string) => void;
   onSetVisibility: (isPublic: boolean) => void;
 };
 
@@ -37,12 +33,8 @@ export function RegularRouteSettingsSection({
   onIncreaseSeats,
   onApplyOperatingDays,
   onRouteDraftChange,
-  onChangeContactPhone,
-  onChangeContactLink,
   onSetVisibility,
 }: RegularRouteSettingsSectionProps) {
-  const phoneInputRef = useRef<TextInput>(null);
-  const linkInputRef = useRef<TextInput>(null);
   const isWeekdayPresetActive = hasSameDays(routeDraft.operatingDays, WEEKDAY_PRESET);
   const isWeekendPresetActive = hasSameDays(routeDraft.operatingDays, WEEKEND_PRESET);
   const isAllDaysPresetActive = hasSameDays(routeDraft.operatingDays, WEEKDAY_OPTIONS);
@@ -86,34 +78,6 @@ export function RegularRouteSettingsSection({
         />
       </View>
       <OperatingDaysChips styles={styles} routeDraft={routeDraft} onRouteDraftChange={onRouteDraftChange} />
-
-      <RouteDraftTextField
-        colors={colors}
-        styles={styles}
-        label="AU phone override"
-        optional
-        value={routeDraft.contactPhone}
-        onChangeText={onChangeContactPhone}
-        placeholder="0412 345 678"
-        keyboardType="phone-pad"
-        returnKeyType="next"
-        blurOnSubmit={false}
-        inputRef={phoneInputRef}
-        onSubmitEditing={() => linkInputRef.current?.focus()}
-      />
-      <RouteDraftTextField
-        colors={colors}
-        styles={styles}
-        label="Chat link override (WhatsApp/Kakao/Telegram)"
-        optional
-        value={routeDraft.contactLink}
-        onChangeText={onChangeContactLink}
-        placeholder="https://wa.me/61412345678"
-        autoCapitalize="none"
-        autoCorrect={false}
-        returnKeyType="done"
-        inputRef={linkInputRef}
-      />
 
       <View style={styles.routeComposerDivider} />
 

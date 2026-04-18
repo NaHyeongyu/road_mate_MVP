@@ -92,6 +92,20 @@ export const createCommunitySurfaceStyles = (colors: AppColors) =>
       justifyContent: "center",
       marginLeft: 8,
     },
+    routeSearchSelectValueWrap: {
+      flex: 1,
+      minHeight: 46,
+      justifyContent: "center",
+      paddingHorizontal: 8,
+    },
+    routeSearchSelectValueText: {
+      color: colors.text,
+      fontSize: 15,
+      lineHeight: 20,
+      fontWeight: "600",
+      includeFontPadding: false,
+      textAlignVertical: "center",
+    },
     routeSearchInputField: {
       flex: 1,
       color: colors.text,
@@ -140,8 +154,11 @@ export const createCommunitySurfaceStyles = (colors: AppColors) =>
     routeSuggestionText: {
       color: colors.text,
       fontSize: 14,
+      lineHeight: 20,
       fontWeight: "700",
       flex: 1,
+      includeFontPadding: false,
+      textAlignVertical: "center",
     },
     routeSuggestionTextSelected: {
       color: colors.hero,
@@ -183,7 +200,6 @@ export const createCommunitySurfaceStyles = (colors: AppColors) =>
       letterSpacing: 0.1,
     },
     routeResultsSummaryCard: {
-      marginTop: 6,
       borderRadius: 14,
       borderWidth: 1,
       borderColor: colors.border,
@@ -237,6 +253,98 @@ export const createCommunitySurfaceStyles = (colors: AppColors) =>
     },
     routeFilterItemTextActive: {
       color: colors.brandText,
+    },
+    riderSearchStack: {
+      gap: 14,
+    },
+    riderSearchStackCompact: {
+      gap: 12,
+    },
+    riderSearchIntro: {
+      gap: 6,
+    },
+    riderSearchEyebrow: {
+      color: colors.hero,
+      fontSize: 11,
+      fontWeight: "800",
+      textTransform: "uppercase",
+      letterSpacing: 0.8,
+    },
+    riderSearchTitle: {
+      color: colors.text,
+      fontSize: 21,
+      lineHeight: 27,
+      fontWeight: "800",
+      letterSpacing: -0.3,
+    },
+    riderSearchFieldsSection: {
+      gap: 12,
+    },
+    riderResultsStack: {
+      gap: 12,
+    },
+    riderResultsStackCompact: {
+      gap: 10,
+    },
+    riderResultsSummaryCard: {
+      borderRadius: 18,
+      paddingHorizontal: 14,
+      paddingVertical: 12,
+      gap: 6,
+    },
+    riderResultsHelperText: {
+      color: colors.subtext,
+      fontSize: 13,
+      lineHeight: 19,
+      paddingHorizontal: 4,
+    },
+    riderFeedList: {
+      gap: 12,
+    },
+    riderFeedListCompact: {
+      gap: 10,
+    },
+    riderFeedPostCard: {
+      marginTop: 0,
+    },
+    riderEmptyStateCard: {
+      borderRadius: 18,
+      borderWidth: 1,
+      borderColor: colors.border,
+      backgroundColor: colors.panel,
+      paddingHorizontal: 14,
+      paddingVertical: 16,
+    },
+    riderScopeRow: {
+      flexDirection: "row",
+      flexWrap: "wrap",
+      gap: 8,
+    },
+    riderScopeChip: {
+      minHeight: 40,
+      paddingHorizontal: 13,
+      paddingVertical: 8,
+      justifyContent: "center",
+    },
+    riderScopeChipCompact: {
+      minHeight: 36,
+      paddingHorizontal: 12,
+      paddingVertical: 7,
+    },
+    riderScopeChipText: {
+      fontSize: 12,
+    },
+    routeFilterRowCompact: {
+      gap: 8,
+    },
+    routeFilterItemCompact: {
+      minHeight: 42,
+      borderRadius: 14,
+      paddingHorizontal: 12,
+      gap: 5,
+    },
+    routeFilterItemTextCompact: {
+      fontSize: 13,
     },
     profileMetaRow: {
       flexDirection: "row",
@@ -317,5 +425,87 @@ export const createCommunitySurfaceStyles = (colors: AppColors) =>
     },
     driverControlBadgeText: {
       fontSize: 13,
+    },
+    driverOverviewHero: {
+      borderRadius: 22,
+      borderWidth: 1,
+      borderColor: colors.border,
+      backgroundColor: colors.panel,
+      padding: 18,
+      gap: 12,
+    },
+    driverOverviewHeroTop: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      gap: 12,
+      flexWrap: "wrap",
+    },
+    driverOverviewHeroTitle: {
+      color: colors.text,
+      fontSize: 22,
+      fontWeight: "800",
+      letterSpacing: -0.3,
+    },
+    driverOverviewHeroBody: {
+      color: colors.subtext,
+      fontSize: 14,
+      lineHeight: 20,
+    },
+    driverOverviewStatusBadge: {
+      minHeight: 32,
+      borderRadius: 999,
+      paddingHorizontal: 12,
+      alignItems: "center",
+      justifyContent: "center",
+      borderWidth: 1,
+    },
+    driverOverviewStatusBadgeActive: {
+      backgroundColor: "#DCFCE7",
+      borderColor: "#BBF7D0",
+    },
+    driverOverviewStatusBadgeDraft: {
+      backgroundColor: "#FEF3C7",
+      borderColor: "#FDE68A",
+    },
+    driverOverviewStatusBadgeIdle: {
+      backgroundColor: colors.panelAlt,
+      borderColor: colors.border,
+    },
+    driverOverviewStatusText: {
+      color: colors.text,
+      fontSize: 12,
+      fontWeight: "800",
+      letterSpacing: 0.2,
+      textTransform: "uppercase",
+    },
+    driverOverviewMetricRow: {
+      flexDirection: "row",
+      flexWrap: "wrap",
+      gap: 10,
+    },
+    driverOverviewMetricCard: {
+      minWidth: 104,
+      flexGrow: 1,
+      borderRadius: 16,
+      borderWidth: 1,
+      borderColor: colors.border,
+      backgroundColor: colors.panelAlt,
+      paddingHorizontal: 12,
+      paddingVertical: 10,
+      gap: 4,
+    },
+    driverOverviewMetricLabel: {
+      color: colors.subtext,
+      fontSize: 11,
+      fontWeight: "700",
+      textTransform: "uppercase",
+      letterSpacing: 0.4,
+    },
+    driverOverviewMetricValue: {
+      color: colors.text,
+      fontSize: 15,
+      fontWeight: "800",
+      letterSpacing: -0.1,
     },
   }) satisfies StyleMap;

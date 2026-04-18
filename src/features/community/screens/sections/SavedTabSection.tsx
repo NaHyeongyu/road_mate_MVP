@@ -2,10 +2,10 @@ import { useMemo, useState } from "react";
 import { Pressable, Text, View } from "react-native";
 
 import type { AppNotice } from "../../../../app/types";
+import { useAppCopy } from "../../../../i18n/AppI18nContext";
 import type { RoutePost } from "../../../../model";
 import type { AppStyles } from "../../../../ui/types";
 import { PostCard } from "../../components/PostCard";
-import { NoticeBanner } from "../../../shared/components/NoticeBanner";
 import { getPostSaveKey } from "../../utils/storage";
 
 type SavedTabSectionProps = {
@@ -27,6 +27,7 @@ export function SavedTabSection({
   savedPostKeys,
   onToggleSavedPost,
 }: SavedTabSectionProps) {
+  const copy = useAppCopy();
   const [sortMode, setSortMode] = useState<"saved_recent" | "notice_recent">("saved_recent");
   const savedPostKeySet = useMemo(() => new Set(savedPostKeys), [savedPostKeys]);
   const riderVisibleSavedPosts = useMemo(
@@ -81,27 +82,25 @@ export function SavedTabSection({
 
   if (!isRiderMode) {
     return (
-      <View style={styles.card}>
-        <Text style={styles.cardTitle}>Saved rides</Text>
-        <Text style={styles.cardBody}>Saved is available in rider mode only.</Text>
+        <View style={styles.card}>
+        <Text style={styles.cardTitle}>{copy.community.savedRidesTitle}</Text>
+        <Text style={styles.cardBody}>{copy.community.savedOnlyInRiderMode}</Text>
       </View>
     );
   }
 
   return (
     <>
-      <NoticeBanner notice={notice} styles={styles} />
-
       <View style={styles.card}>
-        <Text style={styles.cardTitle}>Saved rides</Text>
-        <Text style={styles.cardBody}>Total saved: {riderVisibleSavedPosts.length}</Text>
+        <Text style={styles.cardTitle}>{copy.community.savedRidesTitle}</Text>
+        <Text style={styles.cardBody}>{copy.community.totalSaved(riderVisibleSavedPosts.length)}</Text>
         <View style={styles.row}>
           <Pressable
             style={[styles.chip, sortMode === "saved_recent" ? styles.chipActive : null]}
             onPress={() => setSortMode("saved_recent")}
           >
             <Text style={[styles.chipText, sortMode === "saved_recent" ? styles.chipTextActive : null]}>
-              Saved recent
+              {copy.community.savedRecent}
             </Text>
           </Pressable>
           <Pressable
@@ -109,7 +108,7 @@ export function SavedTabSection({
             onPress={() => setSortMode("notice_recent")}
           >
             <Text style={[styles.chipText, sortMode === "notice_recent" ? styles.chipTextActive : null]}>
-              Notice recent
+              {copy.community.noticeRecent}
             </Text>
           </Pressable>
         </View>
@@ -117,7 +116,7 @@ export function SavedTabSection({
 
       {sortedSavedPosts.length === 0 ? (
         <View style={styles.card}>
-          <Text style={styles.cardBody}>No saved rides yet.</Text>
+          <Text style={styles.cardBody}>{copy.community.noSavedRides}</Text>
         </View>
       ) : (
         sortedSavedPosts.map((post) => (

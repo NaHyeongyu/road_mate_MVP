@@ -2,6 +2,7 @@ import { FontAwesome6, Ionicons } from "@expo/vector-icons";
 import { useEffect, useRef } from "react";
 import { Animated, Pressable, Text, View } from "react-native";
 
+import { useAppCopy } from "../../../i18n/AppI18nContext";
 import type { AppStyles } from "../../../ui/types";
 import type { Mode } from "../types";
 
@@ -16,6 +17,7 @@ const ACTIVE_TINT = "#0B0F14";
 const INACTIVE_TINT = "#111827";
 
 export function RoleModeToggle({ mode, onChangeMode, styles }: RoleModeToggleProps) {
+  const copy = useAppCopy();
   const modeAnim = useRef(new Animated.Value(mode === "rider" ? 0 : 1)).current;
 
   useEffect(() => {
@@ -92,7 +94,7 @@ export function RoleModeToggle({ mode, onChangeMode, styles }: RoleModeTogglePro
               isRiderActive ? styles.roleToggleTextActive : styles.roleToggleTextInactive,
             ]}
           >
-            Rider
+            {copy.common.rider}
           </Text>
         </Animated.View>
       </Pressable>
@@ -119,7 +121,7 @@ export function RoleModeToggle({ mode, onChangeMode, styles }: RoleModeTogglePro
               isDriverActive ? styles.roleToggleTextActive : styles.roleToggleTextInactive,
             ]}
           >
-            Driver
+            {copy.common.driver}
           </Text>
           <FontAwesome6
             color={isDriverActive ? ACTIVE_TINT : INACTIVE_TINT}

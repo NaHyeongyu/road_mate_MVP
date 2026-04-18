@@ -30,9 +30,8 @@ type CommunityTabContentProps = {
   hasDriverContactMethod: boolean;
   routeDraft: RouteDraft;
   hasVehicle: boolean;
-  onSignOut: () => void;
-  onWithdrawAccount: () => void;
   onRequestAuth: () => void;
+  onOpenSettingsPage: () => void;
   onFilterChange: (filter: RouteKind) => void;
   onStateFilterChange: (value: StateFilter) => void;
   onFromSearchQueryChange: (value: string) => void;
@@ -52,7 +51,6 @@ type CommunityTabContentProps = {
   isRiderSearchResultsPageVisible: boolean;
   canLoadMoreRiderSearchResults: boolean;
   onOpenRiderSearchResultsPage: () => void;
-  onCloseRiderSearchResultsPage: () => void;
   onLoadMoreRiderSearchResults: () => void;
 };
 
@@ -79,9 +77,8 @@ export function CommunityTabContent({
   hasDriverContactMethod,
   routeDraft,
   hasVehicle,
-  onSignOut,
-  onWithdrawAccount,
   onRequestAuth,
+  onOpenSettingsPage,
   onFilterChange,
   onStateFilterChange,
   onFromSearchQueryChange,
@@ -97,7 +94,6 @@ export function CommunityTabContent({
   isRiderSearchResultsPageVisible,
   canLoadMoreRiderSearchResults,
   onOpenRiderSearchResultsPage,
-  onCloseRiderSearchResultsPage,
   onLoadMoreRiderSearchResults,
 }: CommunityTabContentProps) {
   const isRiderMode = mode === "rider";
@@ -116,6 +112,7 @@ export function CommunityTabContent({
     myPosts,
     savedPostKeys,
     routeDraft,
+    savedVehicle,
     hasDriverContactMethod,
     currentUserId,
     driverRouteKind,
@@ -126,11 +123,11 @@ export function CommunityTabContent({
     onRouteDraftChange,
     onSaveRouteQuickSettings,
     onOpenDriverRegistrationPage,
+    onRemoveRoute,
     onToggleSavedPost,
     isRiderSearchResultsPageVisible,
     canLoadMoreRiderSearchResults,
     onOpenRiderSearchResultsPage,
-    onCloseRiderSearchResultsPage,
     onLoadMoreRiderSearchResults,
   } as const;
 
@@ -166,9 +163,8 @@ export function CommunityTabContent({
       savedVehicle={savedVehicle}
       onVehicleDraftChange={onVehicleDraftChange}
       onSaveVehicle={onSaveVehicle}
-      onSignOut={onSignOut}
-      onWithdrawAccount={onWithdrawAccount}
       onRequestAuth={onRequestAuth}
+      onOpenSettingsPage={onOpenSettingsPage}
     />
   );
 }

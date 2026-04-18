@@ -1,5 +1,6 @@
 import { Text } from "react-native";
 
+import { useAppCopy } from "../../../../../i18n/AppI18nContext";
 import type { AppStyles } from "../../../../../ui/types";
 
 type NoticeScope = "upcoming" | "all";
@@ -14,12 +15,14 @@ type RiderFeedEmptyStateProps = {
 };
 
 function toEmptyMessage({
+  copy,
   isSearchReady,
   hasSearchRequested,
   isNoticeFilter,
   noticeScope,
   pastNoticeCount,
 }: {
+  copy: ReturnType<typeof useAppCopy>;
   isSearchReady: boolean;
   hasSearchRequested: boolean;
   isNoticeFilter: boolean;
@@ -27,24 +30,22 @@ function toEmptyMessage({
   pastNoticeCount: number;
 }) {
   if (!isSearchReady) {
-    return isNoticeFilter
-      ? "Choose a state or enter both from and to to search notices."
-      : "Choose a state or enter both from and to to search rides.";
+    return copy.community.chooseSearchPrompt(isNoticeFilter);
   }
 
   if (!hasSearchRequested) {
-    return isNoticeFilter ? "Tap search to view notices." : "Tap search to view rides.";
+    return copy.community.tapSearchPrompt(isNoticeFilter);
   }
 
   if (isNoticeFilter && noticeScope === "upcoming" && pastNoticeCount > 0) {
-    return "Only past notices match this filter or search.";
+    return copy.community.pastOnlyPrompt;
   }
 
   if (isNoticeFilter) {
-    return "No notices match this filter or search.";
+    return copy.community.noNoticesMatch;
   }
 
-  return "No rides match this filter or search.";
+  return copy.community.noRidesMatch;
 }
 
 export function RiderFeedEmptyState({
@@ -55,9 +56,17 @@ export function RiderFeedEmptyState({
   noticeScope,
   pastNoticeCount,
 }: RiderFeedEmptyStateProps) {
+  const copy = useAppCopy();
   return (
     <Text style={styles.routeSearchEmptyText}>
-      {toEmptyMessage({ isSearchReady, hasSearchRequested, isNoticeFilter, noticeScope, pastNoticeCount })}
+      {toEmptyMessage({
+        copy,
+        isSearchReady,
+        hasSearchRequested,
+        isNoticeFilter,
+        noticeScope,
+        pastNoticeCount,
+      })}
     </Text>
   );
 }

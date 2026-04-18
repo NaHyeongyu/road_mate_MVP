@@ -1,18 +1,23 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
 
+import { getAppCopy } from "../../../i18n/copy";
 import { EMPTY_ROUTE_DRAFT, EMPTY_VEHICLE, type RouteDraft, type RoutePost, type VehicleInfo } from "../../../model";
 import { getPostSaveKey } from "../utils/storage";
 import { createCommunityPostActions } from "./postActions";
 import type { CommunityActionsContext } from "./types";
 
 const mockDeleteRoutePostInDb = vi.fn();
+const mockDeactivateOneTimeRoutePostsInDb = vi.fn();
 const mockIsRoutePostRepositoryEnabled = vi.fn(() => false);
 const mockUpdateRouteQuickSettingsInDb = vi.fn();
 const mockUpsertRoutePostInDb = vi.fn();
 
 vi.mock("../data/routePostRepository", () => ({
+  deactivateOneTimeRoutePostsInDb: (...args: unknown[]) => mockDeactivateOneTimeRoutePostsInDb(...args),
   deleteRoutePostInDb: (...args: unknown[]) => mockDeleteRoutePostInDb(...args),
   getDefaultRoutePostId: (ownerUserId: string, kind: "regular" | "one_time") => `${ownerUserId}:${kind}`,
+  getNextRoutePostId: (ownerUserId: string, kind: "regular" | "one_time", uniqueToken: string) =>
+    `${ownerUserId}:${kind}:${uniqueToken}`,
   isRoutePostRepositoryEnabled: () => mockIsRoutePostRepositoryEnabled(),
   updateRouteQuickSettingsInDb: (...args: unknown[]) => mockUpdateRouteQuickSettingsInDb(...args),
   upsertRoutePostInDb: (...args: unknown[]) => mockUpsertRoutePostInDb(...args),
@@ -95,6 +100,7 @@ const createContext = (
     setRouteDraft: vi.fn(),
     resetAllRouteDrafts: vi.fn(),
     onNotice: onNoticeMock,
+    copy: getAppCopy("en"),
     persistPosts: persistPostsMock,
     persistSavedPostKeys: persistSavedPostKeysMock,
     persistVehicle: vi.fn(async () => undefined),
@@ -145,11 +151,49 @@ describe("createCommunityPostActions", () => {
     expect(ctx.persistPostsMock).toHaveBeenCalledTimes(1);
     const persistedPosts = ctx.persistPostsMock.mock.calls[0]?.[0] as RoutePost[];
     expect(persistedPosts).toHaveLength(1);
-    expect(persistedPosts[0]?.id).toBe("user-1:regular");
+    expect(persistedPosts[0]?.id).toBe("existing");
     expect(persistedPosts[0]?.ownerUserId).toBe("user-1");
     expect(ctx.onNoticeMock).toHaveBeenCalledWith({
       tone: "success",
       text: "Regular registration updated and shared to riders.",
+    });
+  });
+
+  it("keeps previous one-time notices and creates a new active notice when none is active", async () => {
+    const previousNotice = createPost({
+      id: "notice-old",
+      kind: "one_time",
+      noticeDate: "2026-04-10",
+      createdAt: "2026-04-10T00:00:00.000Z",
+      isActive: true,
+      availableSeats: 1,
+      operatingDays: [],
+      returnSchedule: undefined,
+    });
+    const ctx = createContext({
+      storedPosts: [previousNotice],
+      routeDraft: createValidRouteDraft({
+        kind: "one_time",
+        oneTimeTripType: "one_way",
+        noticeDate: "2026-04-20",
+        schedule: "09:00",
+        returnSchedule: "",
+      }),
+    });
+    const { postRoute } = createCommunityPostActions(ctx);
+
+    const result = await postRoute();
+
+    expect(result).toBe(true);
+    const persistedPosts = ctx.persistPostsMock.mock.calls[0]?.[0] as RoutePost[];
+    expect(persistedPosts).toHaveLength(2);
+    expect(persistedPosts[0]?.kind).toBe("one_time");
+    expect(persistedPosts[0]?.isActive).toBe(true);
+    expect(persistedPosts[1]?.id).toBe("notice-old");
+    expect(persistedPosts[1]?.isActive).toBe(false);
+    expect(ctx.onNoticeMock).toHaveBeenCalledWith({
+      tone: "success",
+      text: "One-time notice posted and shared to riders.",
     });
   });
 
