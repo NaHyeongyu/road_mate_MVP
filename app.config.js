@@ -29,6 +29,11 @@ const getAdMobAppId = (envName, fallbackValue) => {
   return fallbackValue;
 };
 
+const getNativeAdMobAppId = (envName, fallbackValue) => {
+  const configured = trimOrUndefined(process.env[envName]);
+  return configured || fallbackValue;
+};
+
 module.exports = ({ config }) => {
   const existingPlugins = Array.isArray(config.plugins) ? config.plugins : [];
   const pluginsWithoutNativeBranding = existingPlugins.filter((plugin) => {
@@ -39,20 +44,24 @@ module.exports = ({ config }) => {
     return plugin !== "react-native-google-mobile-ads" && plugin !== "expo-splash-screen";
   });
   const isAdsEnabled = parseBooleanEnv(process.env.EXPO_PUBLIC_ENABLE_ADS);
-  const adMobPlugin = !isAdsEnabled
-    ? []
-    : [
-        [
-          "react-native-google-mobile-ads",
-          {
-            androidAppId: getAdMobAppId("ADMOB_ANDROID_APP_ID", ANDROID_TEST_ADMOB_APP_ID),
-            iosAppId: getAdMobAppId("ADMOB_IOS_APP_ID", IOS_TEST_ADMOB_APP_ID),
-            delayAppMeasurementInit: true,
-            userTrackingUsageDescription:
-              "This identifier will be used to deliver personalized ads to you.",
-          },
-        ],
-      ];
+  const adMobPlugin = [
+    [
+      "react-native-google-mobile-ads",
+      {
+        // Keep a valid native App ID configured even when ads are disabled.
+        // The iOS SDK can crash on launch if the module is linked without it.
+        androidAppId: isAdsEnabled
+          ? getAdMobAppId("ADMOB_ANDROID_APP_ID", ANDROID_TEST_ADMOB_APP_ID)
+          : getNativeAdMobAppId("ADMOB_ANDROID_APP_ID", ANDROID_TEST_ADMOB_APP_ID),
+        iosAppId: isAdsEnabled
+          ? getAdMobAppId("ADMOB_IOS_APP_ID", IOS_TEST_ADMOB_APP_ID)
+          : getNativeAdMobAppId("ADMOB_IOS_APP_ID", IOS_TEST_ADMOB_APP_ID),
+        delayAppMeasurementInit: true,
+        userTrackingUsageDescription:
+          "This identifier will be used to deliver personalized ads to you.",
+      },
+    ],
+  ];
   const splashScreenPlugin = [
     [
       "expo-splash-screen",
