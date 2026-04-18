@@ -40,6 +40,8 @@ type PasswordResetEmailStatus = "idle" | "registered" | "missing";
 const OAUTH_REDIRECT_PATH = "auth/callback";
 const OAUTH_SCHEME = "roadmate";
 const EMAIL_AUTH_REDIRECT_URL = `${OAUTH_SCHEME}://${OAUTH_REDIRECT_PATH}`;
+const DEFAULT_AUTH_WEB_URL = "https://rodematemvp.vercel.app";
+const SIGNUP_COMPLETE_PATH = "/auth/complete";
 const PASSWORD_RESET_EMAIL_COOLDOWN_SECONDS = 90;
 
 const getOAuthProviderLabel = (provider: OAuthProvider) => {
@@ -59,7 +61,12 @@ const getOAuthProviderLabel = (provider: OAuthProvider) => {
 };
 
 const getAuthRedirectUrl = () => Linking.createURL(OAUTH_REDIRECT_PATH, { scheme: OAUTH_SCHEME });
-const getEmailAuthRedirectUrl = () => EMAIL_AUTH_REDIRECT_URL;
+const getPasswordResetRedirectUrl = () => EMAIL_AUTH_REDIRECT_URL;
+const getSignupEmailRedirectUrl = () => {
+  const configuredSiteUrl = String(process.env.EXPO_PUBLIC_SITE_URL ?? "").trim();
+  const baseUrl = (configuredSiteUrl || DEFAULT_AUTH_WEB_URL).replace(/\/+$/, "");
+  return `${baseUrl}${SIGNUP_COMPLETE_PATH}`;
+};
 
 function isMissingEmailCheckFunctionError(message: string) {
   return /is_email_registered|function .*does not exist|could not find the function/i.test(
@@ -526,7 +533,7 @@ export function useAuthFlow({ copy, onNotice, onResetSignedInExperience }: UseAu
 
     try {
       const { error } = await supabase.auth.resetPasswordForEmail(normalizedEmail, {
-        redirectTo: getEmailAuthRedirectUrl(),
+        redirectTo: getPasswordResetRedirectUrl(),
       });
 
       if (error) {
@@ -704,7 +711,7 @@ export function useAuthFlow({ copy, onNotice, onResetSignedInExperience }: UseAu
           email: normalizedEmail,
           password,
           options: {
-            emailRedirectTo: getEmailAuthRedirectUrl(),
+            emailRedirectTo: getSignupEmailRedirectUrl(),
           },
         });
 
@@ -792,7 +799,7 @@ export function useAuthFlow({ copy, onNotice, onResetSignedInExperience }: UseAu
         type: "signup",
         email: emailToResend,
         options: {
-          emailRedirectTo: getEmailAuthRedirectUrl(),
+          emailRedirectTo: getSignupEmailRedirectUrl(),
         },
       });
 

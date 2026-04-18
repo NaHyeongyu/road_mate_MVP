@@ -15,6 +15,25 @@ const APP_COPY = {
     loading: {
       title: "Loading Roadmate...",
     },
+    authComplete: {
+      eyebrow: "Verification complete",
+      title: "Your email has been confirmed.",
+      mobileBody: "Return to Roadmate on this phone to continue.",
+      desktopBody:
+        "This email is confirmed. Open Roadmate on your phone and sign in with the same email to continue.",
+      nextTitle: "Next step",
+      nextBodyMobile:
+        "Tap below to reopen Roadmate. If nothing happens, switch back to the app manually.",
+      nextBodyDesktop:
+        "Desktop browsers cannot continue inside the mobile app automatically.",
+      openApp: "Open Roadmate",
+      mobileHint:
+        "If the app does not open, return to Roadmate manually and sign in with the same email.",
+      desktopHint:
+        "After confirming on desktop, open the Roadmate app on your phone and sign in manually.",
+      errorTitle: "Authentication could not be completed.",
+      errorBody: (message: string) => `Supabase returned: ${message}`,
+    },
     config: {
       badgeCaption: "MVP Supabase hookup",
       eyebrow: "Configuration required",
@@ -292,7 +311,7 @@ const APP_COPY = {
       authenticationCouldNotBeCompleted: (message: string) =>
         `Authentication could not be completed: ${message}`,
       verificationEmailSent: (email: string) =>
-        `Verification email sent to ${email}. Tap the link in that email and Roadmate will sign you in automatically.`,
+        `Verification email sent to ${email}. Open the confirmation page from that email, then return to Roadmate and sign in.`,
       emailVerificationStillNeeded: (email: string) =>
         `This account still needs email verification. Open the email sent to ${email}, then return to Roadmate.`,
       enterEmailBeforeResendingVerification:
@@ -382,6 +401,25 @@ const APP_COPY = {
     },
     loading: {
       title: "Chargement de Roadmate...",
+    },
+    authComplete: {
+      eyebrow: "Vérification terminée",
+      title: "Votre adresse e-mail a été confirmée.",
+      mobileBody: "Revenez dans Roadmate sur ce téléphone pour continuer.",
+      desktopBody:
+        "Cet e-mail est confirmé. Ouvrez Roadmate sur votre téléphone et connectez-vous avec la même adresse pour continuer.",
+      nextTitle: "Étape suivante",
+      nextBodyMobile:
+        "Touchez ci-dessous pour rouvrir Roadmate. Si rien ne se passe, revenez manuellement dans l’app.",
+      nextBodyDesktop:
+        "Les navigateurs sur ordinateur ne peuvent pas continuer automatiquement dans l’application mobile.",
+      openApp: "Ouvrir Roadmate",
+      mobileHint:
+        "Si l’app ne s’ouvre pas, revenez manuellement dans Roadmate et connectez-vous avec la même adresse e-mail.",
+      desktopHint:
+        "Après confirmation sur ordinateur, ouvrez l’app Roadmate sur votre téléphone et connectez-vous manuellement.",
+      errorTitle: "L’authentification n’a pas pu être terminée.",
+      errorBody: (message: string) => `Supabase a renvoyé : ${message}`,
     },
     config: {
       badgeCaption: "Connexion MVP Supabase",
@@ -672,7 +710,7 @@ const APP_COPY = {
       authenticationCouldNotBeCompleted: (message: string) =>
         `L’authentification n’a pas pu être terminée : ${message}`,
       verificationEmailSent: (email: string) =>
-        `Un e-mail de vérification a été envoyé à ${email}. Touchez le lien dans cet e-mail et Roadmate vous connectera automatiquement.`,
+        `Un e-mail de vérification a été envoyé à ${email}. Ouvrez la page de confirmation depuis cet e-mail, puis revenez dans Roadmate pour vous connecter.`,
       emailVerificationStillNeeded: (email: string) =>
         `Ce compte nécessite encore une vérification par e-mail. Ouvrez l’e-mail envoyé à ${email}, puis revenez dans Roadmate.`,
       enterEmailBeforeResendingVerification:
@@ -773,6 +811,25 @@ const APP_COPY = {
     },
     loading: {
       title: "Roadmate 불러오는 중...",
+    },
+    authComplete: {
+      eyebrow: "인증 완료",
+      title: "이메일 인증이 완료되었습니다.",
+      mobileBody: "이 휴대폰에서 Roadmate로 돌아와 계속 진행하세요.",
+      desktopBody:
+        "이 이메일은 인증되었습니다. 휴대폰에서 Roadmate를 열고 같은 이메일로 로그인해 계속하세요.",
+      nextTitle: "다음 단계",
+      nextBodyMobile:
+        "아래 버튼으로 Roadmate를 다시 열어보세요. 반응이 없으면 앱으로 직접 돌아가면 됩니다.",
+      nextBodyDesktop:
+        "PC 브라우저에서는 모바일 앱 안으로 자동으로 이어서 진행할 수 없습니다.",
+      openApp: "Roadmate 열기",
+      mobileHint:
+        "앱이 열리지 않으면 Roadmate로 직접 돌아가 같은 이메일로 다시 로그인하세요.",
+      desktopHint:
+        "PC에서 인증했다면 휴대폰에서 Roadmate 앱을 열고 직접 로그인하세요.",
+      errorTitle: "인증을 완료할 수 없습니다.",
+      errorBody: (message: string) => `Supabase 응답: ${message}`,
     },
     config: {
       badgeCaption: "MVP Supabase 연결",
@@ -1044,7 +1101,7 @@ const APP_COPY = {
       emailVerifiedAndSignedIn: "이메일 인증이 완료되어 바로 로그인되었습니다.",
       authenticationCouldNotBeCompleted: (message: string) => `인증을 완료할 수 없습니다: ${message}`,
       verificationEmailSent: (email: string) =>
-        `${email}로 인증 메일을 보냈습니다. 메일의 링크를 누르면 Roadmate가 자동으로 로그인합니다.`,
+        `${email}로 인증 메일을 보냈습니다. 메일의 확인 페이지를 완료한 뒤 Roadmate로 돌아와 로그인하세요.`,
       emailVerificationStillNeeded: (email: string) =>
         `이 계정은 아직 이메일 인증이 필요합니다. ${email}로 온 메일을 열어 인증한 뒤 Roadmate로 돌아오세요.`,
       enterEmailBeforeResendingVerification:
@@ -1136,6 +1193,25 @@ const APP_COPY = {
     },
     loading: {
       title: "Roadmate を読み込み中...",
+    },
+    authComplete: {
+      eyebrow: "認証完了",
+      title: "メール認証が完了しました。",
+      mobileBody: "この端末で Roadmate に戻って続行してください。",
+      desktopBody:
+        "このメールは認証されました。スマートフォンで Roadmate を開き、同じメールアドレスでログインして続けてください。",
+      nextTitle: "次の手順",
+      nextBodyMobile:
+        "下のボタンから Roadmate を再度開いてください。反応しない場合は手動でアプリに戻ってください。",
+      nextBodyDesktop:
+        "デスクトップブラウザではモバイルアプリ内に自動で続行できません。",
+      openApp: "Roadmate を開く",
+      mobileHint:
+        "アプリが開かない場合は、手動で Roadmate に戻り、同じメールアドレスでログインしてください。",
+      desktopHint:
+        "デスクトップで認証した後は、スマートフォンで Roadmate アプリを開いて手動でログインしてください。",
+      errorTitle: "認証を完了できませんでした。",
+      errorBody: (message: string) => `Supabase の応答: ${message}`,
     },
     config: {
       badgeCaption: "MVP Supabase 接続",
@@ -1422,7 +1498,7 @@ const APP_COPY = {
       authenticationCouldNotBeCompleted: (message: string) =>
         `認証を完了できませんでした: ${message}`,
       verificationEmailSent: (email: string) =>
-        `${email} に確認メールを送りました。そのメールのリンクを開くと Roadmate が自動でログインします。`,
+        `${email} に確認メールを送りました。メール内の確認ページを完了したあと、Roadmate に戻ってログインしてください。`,
       emailVerificationStillNeeded: (email: string) =>
         `このアカウントはまだメール認証が必要です。${email} に送られたメールを開いてから Roadmate に戻ってください。`,
       enterEmailBeforeResendingVerification:
@@ -1518,6 +1594,25 @@ const APP_COPY = {
     },
     loading: {
       title: "正在加载 Roadmate...",
+    },
+    authComplete: {
+      eyebrow: "验证完成",
+      title: "你的邮箱已验证完成。",
+      mobileBody: "请回到这台手机上的 Roadmate 继续操作。",
+      desktopBody:
+        "该邮箱已完成验证。请在手机上打开 Roadmate，并使用同一个邮箱登录后继续。",
+      nextTitle: "下一步",
+      nextBodyMobile:
+        "点击下面按钮重新打开 Roadmate。如果没有反应，请手动回到应用。",
+      nextBodyDesktop:
+        "桌面浏览器无法自动继续进入移动应用。",
+      openApp: "打开 Roadmate",
+      mobileHint:
+        "如果应用没有自动打开，请手动回到 Roadmate，并使用同一个邮箱重新登录。",
+      desktopHint:
+        "如果你是在电脑上完成验证，请在手机上打开 Roadmate 应用并手动登录。",
+      errorTitle: "无法完成身份验证。",
+      errorBody: (message: string) => `Supabase 返回：${message}`,
     },
     config: {
       badgeCaption: "MVP Supabase 连接",
@@ -1790,7 +1885,7 @@ const APP_COPY = {
       emailVerifiedAndSignedIn: "邮箱已验证，现在已登录。",
       authenticationCouldNotBeCompleted: (message: string) => `无法完成身份验证：${message}`,
       verificationEmailSent: (email: string) =>
-        `验证邮件已发送到 ${email}。点击邮件中的链接后，Roadmate 会自动为你登录。`,
+        `验证邮件已发送到 ${email}。请先完成邮件中的确认页面，然后返回 Roadmate 再登录。`,
       emailVerificationStillNeeded: (email: string) =>
         `该账号仍需进行邮箱验证。请打开发送到 ${email} 的邮件，然后再返回 Roadmate。`,
       enterEmailBeforeResendingVerification: "请先输入邮箱地址，再重新发送验证邮件。",

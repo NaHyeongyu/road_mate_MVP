@@ -117,8 +117,8 @@ export function AuthEmailFormCard({
           </View>
 
           <Text style={styles.authVerificationText}>
-            Tap the confirmation link in your inbox. When that link opens Roadmate again, the app
-            will complete sign-in automatically.
+            Open the newest verification email, finish confirmation, then return to Roadmate and
+            sign in with the same email.
           </Text>
 
           <View style={styles.authVerificationSteps}>
@@ -130,16 +130,16 @@ export function AuthEmailFormCard({
             </View>
             <View style={styles.authVerificationStepRow}>
               <Text style={styles.authVerificationStepBullet}>2</Text>
-              <Text style={styles.authVerificationStepText}>
-                Tap the confirmation button on this device.
-              </Text>
-            </View>
-            <View style={styles.authVerificationStepRow}>
-              <Text style={styles.authVerificationStepBullet}>3</Text>
-              <Text style={styles.authVerificationStepText}>
-                Return here only if the email app does not reopen Roadmate.
-              </Text>
-            </View>
+                <Text style={styles.authVerificationStepText}>
+                  Complete confirmation in the browser page that opens.
+                </Text>
+              </View>
+              <View style={styles.authVerificationStepRow}>
+                <Text style={styles.authVerificationStepBullet}>3</Text>
+                <Text style={styles.authVerificationStepText}>
+                  Return to Roadmate and sign in again if the app does not reopen automatically.
+                </Text>
+              </View>
           </View>
 
           <View style={styles.authInlineActions}>

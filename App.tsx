@@ -1,9 +1,10 @@
 import { useMemo } from "react";
-import { useColorScheme, View } from "react-native";
+import { Platform, useColorScheme, View } from "react-native";
 
 import RoadmateLogoDark from "./assets/branding/logo_dark.svg";
 import RoadmateLogoLight from "./assets/branding/logo_light.svg";
 import { AppAuthExperienceScreen } from "./src/app/screens/AppAuthExperienceScreen";
+import { AppAuthCompleteScreen } from "./src/app/screens/AppAuthCompleteScreen";
 import { AppCommunityExperienceScreen } from "./src/app/screens/AppCommunityExperienceScreen";
 import { AppLanguageSelectionScreen } from "./src/app/screens/AppLanguageSelectionScreen";
 import { AppLoadingScreen } from "./src/app/screens/AppLoadingScreen";
@@ -19,11 +20,16 @@ export default function App() {
   const scheme = useColorScheme();
   const isDarkMode = scheme === "dark";
   const appState = useRoadmateAppState();
+  const isWebAuthCompleteRoute =
+    Platform.OS === "web" &&
+    typeof window !== "undefined" &&
+    window.location.pathname.replace(/\/+$/, "") === "/auth/complete";
 
   const isSupabaseReady = appState.isSupabaseConfigured && Boolean(supabase);
   const isLanguageSelectionExperience = !appState.hasCompletedLanguageSelection;
   const isAuthExperience = appState.authEntryMethod !== "options";
-  const shouldUseLightShell = isLanguageSelectionExperience || isAuthExperience;
+  const shouldUseLightShell =
+    isLanguageSelectionExperience || isAuthExperience || isWebAuthCompleteRoute;
   const colors = shouldUseLightShell
     ? brandPalette.light
     : isDarkMode
@@ -40,7 +46,9 @@ export default function App() {
   return (
     <AppI18nProvider language={appState.appLanguage} onChangeLanguage={appState.setAppLanguage}>
       <View style={{ flex: 1 }}>
-        {appState.loading || (appState.currentUserId && appState.isVehicleLoading) ? (
+        {isWebAuthCompleteRoute ? (
+          <AppAuthCompleteScreen colors={colors} styles={styles} logoSource={logoSource} />
+        ) : appState.loading || (appState.currentUserId && appState.isVehicleLoading) ? (
           <AppLoadingScreen colors={colors} styles={styles} scheme={scheme} />
         ) : isLanguageSelectionExperience ? (
           <AppLanguageSelectionScreen colors={colors} styles={styles} />
