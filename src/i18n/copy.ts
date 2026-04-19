@@ -307,6 +307,16 @@ const APP_COPY = {
       signUpAndIn: (value: string) => `Signed up and signed in as ${value}.`,
       signUpComplete: "Sign-up complete. Check your email to verify your account, then sign in.",
       authFailed: (action: string, message: string) => `${action} failed: ${message}`,
+      signInEmailNotRegistered: (email: string) =>
+        `${email} is not registered. Check the email address or create a new account first.`,
+      signInWrongPassword: (email: string) =>
+        `${email} is registered, but the password is incorrect. Try again or use password reset.`,
+      signInInvalidCredentials: (email: string) =>
+        `Could not sign in to ${email}. The email or password is incorrect.`,
+      signInRateLimited:
+        "Too many sign-in attempts were made. Wait a few minutes, then try again.",
+      signInNetworkFailed:
+        "Roadmate could not reach the auth server. Check your connection and try again.",
       emailVerifiedAndSignedIn: "Email verified. You are now signed in.",
       authenticationCouldNotBeCompleted: (message: string) =>
         `Authentication could not be completed: ${message}`,
@@ -706,6 +716,16 @@ const APP_COPY = {
       signUpComplete:
         "Inscription terminée. Vérifiez votre e-mail pour confirmer le compte, puis connectez-vous.",
       authFailed: (action: string, message: string) => `${action} a échoué : ${message}`,
+      signInEmailNotRegistered: (email: string) =>
+        `${email} n’est pas enregistré. Vérifiez l’adresse ou créez d’abord un compte.`,
+      signInWrongPassword: (email: string) =>
+        `${email} est enregistré, mais le mot de passe est incorrect. Réessayez ou utilisez la réinitialisation du mot de passe.`,
+      signInInvalidCredentials: (email: string) =>
+        `Connexion impossible à ${email}. L’e-mail ou le mot de passe est incorrect.`,
+      signInRateLimited:
+        "Trop de tentatives de connexion ont été effectuées. Attendez quelques minutes, puis réessayez.",
+      signInNetworkFailed:
+        "Roadmate ne peut pas joindre le serveur d’authentification. Vérifiez votre connexion, puis réessayez.",
       emailVerifiedAndSignedIn: "Adresse e-mail vérifiée. Vous êtes maintenant connecté.",
       authenticationCouldNotBeCompleted: (message: string) =>
         `L’authentification n’a pas pu être terminée : ${message}`,
@@ -1098,6 +1118,15 @@ const APP_COPY = {
       signUpAndIn: (value: string) => `${value} 계정으로 가입과 로그인이 완료되었습니다.`,
       signUpComplete: "회원가입이 완료되었습니다. 이메일 인증 후 로그인하세요.",
       authFailed: (action: string, message: string) => `${action} 실패: ${message}`,
+      signInEmailNotRegistered: (email: string) =>
+        `${email}은(는) 가입되지 않은 이메일입니다. 이메일 주소를 확인하거나 먼저 회원가입을 진행하세요.`,
+      signInWrongPassword: (email: string) =>
+        `${email} 계정은 존재하지만 비밀번호가 맞지 않습니다. 다시 입력하거나 비밀번호 찾기로 재설정하세요.`,
+      signInInvalidCredentials: (email: string) =>
+        `${email}로 로그인할 수 없습니다. 이메일 또는 비밀번호가 올바르지 않습니다.`,
+      signInRateLimited: "로그인 시도가 너무 많습니다. 잠시 후 다시 시도하세요.",
+      signInNetworkFailed:
+        "인증 서버에 연결하지 못했습니다. 인터넷 연결을 확인한 뒤 다시 시도하세요.",
       emailVerifiedAndSignedIn: "이메일 인증이 완료되어 바로 로그인되었습니다.",
       authenticationCouldNotBeCompleted: (message: string) => `인증을 완료할 수 없습니다: ${message}`,
       verificationEmailSent: (email: string) =>
@@ -1494,6 +1523,16 @@ const APP_COPY = {
       signUpComplete:
         "登録が完了しました。メールを確認してアカウントを認証し、その後ログインしてください。",
       authFailed: (action: string, message: string) => `${action}に失敗しました: ${message}`,
+      signInEmailNotRegistered: (email: string) =>
+        `${email} は登録されていません。メールアドレスを確認するか、先にアカウントを作成してください。`,
+      signInWrongPassword: (email: string) =>
+        `${email} のアカウントは存在しますが、パスワードが正しくありません。もう一度入力するか、パスワードを再設定してください。`,
+      signInInvalidCredentials: (email: string) =>
+        `${email} でログインできません。メールアドレスまたはパスワードが正しくありません。`,
+      signInRateLimited:
+        "ログイン試行が多すぎます。数分待ってからもう一度お試しください。",
+      signInNetworkFailed:
+        "認証サーバーに接続できませんでした。通信環境を確認してからもう一度お試しください。",
       emailVerifiedAndSignedIn: "メール認証が完了し、ログインしました。",
       authenticationCouldNotBeCompleted: (message: string) =>
         `認証を完了できませんでした: ${message}`,
@@ -1882,6 +1921,15 @@ const APP_COPY = {
       signUpAndIn: (value: string) => `已完成注册并以 ${value} 登录。`,
       signUpComplete: "注册完成。请先查看邮箱完成验证，然后再登录。",
       authFailed: (action: string, message: string) => `${action}失败：${message}`,
+      signInEmailNotRegistered: (email: string) =>
+        `${email} 尚未注册。请检查邮箱地址，或先创建账号。`,
+      signInWrongPassword: (email: string) =>
+        `${email} 已注册，但密码不正确。请重试，或使用找回密码重置。`,
+      signInInvalidCredentials: (email: string) =>
+        `无法使用 ${email} 登录。邮箱或密码不正确。`,
+      signInRateLimited: "登录尝试次数过多。请等待几分钟后再试。",
+      signInNetworkFailed:
+        "Roadmate 无法连接认证服务器。请检查网络后重试。",
       emailVerifiedAndSignedIn: "邮箱已验证，现在已登录。",
       authenticationCouldNotBeCompleted: (message: string) => `无法完成身份验证：${message}`,
       verificationEmailSent: (email: string) =>

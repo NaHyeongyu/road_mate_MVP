@@ -74,6 +74,22 @@ function isMissingEmailCheckFunctionError(message: string) {
   );
 }
 
+function isInvalidSignInCredentialsError(message: string) {
+  return /(invalid login credentials|invalid credentials|invalid grant|email.*password|password.*email|user not found)/i.test(
+    message,
+  );
+}
+
+function isAuthRateLimitError(message: string) {
+  return /(rate limit|too many|email rate limit|over.*limit|exceeded)/i.test(message);
+}
+
+function isNetworkAuthError(message: string) {
+  return /(network|fetch|failed to fetch|network request failed|connection|timeout|timed out)/i.test(
+    message,
+  );
+}
+
 export function useAuthFlow({ copy, onNotice, onResetSignedInExperience }: UseAuthFlowArgs) {
   const [authMode, setAuthMode] = useState<AuthMode>("signIn");
   const [authEntryMethod, setAuthEntryMethod] = useState<AuthEntryMethod>("options");
@@ -152,6 +168,36 @@ export function useAuthFlow({ copy, onNotice, onResetSignedInExperience }: UseAu
     }
 
     throw error;
+  };
+
+  const describeSignInFailure = async (errorMessage: string, normalizedEmail: string) => {
+    if (isAuthRateLimitError(errorMessage)) {
+      return copy.notices.signInRateLimited;
+    }
+
+    if (isNetworkAuthError(errorMessage)) {
+      return copy.notices.signInNetworkFailed;
+    }
+
+    if (!isInvalidSignInCredentialsError(errorMessage)) {
+      return copy.notices.authFailed(copy.auth.signIn, errorMessage);
+    }
+
+    try {
+      const isRegistered = await checkWhetherEmailIsRegistered(normalizedEmail);
+
+      if (isRegistered === false) {
+        return copy.notices.signInEmailNotRegistered(normalizedEmail);
+      }
+
+      if (isRegistered === true) {
+        return copy.notices.signInWrongPassword(normalizedEmail);
+      }
+    } catch {
+      // Fall back to a safe credential message if the diagnostic RPC is unavailable.
+    }
+
+    return copy.notices.signInInvalidCredentials(normalizedEmail);
   };
 
   const runEmailDuplicateCheck = async (
@@ -794,12 +840,17 @@ export function useAuthFlow({ copy, onNotice, onResetSignedInExperience }: UseAu
         return;
       }
 
+      if (authMode === "signIn") {
+        onNotice({
+          tone: "error",
+          text: await describeSignInFailure(errorMessage, normalizedEmail),
+        });
+        return;
+      }
+
       onNotice({
         tone: "error",
-        text: copy.notices.authFailed(
-          authMode === "signIn" ? copy.auth.signIn : copy.auth.signUp,
-          errorMessage
-        ),
+        text: copy.notices.authFailed(copy.auth.signUp, errorMessage),
       });
     } finally {
       setIsAuthSubmitting(false);
