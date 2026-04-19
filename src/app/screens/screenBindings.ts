@@ -43,7 +43,6 @@ export function buildAuthOptionsScreenProps({
   return {
     logoSource,
     styles,
-    notice: appState.notice,
     isSocialAuthEnabled,
     oauthProviderPending: appState.oauthProviderPending,
     onPressEmail: () => {
@@ -77,7 +76,6 @@ export function buildAuthEmailScreenProps({
     isPasswordResetSubmitting: appState.isPasswordResetSubmitting,
     emailDuplicateCheckStatus: appState.emailDuplicateCheckStatus,
     isCheckingEmailDuplicate: appState.isCheckingEmailDuplicate,
-    notice: appState.notice,
     onBack: () => {
       clearNotice(appState);
       appState.handleCloseEmailAuth();
@@ -135,7 +133,6 @@ export function buildCommunityHomeScreenProps({
   return {
     colors,
     styles,
-    notice: appState.notice,
     currentUserId: appState.currentUserId,
     currentUserName: appState.currentUserName,
     currentUserEmail: appState.currentUserEmail,

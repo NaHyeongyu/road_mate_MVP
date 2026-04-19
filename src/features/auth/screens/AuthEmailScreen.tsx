@@ -22,7 +22,6 @@ export type AuthEmailScreenProps = {
   isPasswordResetSubmitting: boolean;
   emailDuplicateCheckStatus: "idle" | "available" | "duplicate";
   isCheckingEmailDuplicate: boolean;
-  notice: { tone: "info" | "success" | "error"; text: string };
   onBack: () => void;
   onChangeAuthMode: (mode: "signIn" | "signUp") => void;
   onChangeEmail: (value: string) => void;
@@ -50,7 +49,6 @@ export function AuthEmailScreen({
   isPasswordResetSubmitting,
   emailDuplicateCheckStatus,
   isCheckingEmailDuplicate,
-  notice,
   onBack,
   onChangeAuthMode,
   onChangeEmail,

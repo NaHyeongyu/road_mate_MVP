@@ -224,6 +224,7 @@ export function useAuthFlow({ copy, onNotice, onResetSignedInExperience }: UseAu
   const runPasswordResetEmailCheck = async (
     normalizedEmail: string,
     options?: {
+      announceResult?: boolean;
       surfaceErrors?: boolean;
     },
   ): Promise<PasswordResetEmailStatus | "unknown" | "invalid"> => {
@@ -257,10 +258,22 @@ export function useAuthFlow({ copy, onNotice, onResetSignedInExperience }: UseAu
 
       if (isRegistered) {
         setPasswordResetEmailStatus("registered");
+        if (options?.announceResult ?? true) {
+          onNotice({
+            tone: "success",
+            text: copy.auth.registeredEmailConfirmed,
+          });
+        }
         return "registered";
       }
 
       setPasswordResetEmailStatus("missing");
+      if (options?.announceResult ?? true) {
+        onNotice({
+          tone: "error",
+          text: copy.auth.unregisteredEmail,
+        });
+      }
       return "missing";
     } catch (error) {
       if (options?.surfaceErrors ?? true) {
@@ -343,12 +356,12 @@ export function useAuthFlow({ copy, onNotice, onResetSignedInExperience }: UseAu
       if (callbackFlow === "recovery") {
         setAuthMode("signIn");
         setAuthEntryMethod("passwordReset");
-        setIsPasswordRecoveryMode(false);
+        setIsPasswordRecoveryMode(true);
         setPasswordResetCheckedEmail(resolvedUserEmail);
         setPasswordResetEmailStatus("registered");
         setPasswordResetSentEmail(resolvedUserEmail);
         setPasswordResetEmailCooldownSeconds(0);
-        setIsPasswordResetReadyToChange(true);
+        setIsPasswordResetReadyToChange(false);
       } else {
         setIsPasswordRecoveryMode(false);
         setAuthEntryMethod("options");
@@ -485,6 +498,7 @@ export function useAuthFlow({ copy, onNotice, onResetSignedInExperience }: UseAu
     }
 
     await runPasswordResetEmailCheck(normalizeEmail(authEmail), {
+      announceResult: true,
       surfaceErrors: true,
     });
   };
@@ -511,6 +525,7 @@ export function useAuthFlow({ copy, onNotice, onResetSignedInExperience }: UseAu
       passwordResetCheckedEmail === normalizedEmail ? passwordResetEmailStatus : "idle";
     if (checkedResetStatus !== "registered") {
       const emailCheckResult = await runPasswordResetEmailCheck(normalizedEmail, {
+        announceResult: false,
         surfaceErrors: true,
       });
 
@@ -617,7 +632,24 @@ export function useAuthFlow({ copy, onNotice, onResetSignedInExperience }: UseAu
     }
   };
 
-  const handleCloseEmailAuth = () => {
+  const handleCloseEmailAuth = async () => {
+    const shouldClearRecoverySession = isPasswordRecoveryMode || isPasswordResetReadyToChange;
+
+    if (shouldClearRecoverySession && supabase) {
+      try {
+        const { error } = await supabase.auth.signOut();
+        if (error) {
+          throw error;
+        }
+      } catch (error) {
+        onNotice({
+          tone: "error",
+          text: copy.notices.authFailed(copy.common.cancel, (error as Error).message),
+        });
+        return;
+      }
+    }
+
     setIsPasswordRecoveryMode(false);
     setAuthPassword("");
     setAuthPasswordConfirm("");

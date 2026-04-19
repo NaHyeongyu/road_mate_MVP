@@ -44,10 +44,6 @@ export function useDriverComposerSubmitState({
     onPatchDraft({ availableSeats: String(normalized) });
   };
 
-  const applyOperatingDays = (days: readonly string[]) => {
-    onPatchDraft({ operatingDays: [...days] });
-  };
-
   const hasFrom = Boolean(routeDraft.from.trim());
   const hasTo = Boolean(routeDraft.to.trim());
   const hasNoticeDate = isRouteDateValue(routeDraft.noticeDate);
@@ -93,7 +89,6 @@ export function useDriverComposerSubmitState({
   return {
     currentSeatCount,
     updateSeatCount,
-    applyOperatingDays,
     isSubmitting,
     isReadyToSave,
     remainingRequired,

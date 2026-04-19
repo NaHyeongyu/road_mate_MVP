@@ -36,7 +36,6 @@ function GoogleIcon({ disabled }: GoogleIconProps) {
 export type AuthOptionsScreenProps = {
   logoSource: unknown;
   styles: AppStyles;
-  notice: { tone: "info" | "success" | "error"; text: string };
   isSocialAuthEnabled: boolean;
   oauthProviderPending: "google" | "apple" | "facebook" | "kakao" | null;
   onPressEmail: () => void;
@@ -49,7 +48,6 @@ export type AuthOptionsScreenProps = {
 export function AuthOptionsScreen({
   logoSource,
   styles,
-  notice,
   isSocialAuthEnabled,
   oauthProviderPending,
   onPressEmail,

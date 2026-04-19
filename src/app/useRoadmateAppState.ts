@@ -359,10 +359,21 @@ export function useRoadmateAppState() {
   }, [mainTab, mode]);
 
   useEffect(() => {
-    if (isAuthenticated && authEntryMethod !== "options" && !isPasswordRecoveryMode) {
+    if (
+      isAuthenticated &&
+      authEntryMethod !== "options" &&
+      !isPasswordRecoveryMode &&
+      !isPasswordResetReadyToChange
+    ) {
       setAuthEntryMethod("options");
     }
-  }, [authEntryMethod, isAuthenticated, isPasswordRecoveryMode, setAuthEntryMethod]);
+  }, [
+    authEntryMethod,
+    isAuthenticated,
+    isPasswordRecoveryMode,
+    isPasswordResetReadyToChange,
+    setAuthEntryMethod,
+  ]);
 
   const openEmailAuthGate = useCallback(
     (reason: AccountRequiredReason) => {

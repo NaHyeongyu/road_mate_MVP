@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { KeyboardAvoidingView, Platform, ScrollView, StatusBar, View, useWindowDimensions } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import type { AppNotice } from "../../../app/types";
 import type { AppColors } from "../../../brandTheme";
 import { useAppCopy } from "../../../i18n/AppI18nContext";
 import type { RouteDraft, RouteKind, RoutePost, VehicleInfo } from "../../../model";
@@ -22,7 +21,6 @@ import { DriverRouteComposerSection } from "./sections/home/DriverRouteComposerS
 export type CommunityHomeScreenProps = {
   colors: AppColors;
   styles: AppStyles;
-  notice: AppNotice;
   currentUserId: string;
   currentUserName: string;
   currentUserEmail: string;
@@ -72,7 +70,6 @@ export type CommunityHomeScreenProps = {
 export function CommunityHomeScreen({
   colors,
   styles,
-  notice,
   currentUserId,
   currentUserName,
   currentUserEmail,
@@ -337,7 +334,6 @@ export function CommunityHomeScreen({
           <CommunityTabContent
             colors={colors}
             styles={styles}
-            notice={notice}
             currentUserId={currentUserId}
             currentUserName={currentUserName}
             currentUserEmail={currentUserEmail}

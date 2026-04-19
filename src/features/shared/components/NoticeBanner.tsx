@@ -14,7 +14,7 @@ export function NoticeBanner({ notice, styles }: NoticeBannerProps) {
   const insets = useSafeAreaInsets();
   const [activeNotice, setActiveNotice] = useState<AppNotice>(notice);
   const opacity = useRef(new Animated.Value(0)).current;
-  const translateY = useRef(new Animated.Value(24)).current;
+  const translateY = useRef(new Animated.Value(-24)).current;
 
   useEffect(() => {
     if (!notice.text) {
@@ -30,7 +30,7 @@ export function NoticeBanner({ notice, styles }: NoticeBannerProps) {
           useNativeDriver: true,
         }),
         Animated.timing(translateY, {
-          toValue: 24,
+          toValue: -24,
           duration: 180,
           easing: Easing.out(Easing.quad),
           useNativeDriver: true,
@@ -45,7 +45,7 @@ export function NoticeBanner({ notice, styles }: NoticeBannerProps) {
 
     setActiveNotice(notice);
     opacity.setValue(0);
-    translateY.setValue(24);
+    translateY.setValue(-24);
 
     Animated.parallel([
       Animated.timing(opacity, {
@@ -73,7 +73,7 @@ export function NoticeBanner({ notice, styles }: NoticeBannerProps) {
       style={[
         styles.noticeToastWrap,
         {
-          bottom: insets.bottom + 18,
+          top: insets.top + 18,
           opacity,
           transform: [{ translateY }],
         },

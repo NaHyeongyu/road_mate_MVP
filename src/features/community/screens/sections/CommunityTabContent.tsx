@@ -1,4 +1,3 @@
-import type { AppNotice } from "../../../../app/types";
 import type { AppColors } from "../../../../brandTheme";
 import type { RouteDraft, RouteKind, RoutePost, VehicleInfo } from "../../../../model";
 import type { AppStyles } from "../../../../ui/types";
@@ -10,7 +9,6 @@ import { SavedTabSection } from "./SavedTabSection";
 type CommunityTabContentProps = {
   colors: AppColors;
   styles: AppStyles;
-  notice: AppNotice;
   currentUserId: string;
   currentUserName: string;
   currentUserEmail: string;
@@ -57,7 +55,6 @@ type CommunityTabContentProps = {
 export function CommunityTabContent({
   colors,
   styles,
-  notice,
   currentUserId,
   currentUserName,
   currentUserEmail,
@@ -102,7 +99,6 @@ export function CommunityTabContent({
   const homeTabProps = {
     colors,
     styles,
-    notice,
     mode,
     filter,
     stateFilter,
@@ -139,7 +135,6 @@ export function CommunityTabContent({
     return (
       <SavedTabSection
         styles={styles}
-        notice={notice}
         isRiderMode={isRiderMode}
         savedPosts={savedPosts}
         currentUserId={currentUserId}

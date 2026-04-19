@@ -1,7 +1,6 @@
 import { useMemo, useState } from "react";
 import { Pressable, Text, View } from "react-native";
 
-import type { AppNotice } from "../../../../app/types";
 import { useAppCopy } from "../../../../i18n/AppI18nContext";
 import type { RoutePost } from "../../../../model";
 import type { AppStyles } from "../../../../ui/types";
@@ -10,7 +9,6 @@ import { getPostSaveKey } from "../../utils/storage";
 
 type SavedTabSectionProps = {
   styles: AppStyles;
-  notice: AppNotice;
   isRiderMode: boolean;
   savedPosts: RoutePost[];
   currentUserId: string;
@@ -20,7 +18,6 @@ type SavedTabSectionProps = {
 
 export function SavedTabSection({
   styles,
-  notice,
   isRiderMode,
   savedPosts,
   currentUserId,

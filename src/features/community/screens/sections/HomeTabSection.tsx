@@ -1,4 +1,3 @@
-import type { AppNotice } from "../../../../app/types";
 import type { AppColors } from "../../../../brandTheme";
 import type { RouteDraft, RouteKind, RoutePost, VehicleInfo } from "../../../../model";
 import type { AppStyles } from "../../../../ui/types";
@@ -10,7 +9,6 @@ import { RiderFeedSection } from "./home/RiderFeedSection";
 type HomeTabSectionProps = {
   colors: AppColors;
   styles: AppStyles;
-  notice: AppNotice;
   mode: Mode;
   filter: RouteKind;
   stateFilter: StateFilter;
@@ -46,7 +44,6 @@ type HomeTabSectionProps = {
 export function HomeTabSection({
   colors,
   styles,
-  notice,
   mode,
   filter,
   stateFilter,

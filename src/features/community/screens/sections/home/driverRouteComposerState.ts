@@ -18,9 +18,6 @@ type BuildRequiredChecksArgs = {
   hasContactMethod: boolean;
 };
 
-export const hasSameDays = (current: string[], target: readonly string[]) =>
-  current.length === target.length && target.every((day) => current.includes(day));
-
 export const normalizeSeatCount = (value: number, min = 1, max = 8) =>
   Math.min(max, Math.max(min, value));
 

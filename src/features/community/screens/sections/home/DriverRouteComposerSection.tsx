@@ -144,7 +144,6 @@ export function DriverRouteComposerSection({
   const {
     currentSeatCount,
     updateSeatCount,
-    applyOperatingDays,
     isSubmitting,
     isReadyToSave,
     remainingRequired,
@@ -313,13 +312,11 @@ export function DriverRouteComposerSection({
               </Text>
               <View style={styles.composerSectionFields}>
                 <RegularRouteSettingsSection
-                  colors={colors}
                   styles={styles}
                   routeDraft={routeDraft}
                   currentSeatCount={currentSeatCount}
                   onDecreaseSeats={() => updateSeatCount(currentSeatCount - 1)}
                   onIncreaseSeats={() => updateSeatCount(currentSeatCount + 1)}
-                  onApplyOperatingDays={applyOperatingDays}
                   onRouteDraftChange={onRouteDraftChange}
                   onSetVisibility={(isPublic) => updateRouteDraft({ isPublic })}
                 />
