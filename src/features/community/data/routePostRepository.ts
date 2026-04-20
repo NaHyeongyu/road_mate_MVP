@@ -358,3 +358,21 @@ export const deleteMyRoutePostsInDb = async (ownerUserId: string) => {
 
   clearRoutePostsQueryCache();
 };
+
+export const hideMyRoutePostsForAccountDeletionInDb = async (ownerUserId: string) => {
+  if (!supabase || !ownerUserId.trim()) {
+    return;
+  }
+
+  const { error } = await supabase
+    .from(ROUTE_POSTS_TABLE)
+    .update({
+      is_public: false,
+    })
+    .eq("owner_user_id", ownerUserId.trim());
+  if (error) {
+    throw error;
+  }
+
+  clearRoutePostsQueryCache();
+};

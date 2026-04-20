@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { Pressable, StatusBar, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import Svg, { Path } from "react-native-svg";
 
-import type { AppColors } from "../../brandTheme";
+import { isDarkAppColors, type AppColors } from "../../brandTheme";
 import { useAppI18n } from "../../i18n/AppI18nContext";
 import type { AppStyles } from "../../ui/types";
 
@@ -17,10 +18,11 @@ export function AppLanguageSelectionScreen({
 }: AppLanguageSelectionScreenProps) {
   const { copy, language, options, setLanguage } = useAppI18n();
   const [pendingLanguage, setPendingLanguage] = useState(language);
+  const statusBarStyle = isDarkAppColors(colors) ? "light-content" : "dark-content";
 
   return (
     <SafeAreaView style={[styles.safeArea, styles.authPage]}>
-      <StatusBar barStyle="dark-content" backgroundColor={colors.bg} translucent={false} />
+      <StatusBar barStyle={statusBarStyle} backgroundColor={colors.bg} translucent={false} />
 
       <View
         style={[
@@ -31,7 +33,7 @@ export function AppLanguageSelectionScreen({
           },
         ]}
       >
-        <View style={[styles.authCard, styles.authStandaloneCard, styles.authEntryCard]}>
+        <View style={{ width: "100%", maxWidth: 420, alignSelf: "center", gap: 14 }}>
           <View style={styles.authCardHeader}>
             <Text style={styles.authSectionEyebrow}>{copy.languageSelection.eyebrow}</Text>
             <Text style={styles.authEntryTitle}>{copy.languageSelection.title}</Text>
@@ -80,14 +82,24 @@ export function AppLanguageSelectionScreen({
 
                 <View
                   style={{
-                    width: 18,
-                    height: 18,
-                    borderRadius: 999,
-                    borderWidth: 2,
-                    borderColor: isSelected ? colors.brandText : colors.border,
-                    backgroundColor: isSelected ? colors.brandText : "transparent",
+                    width: 22,
+                    height: 22,
+                    alignItems: "center",
+                    justifyContent: "center",
                   }}
-                />
+                >
+                  {isSelected ? (
+                    <Svg width={22} height={22} viewBox="0 0 24 24" fill="none">
+                      <Path
+                        d="M5 12.4l4.2 4.2L19 6.8"
+                        stroke={colors.hero}
+                        strokeWidth={2.8}
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </Svg>
+                  ) : null}
+                </View>
               </Pressable>
             );
           })}

@@ -233,10 +233,10 @@ export const createAuthFormStyles = (colors: AppColors) =>
       marginTop: 2,
     },
     authStatusSuccessText: {
-      color: colors.success,
+      color: colors.successText,
     },
     authStatusErrorText: {
-      color: colors.error,
+      color: colors.danger,
     },
     noticeToastWrap: {
       position: "absolute",

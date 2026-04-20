@@ -3,7 +3,6 @@ import type { StyleMap } from "../styleTypes";
 import {
   AUTH_BODY_FONT_EMPHASIS,
   AUTH_DISPLAY_FONT,
-  AUTH_PAGE_BACKGROUND,
 } from "./constants";
 
 export const createAuthLayoutStyles = (colors: AppColors) =>
@@ -13,11 +12,11 @@ export const createAuthLayoutStyles = (colors: AppColors) =>
       paddingHorizontal: 18,
       paddingTop: 18,
       paddingBottom: 20,
-      backgroundColor: AUTH_PAGE_BACKGROUND,
+      backgroundColor: colors.bg,
     },
     authPageFrame: {
       flex: 1,
-      backgroundColor: AUTH_PAGE_BACKGROUND,
+      backgroundColor: colors.bg,
     },
     authPageScroll: {
       flex: 1,

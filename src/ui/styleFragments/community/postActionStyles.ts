@@ -1,7 +1,5 @@
-import { brandPalette, type AppColors } from "../../../brandTheme";
+import type { AppColors } from "../../../brandTheme";
 import type { StyleMap } from "../styleTypes";
-
-const isDarkPalette = (colors: AppColors) => colors.bg === brandPalette.dark.bg;
 
 export const createCommunityPostActionStyles = (colors: AppColors) =>
   ({
@@ -20,14 +18,14 @@ export const createCommunityPostActionStyles = (colors: AppColors) =>
       gap: 6,
       borderRadius: 10,
       borderWidth: 1,
-      borderColor: "#BFDBFE",
-      backgroundColor: "#EFF6FF",
+      borderColor: colors.accentBorder,
+      backgroundColor: colors.accentBg,
       minHeight: 44,
       paddingHorizontal: 14,
       maxWidth: "100%",
     },
     postActionInfoText: {
-      color: "#1D4ED8",
+      color: colors.accent,
       fontSize: 13,
       fontWeight: "700",
       flexShrink: 1,
@@ -40,23 +38,23 @@ export const createCommunityPostActionStyles = (colors: AppColors) =>
       borderRadius: 999,
       borderWidth: 1,
       borderColor: colors.brand,
-      backgroundColor: isDarkPalette(colors) ? "rgba(255,209,102,0.18)" : "#FFF7D6",
+      backgroundColor: colors.warningBg,
       minHeight: 44,
       paddingHorizontal: 16,
       maxWidth: "100%",
     },
     postActionSaveActive: {
-      borderColor: isDarkPalette(colors) ? "#8FA6CB" : "#93C5FD",
-      backgroundColor: isDarkPalette(colors) ? "rgba(143,166,203,0.24)" : "#DBEAFE",
+      borderColor: colors.accentSoftBorder,
+      backgroundColor: colors.accentSoftBg,
     },
     postActionSaveText: {
-      color: isDarkPalette(colors) ? "#FFE29B" : "#8A5A00",
+      color: colors.warning,
       fontSize: 13,
       fontWeight: "700",
       flexShrink: 1,
     },
     postActionSaveTextActive: {
-      color: isDarkPalette(colors) ? "#EAF2FF" : "#0D274A",
+      color: colors.text,
     },
     postActionDanger: {
       flexDirection: "row",
@@ -65,14 +63,14 @@ export const createCommunityPostActionStyles = (colors: AppColors) =>
       gap: 6,
       borderRadius: 10,
       borderWidth: 1,
-      borderColor: "#FECACA",
-      backgroundColor: "#FEF2F2",
+      borderColor: colors.dangerBorder,
+      backgroundColor: colors.dangerBg,
       minHeight: 44,
       paddingHorizontal: 14,
       maxWidth: "100%",
     },
     postActionDangerText: {
-      color: "#991B1B",
+      color: colors.danger,
       fontSize: 13,
       fontWeight: "700",
       flexShrink: 1,

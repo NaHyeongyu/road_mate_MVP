@@ -9,6 +9,7 @@ import {
 } from "../../../i18n/formatters";
 import type { RoutePost } from "../../../model";
 import type { AppStyles } from "../../../ui/types";
+import { useAppColors } from "../../../ui/useAppColors";
 import { PostCardContactRow } from "./postCard/PostCardContactRow";
 import { PostCardHeader } from "./postCard/PostCardHeader";
 import { PostCardRouteStack } from "./postCard/PostCardRouteStack";
@@ -36,6 +37,7 @@ export function RoutePostDetailPage({
   onToggleSave,
 }: RoutePostDetailPageProps) {
   const copy = useAppCopy();
+  const colors = useAppColors();
   const isRegular = post.kind === "regular";
   const shouldShowSaveAction = !isOwnedByCurrentUser && Boolean(onToggleSave);
   const seatsLabel = isRegular ? copy.community.seatsLeft(post.availableSeats) : undefined;
@@ -113,7 +115,7 @@ export function RoutePostDetailPage({
             <MaterialCommunityIcons
               name={isSaved ? "bookmark-check" : "bookmark-plus-outline"}
               size={20}
-              color={isSaved ? "#1D4ED8" : "#64748B"}
+              color={isSaved ? colors.accent : colors.mutedIcon}
             />
           </Pressable>
         ) : null}
@@ -124,7 +126,7 @@ export function RoutePostDetailPage({
 
       <View style={styles.postDriverInfoCard}>
         <View style={styles.postDriverInfoHeader}>
-          <MaterialCommunityIcons name="steering" size={16} color="#0B0F14" />
+          <MaterialCommunityIcons name="steering" size={16} color={colors.text} />
           <Text style={styles.postDriverInfoTitle}>{copy.common.driverInfo}</Text>
         </View>
 
@@ -132,7 +134,7 @@ export function RoutePostDetailPage({
           {driverInfoRows.map((item) => (
             <View key={item.label} style={styles.postDriverInfoRow}>
               <View style={styles.postDriverInfoIconSlot}>
-                <MaterialCommunityIcons name={item.iconName} size={15} color="#64748B" />
+                <MaterialCommunityIcons name={item.iconName} size={15} color={colors.mutedIcon} />
               </View>
               <Text style={styles.postDriverInfoLabel}>{item.label}</Text>
               <Text numberOfLines={1} style={styles.postDriverInfoValue}>

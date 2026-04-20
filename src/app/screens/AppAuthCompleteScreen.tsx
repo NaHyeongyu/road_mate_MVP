@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { Pressable, StatusBar, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import type { AppColors } from "../../brandTheme";
+import { isDarkAppColors, type AppColors } from "../../brandTheme";
 import { BrandLogo } from "../../features/shared/components/BrandLogo";
 import { useAppCopy } from "../../i18n/AppI18nContext";
 import type { AppStyles } from "../../ui/types";
@@ -71,6 +71,7 @@ export function AppAuthCompleteScreen({
   const isMobileBrowser = isLikelyMobileBrowser();
   const authErrorMessage = readAuthErrorMessage();
   const hasError = Boolean(authErrorMessage);
+  const statusBarStyle = isDarkAppColors(colors) ? "light-content" : "dark-content";
 
   useEffect(() => {
     if (hasError || !isMobileBrowser) {
@@ -88,7 +89,7 @@ export function AppAuthCompleteScreen({
 
   return (
     <SafeAreaView style={[styles.safeArea, styles.authPage]}>
-      <StatusBar barStyle="dark-content" backgroundColor={colors.bg} translucent={false} />
+      <StatusBar barStyle={statusBarStyle} backgroundColor={colors.bg} translucent={false} />
 
       <View
         style={[

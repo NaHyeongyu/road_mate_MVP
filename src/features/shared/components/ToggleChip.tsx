@@ -2,6 +2,7 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Pressable, Text } from "react-native";
 
 import type { AppStyles } from "../../../ui/types";
+import { useAppColors } from "../../../ui/useAppColors";
 
 type ToggleChipProps = {
   label: string;
@@ -12,6 +13,8 @@ type ToggleChipProps = {
 };
 
 export function ToggleChip({ label, active, iconName, onPress, styles }: ToggleChipProps) {
+  const colors = useAppColors();
+
   return (
     <Pressable
       style={[
@@ -31,7 +34,7 @@ export function ToggleChip({ label, active, iconName, onPress, styles }: ToggleC
         <MaterialCommunityIcons
           name={iconName}
           size={16}
-          color={active ? "#0B0F14" : "#64748B"}
+          color={active ? colors.brandText : colors.mutedIcon}
         />
       ) : null}
       <Text style={[styles.chipText, active ? styles.chipTextActive : null]}>{label}</Text>

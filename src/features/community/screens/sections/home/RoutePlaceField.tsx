@@ -69,7 +69,7 @@ export function RoutePlaceField({
         />
         {value.trim() ? (
           <Pressable style={styles.routeSearchClearButton} onPressIn={onClear}>
-            <MaterialCommunityIcons name="close-circle" size={18} color="#64748B" />
+            <MaterialCommunityIcons name="close-circle" size={18} color={colors.mutedIcon} />
           </Pressable>
         ) : null}
       </View>

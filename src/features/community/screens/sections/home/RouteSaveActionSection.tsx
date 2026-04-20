@@ -3,6 +3,7 @@ import { Pressable, Text, View } from "react-native";
 
 import { useAppCopy } from "../../../../../i18n/AppI18nContext";
 import type { AppStyles } from "../../../../../ui/types";
+import { useAppColors } from "../../../../../ui/useAppColors";
 
 type RouteSaveActionSectionProps = {
   styles: AppStyles;
@@ -24,6 +25,7 @@ export function RouteSaveActionSection({
   onPress,
 }: RouteSaveActionSectionProps) {
   const copy = useAppCopy();
+  const colors = useAppColors();
   const buttonTitle = isSubmitting
     ? isOneTimeRoute
       ? copy.community.postingOneTimeNotice
@@ -63,7 +65,7 @@ export function RouteSaveActionSection({
       >
         <View style={styles.noticeSubmitButtonMain}>
           <View style={styles.noticeSubmitButtonIconWrap}>
-            <MaterialCommunityIcons name={buttonIconName} size={18} color="#0B0F14" />
+            <MaterialCommunityIcons name={buttonIconName} size={18} color={colors.brandText} />
           </View>
           <View style={styles.noticeSubmitButtonTextWrap}>
             <Text style={styles.noticeSubmitButtonTitle}>{buttonTitle}</Text>
@@ -75,7 +77,7 @@ export function RouteSaveActionSection({
         <MaterialCommunityIcons
           name={isSubmitting ? "loading" : "chevron-right"}
           size={20}
-          color="#0B0F14"
+          color={colors.brandText}
         />
       </Pressable>
     </>

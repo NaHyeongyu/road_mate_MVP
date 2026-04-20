@@ -6,6 +6,7 @@ import { useAppCopy } from "../../../../i18n/AppI18nContext";
 import { formatLocalizedNoticeDate } from "../../../../i18n/formatters";
 import type { RoutePost } from "../../../../model";
 import type { AppStyles } from "../../../../ui/types";
+import { useAppColors } from "../../../../ui/useAppColors";
 import { openPlaceInGoogleMaps } from "./linking";
 
 type PostCardRouteStackProps = {
@@ -22,6 +23,7 @@ export function PostCardRouteStack({
   enableMapLinks = false,
 }: PostCardRouteStackProps) {
   const copy = useAppCopy();
+  const colors = useAppColors();
   const isOneTimeRoundTrip =
     !isRegular && (post.oneTimeTripType === "round_trip" || Boolean(post.returnSchedule));
   const shouldShowReturnTime = isRegular || isOneTimeRoundTrip;
@@ -54,7 +56,7 @@ export function PostCardRouteStack({
         <>
           <View style={styles.postRouteStopRow}>
             <View style={styles.postRouteLeadIconSlot}>
-              <MaterialCommunityIcons name="map-marker-outline" size={16} color="#64748B" />
+              <MaterialCommunityIcons name="map-marker-outline" size={16} color={colors.mutedIcon} />
             </View>
             <Text numberOfLines={2} style={styles.postRouteEndpointTextPrimary}>
               {post.from}
@@ -63,14 +65,14 @@ export function PostCardRouteStack({
           {!isRegular ? (
             <View style={styles.postRouteTimeRow}>
               <View style={styles.postRouteLeadIconSlot}>
-                <MaterialCommunityIcons name="calendar-month-outline" size={14} color="#64748B" />
+                <MaterialCommunityIcons name="calendar-month-outline" size={14} color={colors.mutedIcon} />
               </View>
               <Text style={styles.postRouteTimeText}>{departureDateLabel}</Text>
             </View>
           ) : null}
           <View style={styles.postRouteTimeRow}>
             <View style={styles.postRouteLeadIconSlot}>
-              <MaterialCommunityIcons name="clock-outline" size={14} color="#64748B" />
+              <MaterialCommunityIcons name="clock-outline" size={14} color={colors.mutedIcon} />
             </View>
             <Text style={styles.postRouteTimeText}>{post.schedule}</Text>
           </View>
@@ -86,7 +88,7 @@ export function PostCardRouteStack({
           ]}
         >
           <MaterialCommunityIcons
-            color={shouldShowReturnTime ? "#0B0F14" : "#64748B"}
+            color={shouldShowReturnTime ? colors.brandText : colors.mutedIcon}
             name={shouldShowReturnTime ? "swap-vertical" : "arrow-down"}
             size={16}
             style={styles.postRouteDirectionIcon}
@@ -100,7 +102,7 @@ export function PostCardRouteStack({
         <>
           <View style={styles.postRouteStopRow}>
             <View style={styles.postRouteLeadIconSlot}>
-              <MaterialCommunityIcons name="map-marker-check-outline" size={16} color="#64748B" />
+              <MaterialCommunityIcons name="map-marker-check-outline" size={16} color={colors.mutedIcon} />
             </View>
             <Text numberOfLines={2} style={styles.postRouteEndpointTextPrimary}>
               {post.to}
@@ -111,14 +113,14 @@ export function PostCardRouteStack({
               {isRegular ? null : (
                 <View style={styles.postRouteTimeRow}>
                   <View style={styles.postRouteLeadIconSlot}>
-                    <MaterialCommunityIcons name="calendar-month-outline" size={14} color="#64748B" />
+                    <MaterialCommunityIcons name="calendar-month-outline" size={14} color={colors.mutedIcon} />
                   </View>
                   <Text style={styles.postRouteTimeText}>{returnDateLabel}</Text>
                 </View>
               )}
               <View style={styles.postRouteTimeRow}>
                 <View style={styles.postRouteLeadIconSlot}>
-                  <MaterialCommunityIcons name="clock-outline" size={14} color="#64748B" />
+                  <MaterialCommunityIcons name="clock-outline" size={14} color={colors.mutedIcon} />
                 </View>
                 <Text style={styles.postRouteTimeText}>{post.returnSchedule || "--:--"}</Text>
               </View>

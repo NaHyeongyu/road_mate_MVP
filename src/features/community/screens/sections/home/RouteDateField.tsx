@@ -3,6 +3,7 @@ import { Pressable, Text, View } from "react-native";
 
 import { useAppI18n } from "../../../../../i18n/AppI18nContext";
 import type { AppStyles } from "../../../../../ui/types";
+import { useAppColors } from "../../../../../ui/useAppColors";
 import { toRouteDateDisplayLabel } from "../../../utils/routeForm";
 import { Label } from "../../../../shared/components/Label";
 
@@ -22,6 +23,7 @@ export function RouteDateField({
   onPress,
 }: RouteDateFieldProps) {
   const { copy, language } = useAppI18n();
+  const colors = useAppColors();
   const displayLabel = toRouteDateDisplayLabel(value, language);
   const hasValue = Boolean(displayLabel);
 
@@ -34,7 +36,7 @@ export function RouteDateField({
       >
         <View style={styles.pickerFieldMain}>
           <View style={styles.pickerFieldIconWrap}>
-            <MaterialCommunityIcons name="calendar-month-outline" size={18} color="#475569" />
+            <MaterialCommunityIcons name="calendar-month-outline" size={18} color={colors.mutedIcon} />
           </View>
           <View style={styles.timeFieldButtonTextWrap}>
             <Text style={[styles.timeFieldButtonValue, hasValue ? null : styles.timeFieldButtonPlaceholder]}>
@@ -48,7 +50,7 @@ export function RouteDateField({
         <MaterialCommunityIcons
           name="chevron-down"
           size={18}
-          color="#94A3B8"
+          color={colors.disabledText}
           style={styles.pickerFieldChevron}
         />
       </Pressable>

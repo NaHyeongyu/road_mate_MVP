@@ -14,9 +14,11 @@ import { useDriverRouteDraftState } from "./hooks/useDriverRouteDraftState";
 import { useSavedPostKeysCleanup } from "./hooks/useSavedPostKeysCleanup";
 import { useSessionState } from "./hooks/useSessionState";
 import { useStoredPostsState } from "./hooks/useStoredPostsState";
+import { isAppThemeMode, type AppThemeMode } from "./theme";
 
 const RIDER_SEARCH_RESULTS_PAGE_SIZE = 40;
 const APP_LANGUAGE_STORAGE_KEY = "roadmate_mvp.app_language";
+const APP_THEME_MODE_STORAGE_KEY = "roadmate_mvp.app_theme_mode";
 const SUPPORTED_APP_LANGUAGES = ["en", "fr", "ko", "ja", "zh"] as const satisfies readonly AppLanguage[];
 
 function isSupportedAppLanguage(value: string): value is AppLanguage {
@@ -71,8 +73,10 @@ export function useRoadmateAppState() {
     handleLoadError,
   } = useCommunityUiState();
   const [appLanguage, setAppLanguageState] = useState<AppLanguage>(() => getPreferredAppLanguage());
+  const [appThemeMode, setAppThemeModeState] = useState<AppThemeMode>("system");
   const [hasCompletedLanguageSelection, setHasCompletedLanguageSelection] = useState(false);
   const [isAppLanguageLoading, setIsAppLanguageLoading] = useState(true);
+  const [isAppThemeModeLoading, setIsAppThemeModeLoading] = useState(true);
   const [isRiderSearchResultsPageVisible, setIsRiderSearchResultsPageVisible] = useState(false);
   const [riderSearchResultsLimit, setRiderSearchResultsLimit] = useState(
     RIDER_SEARCH_RESULTS_PAGE_SIZE
@@ -103,10 +107,38 @@ export function useRoadmateAppState() {
     };
   }, []);
 
+  useEffect(() => {
+    let isMounted = true;
+
+    void (async () => {
+      try {
+        const storedThemeMode = await AsyncStorage.getItem(APP_THEME_MODE_STORAGE_KEY);
+        if (isMounted && storedThemeMode && isAppThemeMode(storedThemeMode)) {
+          setAppThemeModeState(storedThemeMode);
+        }
+      } catch {
+        // Keep the system default when stored preference cannot be read.
+      } finally {
+        if (isMounted) {
+          setIsAppThemeModeLoading(false);
+        }
+      }
+    })();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
   const setAppLanguage = useCallback((nextLanguage: AppLanguage) => {
     setAppLanguageState(nextLanguage);
     setHasCompletedLanguageSelection(true);
     void AsyncStorage.setItem(APP_LANGUAGE_STORAGE_KEY, nextLanguage);
+  }, []);
+
+  const setAppThemeMode = useCallback((nextThemeMode: AppThemeMode) => {
+    setAppThemeModeState(nextThemeMode);
+    void AsyncStorage.setItem(APP_THEME_MODE_STORAGE_KEY, nextThemeMode);
   }, []);
 
   const openRiderSearchResultsPage = useCallback(() => {
@@ -193,7 +225,8 @@ export function useRoadmateAppState() {
   const hasDriverContactMethod = Boolean(
     savedVehicle.contactPhone.trim() || savedVehicle.contactLink.trim()
   );
-  const loading = isAppLanguageLoading || isSessionLoading || isPostsLoading;
+  const loading =
+    isAppLanguageLoading || isAppThemeModeLoading || isSessionLoading || isPostsLoading;
   const { routeDraft, setRouteDraft } = useDriverRouteDraftState({
     mode,
     mainTab,
@@ -454,6 +487,7 @@ export function useRoadmateAppState() {
     currentUserId,
     currentUserName,
     appLanguage,
+    appThemeMode,
     hasCompletedLanguageSelection,
     isAuthenticated,
     filter,
@@ -493,6 +527,7 @@ export function useRoadmateAppState() {
     visiblePosts,
 
     setAppLanguage,
+    setAppThemeMode,
     handleModeChange: handleModeChangeWithAuth,
     openRiderSearchResultsPage,
     closeRiderSearchResultsPage,

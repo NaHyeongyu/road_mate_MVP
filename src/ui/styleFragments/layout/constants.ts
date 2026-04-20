@@ -1,9 +1,3 @@
-import { brandPalette } from "../../../brandTheme";
-
-export const AUTH_PAGE_BACKGROUND = brandPalette.light.bg;
-export const APP_BAR_BG = "#FFFFFF";
-export const APP_BAR_BORDER = "#E8EDF3";
-
 export const ROLE_TOGGLE_WIDTH = 220;
 export const ROLE_TOGGLE_HEIGHT = 44;
 export const ROLE_TOGGLE_THUMB_WIDTH = ROLE_TOGGLE_WIDTH / 2;

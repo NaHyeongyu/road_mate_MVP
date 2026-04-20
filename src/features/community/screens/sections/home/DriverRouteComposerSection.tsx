@@ -355,7 +355,7 @@ export function DriverRouteComposerSection({
             onPress={() => onRemoveRoute(activeRegisteredPost.id)}
           >
             <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
-              <MaterialCommunityIcons name="trash-can-outline" size={17} color="#991B1B" />
+              <MaterialCommunityIcons name="trash-can-outline" size={17} color={colors.danger} />
               <Text style={styles.dangerButtonText}>{copy.common.delete}</Text>
             </View>
           </Pressable>

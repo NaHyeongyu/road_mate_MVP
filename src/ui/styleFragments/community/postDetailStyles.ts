@@ -39,16 +39,16 @@ export const createCommunityPostDetailStyles = (colors: AppColors) =>
       gap: 5,
     },
     postMetaBadgePrimary: {
-      borderColor: "#BFDBFE",
-      backgroundColor: "#EFF6FF",
+      borderColor: colors.accentBorder,
+      backgroundColor: colors.accentBg,
     },
     postMetaBadgeWarning: {
-      borderColor: "#FCD34D",
-      backgroundColor: "#FFFBEB",
+      borderColor: colors.warningBorder,
+      backgroundColor: colors.warningBg,
     },
     postMetaBadgeNeutral: {
-      borderColor: "#CBD5E1",
-      backgroundColor: "#F8FAFC",
+      borderColor: colors.neutralBorder,
+      backgroundColor: colors.neutralBg,
     },
     postMetaBadgeText: {
       color: colors.subtext,
@@ -60,15 +60,15 @@ export const createCommunityPostDetailStyles = (colors: AppColors) =>
       textAlignVertical: "center",
     },
     postMetaBadgeTextPrimary: {
-      color: "#1D4ED8",
+      color: colors.accent,
       fontWeight: "800",
     },
     postMetaBadgeTextWarning: {
-      color: "#92400E",
+      color: colors.warning,
       fontWeight: "800",
     },
     postMetaBadgeTextNeutral: {
-      color: "#475569",
+      color: colors.neutralText,
       fontWeight: "700",
     },
     postWeekdayRow: {
@@ -86,15 +86,15 @@ export const createCommunityPostDetailStyles = (colors: AppColors) =>
       justifyContent: "center",
     },
     postWeekdayChipActive: {
-      borderColor: "#F59E0B",
-      backgroundColor: "#FFF7D6",
+      borderColor: colors.brand,
+      backgroundColor: colors.warningBg,
     },
     postWeekdayChipInactive: {
       borderColor: colors.border,
-      backgroundColor: "#F8FAFC",
+      backgroundColor: colors.neutralBg,
     },
     postWeekdayText: {
-      color: "#94A3B8",
+      color: colors.disabledText,
       fontSize: 10,
       lineHeight: 12,
       fontWeight: "700",
@@ -163,8 +163,8 @@ export const createCommunityPostDetailStyles = (colors: AppColors) =>
       minHeight: 44,
       borderRadius: 999,
       borderWidth: 1,
-      borderColor: "#BFDBFE",
-      backgroundColor: "#EFF6FF",
+      borderColor: colors.accentBorder,
+      backgroundColor: colors.accentBg,
       paddingHorizontal: 11,
       flexShrink: 1,
       flexDirection: "row",
@@ -172,7 +172,7 @@ export const createCommunityPostDetailStyles = (colors: AppColors) =>
       gap: 5,
     },
     postContactActionText: {
-      color: "#1D4ED8",
+      color: colors.accent,
       fontSize: 12,
       lineHeight: 16,
       fontWeight: "700",
@@ -184,7 +184,7 @@ export const createCommunityPostDetailStyles = (colors: AppColors) =>
       borderRadius: 14,
       borderWidth: 1,
       borderColor: colors.border,
-      backgroundColor: "#FFFFFF",
+      backgroundColor: colors.panel,
       paddingHorizontal: 12,
       paddingVertical: 11,
       gap: 10,

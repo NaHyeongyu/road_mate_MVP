@@ -101,7 +101,12 @@ export function AuthEmailFormCard({
       </View>
 
       {isPasswordRecoveryMode ? null : (
-        <AuthModeSwitch styles={styles} authMode={authMode} onChangeAuthMode={onChangeAuthMode} />
+        <AuthModeSwitch
+          colors={colors}
+          styles={styles}
+          authMode={authMode}
+          onChangeAuthMode={onChangeAuthMode}
+        />
       )}
 
       {hasPendingVerification && !isPasswordRecoveryMode ? (

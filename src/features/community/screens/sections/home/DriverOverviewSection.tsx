@@ -4,6 +4,7 @@ import { Pressable, Text, View } from "react-native";
 import { useAppCopy } from "../../../../../i18n/AppI18nContext";
 import type { RouteDraft, RouteKind, RoutePost, VehicleInfo } from "../../../../../model";
 import type { AppStyles } from "../../../../../ui/types";
+import { useAppColors } from "../../../../../ui/useAppColors";
 import { PostCard } from "../../../components/PostCard";
 
 type DriverOverviewSectionProps = {
@@ -44,6 +45,7 @@ export function DriverOverviewSection({
   onRouteVisibilityChange,
 }: DriverOverviewSectionProps) {
   const copy = useAppCopy();
+  const colors = useAppColors();
   const routeKindLabel = driverRouteKind === "regular" ? copy.common.regular : copy.common.oneTime;
   const isRegular = driverRouteKind === "regular";
   const notePreview = routeDraft.note.trim();
@@ -117,10 +119,10 @@ export function DriverOverviewSection({
             disabled={isQuickSettingSaving}
             onPress={() => onAdjustSeats(-1)}
           >
-            <MaterialCommunityIcons name="minus" size={18} color="#64748B" />
+            <MaterialCommunityIcons name="minus" size={18} color={colors.mutedIcon} />
           </Pressable>
           <View style={[styles.postMetaBadge, styles.postMetaBadgePrimary, styles.driverControlBadge]}>
-            <MaterialCommunityIcons name="seat-passenger" size={18} color="#1D4ED8" />
+            <MaterialCommunityIcons name="seat-passenger" size={18} color={colors.accent} />
             <Text
               style={[
                 styles.postMetaBadgeText,
@@ -141,7 +143,7 @@ export function DriverOverviewSection({
             disabled={isQuickSettingSaving}
             onPress={() => onAdjustSeats(1)}
           >
-            <MaterialCommunityIcons name="plus" size={18} color="#64748B" />
+            <MaterialCommunityIcons name="plus" size={18} color={colors.mutedIcon} />
           </Pressable>
         </View>
       </View>
@@ -162,7 +164,7 @@ export function DriverOverviewSection({
             <MaterialCommunityIcons
               name="earth"
               size={18}
-              color={routeDraft.isPublic ? "#1D4ED8" : "#64748B"}
+              color={routeDraft.isPublic ? colors.accent : colors.mutedIcon}
             />
             <Text
               style={[
@@ -187,7 +189,7 @@ export function DriverOverviewSection({
             <MaterialCommunityIcons
               name="lock-outline"
               size={18}
-              color={!routeDraft.isPublic ? "#1D4ED8" : "#64748B"}
+              color={!routeDraft.isPublic ? colors.accent : colors.mutedIcon}
             />
             <Text
               style={[
@@ -236,7 +238,7 @@ export function DriverOverviewSection({
             ]}
             onPress={onOpenRouteRegistration}
           >
-            <MaterialCommunityIcons name="plus-circle-outline" size={17} color="#0B0F14" />
+            <MaterialCommunityIcons name="plus-circle-outline" size={17} color={colors.brandText} />
             <Text style={styles.primaryButtonText}>{registerActionText}</Text>
           </Pressable>
         </View>
@@ -261,9 +263,9 @@ export function DriverOverviewSection({
               styles.primaryButton,
               {
                 marginTop: 0,
-                backgroundColor: "#FFFFFF",
+                backgroundColor: colors.panel,
                 borderWidth: 1,
-                borderColor: "#E2E8F0",
+                borderColor: colors.border,
                 flexDirection: "row",
                 alignItems: "center",
                 justifyContent: "center",
@@ -272,8 +274,10 @@ export function DriverOverviewSection({
               pressed ? styles.primaryButtonDisabled : null,
             ]}
           >
-            <MaterialCommunityIcons name="square-edit-outline" size={17} color="#0B0F14" />
-            <Text style={styles.primaryButtonText}>{copy.common.edit}</Text>
+            <MaterialCommunityIcons name="square-edit-outline" size={17} color={colors.text} />
+            <Text style={[styles.primaryButtonText, { color: colors.text }]}>
+              {copy.common.edit}
+            </Text>
           </Pressable>
         </View>
       )}
@@ -286,9 +290,9 @@ export function DriverOverviewSection({
               {
                 ...styles.primaryButton,
                 marginTop: 0,
-                backgroundColor: "#FFFFFF",
+                backgroundColor: colors.panel,
                 borderWidth: 1,
-                borderColor: "#E2E8F0",
+                borderColor: colors.border,
                 flexDirection: "row",
                 alignItems: "center",
                 justifyContent: "center",
@@ -297,8 +301,10 @@ export function DriverOverviewSection({
               pressed ? styles.primaryButtonDisabled : null,
             ]}
           >
-            <MaterialCommunityIcons name="history" size={18} color="#0B0F14" />
-            <Text style={styles.primaryButtonText}>{copy.community.viewPreviousNotices}</Text>
+            <MaterialCommunityIcons name="history" size={18} color={colors.text} />
+            <Text style={[styles.primaryButtonText, { color: colors.text }]}>
+              {copy.community.viewPreviousNotices}
+            </Text>
           </Pressable>
         </View>
       ) : null}

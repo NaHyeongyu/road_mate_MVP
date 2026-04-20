@@ -1,16 +1,18 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Pressable, Text, View } from "react-native";
 
+import type { AppColors } from "../../../../brandTheme";
 import { useAppCopy } from "../../../../i18n/AppI18nContext";
 import type { AppStyles } from "../../../../ui/types";
 
 type AuthModeSwitchProps = {
+  colors: AppColors;
   styles: AppStyles;
   authMode: "signIn" | "signUp";
   onChangeAuthMode: (mode: "signIn" | "signUp") => void;
 };
 
-export function AuthModeSwitch({ styles, authMode, onChangeAuthMode }: AuthModeSwitchProps) {
+export function AuthModeSwitch({ colors, styles, authMode, onChangeAuthMode }: AuthModeSwitchProps) {
   const copy = useAppCopy();
 
   return (
@@ -33,7 +35,7 @@ export function AuthModeSwitch({ styles, authMode, onChangeAuthMode }: AuthModeS
             <MaterialCommunityIcons
               name="login"
               size={14}
-              color={authMode === "signIn" ? "#0B0F14" : "#64748B"}
+              color={authMode === "signIn" ? colors.brandText : colors.mutedIcon}
             />
           </View>
           <Text
@@ -64,7 +66,7 @@ export function AuthModeSwitch({ styles, authMode, onChangeAuthMode }: AuthModeS
             <MaterialCommunityIcons
               name="account-plus-outline"
               size={14}
-              color={authMode === "signUp" ? "#0B0F14" : "#64748B"}
+              color={authMode === "signUp" ? colors.brandText : colors.mutedIcon}
             />
           </View>
           <Text

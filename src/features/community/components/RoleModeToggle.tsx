@@ -4,6 +4,7 @@ import { Animated, Pressable, Text, View } from "react-native";
 
 import { useAppCopy } from "../../../i18n/AppI18nContext";
 import type { AppStyles } from "../../../ui/types";
+import { useAppColors } from "../../../ui/useAppColors";
 import type { Mode } from "../types";
 
 type RoleModeToggleProps = {
@@ -13,11 +14,10 @@ type RoleModeToggleProps = {
 };
 
 const TOGGLE_TRAVEL_DISTANCE = 110;
-const ACTIVE_TINT = "#0B0F14";
-const INACTIVE_TINT = "#111827";
 
 export function RoleModeToggle({ mode, onChangeMode, styles }: RoleModeToggleProps) {
   const copy = useAppCopy();
+  const colors = useAppColors();
   const modeAnim = useRef(new Animated.Value(mode === "rider" ? 0 : 1)).current;
 
   useEffect(() => {
@@ -84,7 +84,7 @@ export function RoleModeToggle({ mode, onChangeMode, styles }: RoleModeTogglePro
           ]}
         >
           <Ionicons
-            color={isRiderActive ? ACTIVE_TINT : INACTIVE_TINT}
+            color={isRiderActive ? colors.brandText : colors.text}
             name="person"
             size={16}
           />
@@ -124,7 +124,7 @@ export function RoleModeToggle({ mode, onChangeMode, styles }: RoleModeTogglePro
             {copy.common.driver}
           </Text>
           <FontAwesome6
-            color={isDriverActive ? ACTIVE_TINT : INACTIVE_TINT}
+            color={isDriverActive ? colors.brandText : colors.text}
             name="car"
             size={15}
           />

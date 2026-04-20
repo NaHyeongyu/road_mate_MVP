@@ -17,6 +17,7 @@ import {
 } from "../../../i18n/formatters";
 import type { RoutePost } from "../../../model";
 import type { AppStyles } from "../../../ui/types";
+import { useAppColors } from "../../../ui/useAppColors";
 import { PostCardActions } from "./postCard/PostCardActions";
 import { PostCardContactRow } from "./postCard/PostCardContactRow";
 import { PostCardHeader } from "./postCard/PostCardHeader";
@@ -55,6 +56,7 @@ export function PostCard({
   onDelete,
 }: PostCardProps) {
   const copy = useAppCopy();
+  const colors = useAppColors();
   const { width } = useWindowDimensions();
   const isCompactLayout = width < 390;
   const isRegular = post.kind === "regular";
@@ -139,7 +141,7 @@ export function PostCard({
             <MaterialCommunityIcons
               name={isSaved ? "bookmark-check" : "bookmark-plus-outline"}
               size={20}
-              color={isSaved ? "#1D4ED8" : "#64748B"}
+              color={isSaved ? colors.accent : colors.mutedIcon}
             />
           </Pressable>
         ) : null}
@@ -160,7 +162,7 @@ export function PostCard({
             }}
             hitSlop={6}
           >
-            <MaterialCommunityIcons name="square-edit-outline" size={16} color="#1D4ED8" />
+            <MaterialCommunityIcons name="square-edit-outline" size={16} color={colors.accent} />
             <Text style={styles.postHeaderEditActionText}>{editLabel}</Text>
           </Pressable>
         ) : null}

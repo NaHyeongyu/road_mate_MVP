@@ -2,7 +2,6 @@ import { Platform, StatusBar } from "react-native";
 
 import type { AppColors } from "../../../brandTheme";
 import type { StyleMap } from "../styleTypes";
-import { APP_BAR_BG, APP_BAR_BORDER, AUTH_PAGE_BACKGROUND } from "./constants";
 
 export const createLayoutScreenStyles = (colors: AppColors) =>
   ({
@@ -15,7 +14,7 @@ export const createLayoutScreenStyles = (colors: AppColors) =>
       backgroundColor: colors.panelAlt,
     },
     authPage: {
-      backgroundColor: AUTH_PAGE_BACKGROUND,
+      backgroundColor: colors.bg,
     },
     content: {
       padding: 18,
@@ -26,9 +25,9 @@ export const createLayoutScreenStyles = (colors: AppColors) =>
       paddingTop: Platform.OS === "android" ? (StatusBar.currentHeight ?? 0) + 6 : 0,
       paddingHorizontal: 16,
       paddingBottom: 10,
-      backgroundColor: APP_BAR_BG,
+      backgroundColor: colors.appBarBg,
       borderBottomWidth: 1,
-      borderBottomColor: APP_BAR_BORDER,
+      borderBottomColor: colors.appBarBorder,
       shadowColor: colors.shadow,
       shadowOpacity: 0.05,
       shadowRadius: 12,

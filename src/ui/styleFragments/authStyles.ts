@@ -12,5 +12,5 @@ export const createAuthStyles = (colors: AppColors) =>
     ...createAuthProviderStyles(colors),
     ...createAuthHeroStyles(colors),
     ...createAuthFormStyles(colors),
-    ...createAuthAppBarStyles(),
+    ...createAuthAppBarStyles(colors),
   }) satisfies StyleMap;

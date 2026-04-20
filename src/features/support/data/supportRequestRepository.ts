@@ -59,3 +59,25 @@ export const createSupportRequestInDb = async ({
     throw error;
   }
 };
+
+export const fetchMySupportRequestsFromDb = async (
+  userId: string
+): Promise<SupportRequestRecord[]> => {
+  if (!supabase || !userId.trim()) {
+    return [];
+  }
+
+  const { data, error } = await supabase
+    .from("support_requests")
+    .select(
+      "id,category,status,user_id,user_email,title,message,admin_note,created_at,updated_at,resolved_at"
+    )
+    .eq("user_id", userId.trim())
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    throw error;
+  }
+
+  return data ?? [];
+};

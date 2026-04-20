@@ -1,15 +1,7 @@
+import type { AppColors } from "../../../brandTheme";
 import type { StyleMap } from "../styleTypes";
-import {
-  APP_BAR_ACTION_BG,
-  APP_BAR_ACTION_BORDER,
-  APP_BAR_ACTION_TEXT,
-  APP_BAR_GHOST_BG,
-  APP_BAR_GHOST_BORDER,
-  APP_BAR_SUBTEXT,
-  APP_BAR_TEXT,
-} from "./constants";
 
-export const createAuthAppBarStyles = () =>
+export const createAuthAppBarStyles = (colors: AppColors) =>
   ({
     appBar: {
       minHeight: 56,
@@ -41,7 +33,7 @@ export const createAuthAppBarStyles = () =>
       height: 42,
     },
     appBarTitle: {
-      color: APP_BAR_TEXT,
+      color: colors.text,
       fontSize: 18,
       fontWeight: "800",
       letterSpacing: -0.4,
@@ -49,7 +41,7 @@ export const createAuthAppBarStyles = () =>
       flexShrink: 1,
     },
     appBarSubtitle: {
-      color: APP_BAR_SUBTEXT,
+      color: colors.subtext,
       fontSize: 11,
       lineHeight: 16,
       fontWeight: "600",
@@ -67,9 +59,9 @@ export const createAuthAppBarStyles = () =>
       borderWidth: 1,
     },
     appBarActionBack: {
-      backgroundColor: APP_BAR_ACTION_BG,
-      borderColor: APP_BAR_ACTION_BORDER,
-      shadowColor: APP_BAR_ACTION_TEXT,
+      backgroundColor: colors.panel,
+      borderColor: colors.border,
+      shadowColor: colors.shadow,
       shadowOpacity: 0.04,
       shadowRadius: 4,
       shadowOffset: { width: 0, height: 1 },
@@ -78,17 +70,17 @@ export const createAuthAppBarStyles = () =>
       paddingHorizontal: 0,
     },
     appBarActionGhost: {
-      backgroundColor: APP_BAR_GHOST_BG,
-      borderColor: APP_BAR_GHOST_BORDER,
+      backgroundColor: colors.panel,
+      borderColor: colors.border,
     },
     appBarActionText: {
-      color: APP_BAR_ACTION_TEXT,
+      color: colors.text,
       fontSize: 15,
       fontWeight: "700",
       letterSpacing: -0.2,
     },
     appBarBackIcon: {
-      color: APP_BAR_ACTION_TEXT,
+      color: colors.text,
       fontSize: 24,
       lineHeight: 24,
       marginTop: -2,

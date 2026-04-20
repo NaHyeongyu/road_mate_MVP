@@ -180,9 +180,9 @@ export function MyPageTabSection({
           styles.primaryButton,
           {
             marginTop: 0,
-            backgroundColor: "#FFFFFF",
+            backgroundColor: colors.panel,
             borderWidth: 1,
-            borderColor: "#E2E8F0",
+            borderColor: colors.border,
             flexDirection: "row",
             alignItems: "center",
             justifyContent: "center",
@@ -194,9 +194,11 @@ export function MyPageTabSection({
         <MaterialCommunityIcons
           name="cog-outline"
           size={18}
-          color={colors.brandText}
+          color={colors.text}
         />
-        <Text style={styles.primaryButtonText}>{copy.common.settings}</Text>
+        <Text style={[styles.primaryButtonText, { color: colors.text }]}>
+          {copy.common.settings}
+        </Text>
       </Pressable>
     </>
   );

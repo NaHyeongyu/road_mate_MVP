@@ -1,4 +1,3 @@
-import type { ColorSchemeName } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import type { AppColors } from "../../brandTheme";
@@ -11,14 +10,12 @@ type AppCommunityExperienceScreenProps = {
   appState: RoadmateAppState;
   colors: AppColors;
   styles: AppStyles;
-  scheme: ColorSchemeName;
 };
 
 export function AppCommunityExperienceScreen({
   appState,
   colors,
   styles,
-  scheme: _scheme,
 }: AppCommunityExperienceScreenProps) {
   const communityHomeScreenProps = buildCommunityHomeScreenProps({ appState, colors, styles });
 

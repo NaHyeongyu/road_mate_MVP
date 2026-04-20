@@ -2,10 +2,10 @@ import { useEffect, useMemo, useState } from "react";
 import { KeyboardAvoidingView, Platform, ScrollView, StatusBar, View, useWindowDimensions } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import type { AppColors } from "../../../brandTheme";
+import type { AppThemeMode } from "../../../app/theme";
+import { isDarkAppColors, type AppColors } from "../../../brandTheme";
 import { useAppCopy } from "../../../i18n/AppI18nContext";
 import type { RouteDraft, RouteKind, RoutePost, VehicleInfo } from "../../../model";
-import { APP_BAR_BG } from "../../../ui/styleFragments/layout/constants";
 import type { AppStyles } from "../../../ui/types";
 import { ScreenHeader } from "../../shared/components/ScreenHeader";
 import { AnimatedEntrance } from "../../shared/components/AnimatedEntrance";
@@ -28,6 +28,7 @@ export type CommunityHomeScreenProps = {
   currentUserId: string;
   currentUserName: string;
   currentUserEmail: string;
+  appThemeMode: AppThemeMode;
   isAuthenticated: boolean;
   mainTab: MainTab;
   mode: Mode;
@@ -47,6 +48,7 @@ export type CommunityHomeScreenProps = {
   onSignOut: () => void;
   onWithdrawAccount: () => void;
   onRequestAuth: () => void;
+  onAppThemeModeChange: (mode: AppThemeMode) => void;
   onMainTabChange: (tab: MainTab) => void;
   onModeChange: (mode: Mode) => void;
   onFilterChange: (filter: RouteKind) => void;
@@ -77,6 +79,7 @@ export function CommunityHomeScreen({
   currentUserId,
   currentUserName,
   currentUserEmail,
+  appThemeMode,
   isAuthenticated,
   mainTab,
   mode,
@@ -96,6 +99,7 @@ export function CommunityHomeScreen({
   onSignOut,
   onWithdrawAccount,
   onRequestAuth,
+  onAppThemeModeChange,
   onMainTabChange,
   onModeChange,
   onFilterChange,
@@ -121,6 +125,7 @@ export function CommunityHomeScreen({
   const bottomInset = Math.max(insets.bottom, 8);
   const isCompactLayout = width < 390;
   const isRiderMode = mode === "rider";
+  const statusBarStyle = isDarkAppColors(colors) ? "light-content" : "dark-content";
   const isSearchDetailScreen =
     isRiderMode && mainTab === "home" && isRiderSearchResultsPageVisible;
   const [isSettingsPageVisible, setIsSettingsPageVisible] = useState(false);
@@ -193,7 +198,7 @@ export function CommunityHomeScreen({
   if (selectedDetailPost) {
     return (
       <View style={styles.screen}>
-        <StatusBar barStyle="dark-content" backgroundColor={APP_BAR_BG} translucent={false} />
+        <StatusBar barStyle={statusBarStyle} backgroundColor={colors.appBarBg} translucent={false} />
         <View
           style={[
             styles.headerDock,
@@ -245,7 +250,7 @@ export function CommunityHomeScreen({
   if (isDriverRegistrationPageVisible) {
     return (
       <View style={styles.screen}>
-        <StatusBar barStyle="dark-content" backgroundColor={APP_BAR_BG} translucent={false} />
+        <StatusBar barStyle={statusBarStyle} backgroundColor={colors.appBarBg} translucent={false} />
         <View
           style={[
             styles.headerDock,
@@ -311,7 +316,7 @@ export function CommunityHomeScreen({
   if (isSettingsPageVisible) {
     return (
       <View style={styles.screen}>
-        <StatusBar barStyle="dark-content" backgroundColor={APP_BAR_BG} translucent={false} />
+        <StatusBar barStyle={statusBarStyle} backgroundColor={colors.appBarBg} translucent={false} />
         <View
           style={[
             styles.headerDock,
@@ -351,9 +356,11 @@ export function CommunityHomeScreen({
                 isAuthenticated={isAuthenticated}
                 currentUserId={currentUserId}
                 currentUserEmail={currentUserEmail}
+                appThemeMode={appThemeMode}
                 onSignOut={onSignOut}
                 onWithdrawAccount={onWithdrawAccount}
                 onRequestAuth={onRequestAuth}
+                onAppThemeModeChange={onAppThemeModeChange}
               />
             </AnimatedEntrance>
           </ScrollView>
@@ -367,7 +374,7 @@ export function CommunityHomeScreen({
   if (isPreviousNoticesPageVisible) {
     return (
       <View style={styles.screen}>
-        <StatusBar barStyle="dark-content" backgroundColor={APP_BAR_BG} translucent={false} />
+        <StatusBar barStyle={statusBarStyle} backgroundColor={colors.appBarBg} translucent={false} />
         <View
           style={[
             styles.headerDock,
@@ -414,7 +421,7 @@ export function CommunityHomeScreen({
 
   return (
     <View style={styles.screen}>
-      <StatusBar barStyle="dark-content" backgroundColor={colors.panelAlt} translucent={false} />
+      <StatusBar barStyle={statusBarStyle} backgroundColor={colors.panelAlt} translucent={false} />
       {isSearchDetailScreen ? (
         <View
           style={[

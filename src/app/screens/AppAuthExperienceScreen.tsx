@@ -1,11 +1,10 @@
 import { KeyboardAvoidingView, Platform, StatusBar } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import type { AppColors } from "../../brandTheme";
+import { isDarkAppColors, type AppColors } from "../../brandTheme";
 import { AuthConfigScreen } from "../../features/auth/screens/AuthConfigScreen";
 import { AuthEmailScreen } from "../../features/auth/screens/AuthEmailScreen";
 import { AuthPasswordResetScreen } from "../../features/auth/screens/AuthPasswordResetScreen";
-import { APP_BAR_BG } from "../../ui/styleFragments/layout/constants";
 import type { AppStyles } from "../../ui/types";
 import type { RoadmateAppState } from "../useRoadmateAppState";
 import {
@@ -28,6 +27,7 @@ export function AppAuthExperienceScreen({
   logoSource,
   isSupabaseReady,
 }: AppAuthExperienceScreenProps) {
+  const statusBarStyle = isDarkAppColors(colors) ? "light-content" : "dark-content";
   const authEmailScreenProps = buildAuthEmailScreenProps({ appState, colors, styles });
   const authPasswordResetScreenProps = buildAuthPasswordResetScreenProps({
     appState,
@@ -38,7 +38,7 @@ export function AppAuthExperienceScreen({
   if (!isSupabaseReady) {
     return (
       <SafeAreaView style={[styles.safeArea, styles.authPage]}>
-        <StatusBar barStyle="dark-content" backgroundColor={APP_BAR_BG} translucent={false} />
+        <StatusBar barStyle={statusBarStyle} backgroundColor={colors.bg} translucent={false} />
         <AuthConfigScreen logoSource={logoSource} styles={styles} />
       </SafeAreaView>
     );
@@ -46,7 +46,7 @@ export function AppAuthExperienceScreen({
 
   return (
     <SafeAreaView style={[styles.safeArea, styles.authPage]}>
-      <StatusBar barStyle="dark-content" backgroundColor={APP_BAR_BG} translucent={false} />
+      <StatusBar barStyle={statusBarStyle} backgroundColor={colors.bg} translucent={false} />
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : undefined}
         style={styles.authPageFrame}

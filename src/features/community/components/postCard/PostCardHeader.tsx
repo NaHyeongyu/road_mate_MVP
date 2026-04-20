@@ -4,6 +4,7 @@ import { Text, View } from "react-native";
 import { useAppCopy } from "../../../../i18n/AppI18nContext";
 import type { RoutePost } from "../../../../model";
 import type { AppStyles } from "../../../../ui/types";
+import { useAppColors } from "../../../../ui/useAppColors";
 
 type PostCardHeaderProps = {
   post: RoutePost;
@@ -29,7 +30,8 @@ export function PostCardHeader({
   noticeCountdownTone = "unknown",
 }: PostCardHeaderProps) {
   const copy = useAppCopy();
-  const typeIconColor = isRegular ? "#0B0F14" : "#475569";
+  const colors = useAppColors();
+  const typeIconColor = isRegular ? colors.brandText : colors.neutralText;
   const isPastNotice = noticeCountdownTone === "past";
   const isUpcomingNotice = noticeCountdownTone === "upcoming";
 
@@ -57,7 +59,7 @@ export function PostCardHeader({
       </View>
       {isRegular && seatsLabel ? (
         <View style={[styles.postMetaBadge, styles.postMetaBadgePrimary]}>
-          <MaterialCommunityIcons name="seat-passenger" size={14} color="#1D4ED8" />
+          <MaterialCommunityIcons name="seat-passenger" size={14} color={colors.accent} />
           <Text style={[styles.postMetaBadgeText, styles.postMetaBadgeTextPrimary]}>{seatsLabel}</Text>
         </View>
       ) : null}
@@ -66,14 +68,14 @@ export function PostCardHeader({
           <MaterialCommunityIcons
             name={noticeTripTypeLabel === copy.tripTypes.roundTrip ? "swap-horizontal" : "arrow-right"}
             size={14}
-            color="#64748B"
+            color={colors.mutedIcon}
           />
           <Text style={styles.postMetaBadgeText}>{noticeTripTypeLabel}</Text>
         </View>
       ) : null}
       {!isRegular && noticeDateLabel ? (
         <View style={[styles.postMetaBadge, styles.postMetaBadgePrimary]}>
-          <MaterialCommunityIcons name="calendar-start-outline" size={14} color="#1D4ED8" />
+          <MaterialCommunityIcons name="calendar-start-outline" size={14} color={colors.accent} />
           <Text style={[styles.postMetaBadgeText, styles.postMetaBadgeTextPrimary]}>
             {noticeDateLabel}
           </Text>
@@ -81,7 +83,7 @@ export function PostCardHeader({
       ) : null}
       {!isRegular && returnDateLabel ? (
         <View style={[styles.postMetaBadge, styles.postMetaBadgePrimary]}>
-          <MaterialCommunityIcons name="calendar-end-outline" size={14} color="#1D4ED8" />
+          <MaterialCommunityIcons name="calendar-end-outline" size={14} color={colors.accent} />
           <Text style={[styles.postMetaBadgeText, styles.postMetaBadgeTextPrimary]}>
             {returnDateLabel}
           </Text>
@@ -101,7 +103,7 @@ export function PostCardHeader({
           <MaterialCommunityIcons
             name={isPastNotice ? "clock-alert-outline" : "calendar-check-outline"}
             size={14}
-            color={isPastNotice ? "#475569" : "#92400E"}
+            color={isPastNotice ? colors.neutralText : colors.warning}
           />
           <Text
             style={[

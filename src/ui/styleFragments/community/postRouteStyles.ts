@@ -44,8 +44,8 @@ export const createCommunityPostRouteStyles = (colors: AppColors) =>
       justifyContent: "center",
     },
     postHeaderIconActionActive: {
-      borderColor: "#93C5FD",
-      backgroundColor: "#DBEAFE",
+      borderColor: colors.accentSoftBorder,
+      backgroundColor: colors.accentSoftBg,
     },
     postHeaderIconActionPressed: {
       opacity: 0.72,
@@ -54,8 +54,8 @@ export const createCommunityPostRouteStyles = (colors: AppColors) =>
       minHeight: 44,
       borderRadius: 999,
       borderWidth: 1,
-      borderColor: "#BFDBFE",
-      backgroundColor: "#EFF6FF",
+      borderColor: colors.accentBorder,
+      backgroundColor: colors.accentBg,
       paddingHorizontal: 13,
       flexDirection: "row",
       alignItems: "center",
@@ -63,7 +63,7 @@ export const createCommunityPostRouteStyles = (colors: AppColors) =>
       gap: 6,
     },
     postHeaderEditActionText: {
-      color: "#1D4ED8",
+      color: colors.accent,
       fontSize: 13,
       fontWeight: "800",
     },
@@ -88,8 +88,8 @@ export const createCommunityPostRouteStyles = (colors: AppColors) =>
       borderColor: colors.brand,
     },
     postTypePillOneTime: {
-      backgroundColor: "#F8FAFC",
-      borderColor: "#CBD5E1",
+      backgroundColor: colors.neutralBg,
+      borderColor: colors.neutralBorder,
     },
     postTypePillText: {
       color: colors.text,
@@ -165,12 +165,12 @@ export const createCommunityPostRouteStyles = (colors: AppColors) =>
       justifyContent: "center",
     },
     postRouteDirectionChipRegular: {
-      backgroundColor: "#EEF2FF",
-      borderColor: "#C7D2FE",
+      backgroundColor: colors.accentSoftBg,
+      borderColor: colors.accentSoftBorder,
     },
     postRouteDirectionChipOneTime: {
-      backgroundColor: "#F8FAFC",
-      borderColor: "#CBD5E1",
+      backgroundColor: colors.neutralBg,
+      borderColor: colors.neutralBorder,
     },
     postRouteDirectionIcon: {
       opacity: 0.92,

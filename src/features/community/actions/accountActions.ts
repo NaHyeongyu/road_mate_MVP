@@ -1,12 +1,13 @@
 import { Alert } from "react-native";
 
-import { deleteMyRoutePostsInDb, isRoutePostRepositoryEnabled } from "../data/routePostRepository";
 import {
-  deleteMyDriverProfileInDb,
-  isDriverProfileRepositoryEnabled,
-} from "../data/driverProfileRepository";
+  hideMyRoutePostsForAccountDeletionInDb,
+  isRoutePostRepositoryEnabled,
+} from "../data/routePostRepository";
 import { supabase } from "../../../lib/supabase";
 import type { CommunityActionsContext } from "./types";
+
+const ACCOUNT_DELETION_RETENTION_DAYS = 30;
 
 type CommunityAccountActions = {
   resetSignedInExperience: () => void;
@@ -71,22 +72,26 @@ export const createCommunityAccountActions = (
           onPress: () => {
             void (async () => {
               try {
+                const deletionRequestedAt = new Date();
+                const deletionRetentionUntil = new Date(
+                  deletionRequestedAt.getTime() +
+                    ACCOUNT_DELETION_RETENTION_DAYS * 24 * 60 * 60 * 1000
+                );
                 const remainingPosts = context.storedPosts.filter(
                   (post) => post.ownerUserId !== context.currentUserId
                 );
                 await context.persistPosts(remainingPosts);
                 await context.clearCurrentUserStorage();
                 if (isRoutePostRepositoryEnabled()) {
-                  await deleteMyRoutePostsInDb(context.currentUserId);
-                }
-                if (isDriverProfileRepositoryEnabled()) {
-                  await deleteMyDriverProfileInDb(context.currentUserId);
+                  await hideMyRoutePostsForAccountDeletionInDb(context.currentUserId);
                 }
 
                 const { error: updateError } = await authClient.auth.updateUser({
                   data: {
-                    account_status: "withdrawn",
-                    withdrawn_at: new Date().toISOString(),
+                    account_status: "deletion_requested",
+                    deletion_requested_at: deletionRequestedAt.toISOString(),
+                    deletion_retention_until: deletionRetentionUntil.toISOString(),
+                    deletion_retention_days: ACCOUNT_DELETION_RETENTION_DAYS,
                   },
                 });
                 if (updateError) {

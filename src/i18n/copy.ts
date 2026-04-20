@@ -214,7 +214,7 @@ const APP_COPY = {
         "Add phone or chat link (WhatsApp/Kakao/Telegram) to make riders contact you.",
       carNoteRow: (value: string) => `Car note: ${value}`,
       accountManagementSignedIn:
-        "Sign out keeps your account. Leave community removes your public posts and driver profile, then signs you out.",
+        "Manage login info, password, support, language, and account deletion.",
       accountManagementGuest:
         "You are browsing as guest. Create an account to save rides and register as a driver.",
       guestMyPageMessage:
@@ -393,8 +393,9 @@ const APP_COPY = {
       driverRegistrationFirst:
         "Complete driver registration first: save your car model and plate.",
       signInBeforeLeaving: "Sign in before leaving the community.",
-      leaveCommunitySuccess: "Community profile cleared and signed out.",
-      leaveCommunityFailed: (message: string) => `Leave community failed: ${message}`,
+      leaveCommunitySuccess:
+        "Account deletion requested. Your data is retained for 30 days, hidden from public search, and you have been signed out.",
+      leaveCommunityFailed: (message: string) => `Account deletion request failed: ${message}`,
       signInBeforePosting: "Sign in before posting a route.",
       saveVehicleInfoFirst: "Save vehicle info first.",
       localDbSyncFailed: (message: string) => `DB sync failed. Saved only on this device. (${message})`,
@@ -432,10 +433,10 @@ const APP_COPY = {
       routeOperatingDaysRequired: "Select at least one operating day.",
     },
     alerts: {
-      leaveCommunityTitle: "Leave community?",
+      leaveCommunityTitle: "Delete account?",
       leaveCommunityBody:
-        "This removes your route posts and driver profile, marks your community access inactive, and signs you out.",
-      leaveCommunityAction: "Leave",
+        "Your account data will be retained for 30 days before permanent cleanup. Public route posts will be hidden now.",
+      leaveCommunityAction: "Request deletion",
       deleteRouteTitle: (kind: string) => `Delete ${kind}?`,
       deleteRouteBody: (kind: string) =>
         `This will remove this ${kind} registration from rider search. This cannot be undone.`,
@@ -667,7 +668,7 @@ const APP_COPY = {
         "Ajoutez un téléphone ou un lien de chat (WhatsApp/Kakao/Telegram) pour que les passagers puissent vous joindre.",
       carNoteRow: (value: string) => `Note du véhicule : ${value}`,
       accountManagementSignedIn:
-        "Se déconnecter conserve votre compte. Quitter la communauté supprime vos publications publiques et votre profil conducteur, puis vous déconnecte.",
+        "Gérez la connexion, le mot de passe, le support, la langue et la suppression du compte.",
       accountManagementGuest:
         "Vous naviguez en tant qu’invité. Créez un compte pour enregistrer des trajets et vous inscrire comme conducteur.",
       guestMyPageMessage:
@@ -861,8 +862,10 @@ const APP_COPY = {
       driverRegistrationFirst:
         "Terminez d’abord l’inscription conducteur : enregistrez le modèle et la plaque du véhicule.",
       signInBeforeLeaving: "Connectez-vous avant de quitter la communauté.",
-      leaveCommunitySuccess: "Profil communautaire effacé et déconnexion effectuée.",
-      leaveCommunityFailed: (message: string) => `Échec du départ de la communauté : ${message}`,
+      leaveCommunitySuccess:
+        "Suppression du compte demandée. Vos données sont conservées 30 jours, masquées de la recherche publique, puis vous êtes déconnecté.",
+      leaveCommunityFailed: (message: string) =>
+        `Échec de la demande de suppression du compte : ${message}`,
       signInBeforePosting: "Connectez-vous avant de publier un trajet.",
       saveVehicleInfoFirst: "Enregistrez d’abord les informations du véhicule.",
       localDbSyncFailed: (message: string) =>
@@ -906,10 +909,10 @@ const APP_COPY = {
       routeOperatingDaysRequired: "Sélectionnez au moins un jour de service.",
     },
     alerts: {
-      leaveCommunityTitle: "Quitter la communauté ?",
+      leaveCommunityTitle: "Supprimer le compte ?",
       leaveCommunityBody:
-        "Cela supprime vos publications de trajet et votre profil conducteur, marque votre accès communautaire comme inactif et vous déconnecte.",
-      leaveCommunityAction: "Quitter",
+        "Vos données de compte seront conservées 30 jours avant suppression définitive. Les trajets publics seront masqués maintenant.",
+      leaveCommunityAction: "Demander la suppression",
       deleteRouteTitle: (kind: string) => `Supprimer ${kind} ?`,
       deleteRouteBody: (kind: string) =>
         `Cette inscription ${kind} sera retirée de la recherche des passagers. Cette action est définitive.`,
@@ -1134,7 +1137,7 @@ const APP_COPY = {
         "라이더가 연락할 수 있도록 전화번호나 채팅 링크(WhatsApp/Kakao/Telegram)를 추가하세요.",
       carNoteRow: (value: string) => `차량 메모: ${value}`,
       accountManagementSignedIn:
-        "로그아웃은 계정을 유지합니다. 커뮤니티 나가기는 공개 게시물과 드라이버 프로필을 지운 뒤 로그아웃합니다.",
+        "로그인 정보, 비밀번호, 문의, 언어, 계정 삭제를 관리합니다.",
       accountManagementGuest:
         "현재 게스트로 둘러보고 있습니다. 라이드 저장과 드라이버 등록을 하려면 계정을 만드세요.",
       guestMyPageMessage:
@@ -1306,8 +1309,9 @@ const APP_COPY = {
       driverRegistrationFirst:
         "먼저 드라이버 등록을 완료하세요. 차량 모델과 번호판을 저장해야 합니다.",
       signInBeforeLeaving: "커뮤니티를 나가려면 먼저 로그인하세요.",
-      leaveCommunitySuccess: "커뮤니티 프로필이 정리되고 로그아웃되었습니다.",
-      leaveCommunityFailed: (message: string) => `커뮤니티 나가기 실패: ${message}`,
+      leaveCommunitySuccess:
+        "계정 삭제 요청이 접수되었습니다. 데이터는 30일 동안 보관되고 공개 검색에서는 숨겨지며 로그아웃됩니다.",
+      leaveCommunityFailed: (message: string) => `계정 삭제 요청 실패: ${message}`,
       signInBeforePosting: "경로를 올리기 전에 로그인하세요.",
       saveVehicleInfoFirst: "먼저 차량 정보를 저장하세요.",
       localDbSyncFailed: (message: string) =>
@@ -1346,10 +1350,10 @@ const APP_COPY = {
       routeOperatingDaysRequired: "운행 요일을 최소 1개 선택하세요.",
     },
     alerts: {
-      leaveCommunityTitle: "커뮤니티에서 나가시겠어요?",
+      leaveCommunityTitle: "계정을 삭제할까요?",
       leaveCommunityBody:
-        "공개 경로 게시물과 드라이버 프로필이 삭제되고, 커뮤니티 접근이 비활성화된 뒤 로그아웃됩니다.",
-      leaveCommunityAction: "나가기",
+        "계정 데이터는 30일 동안 보관된 뒤 영구 정리됩니다. 공개 경로 게시물은 지금 바로 숨겨집니다.",
+      leaveCommunityAction: "삭제 요청",
       deleteRouteTitle: (kind: string) => `${kind} 등록을 삭제할까요?`,
       deleteRouteBody: (kind: string) =>
         `이 ${kind} 등록은 라이더 검색에서 사라지며, 삭제 후에는 되돌릴 수 없습니다.`,
@@ -1579,7 +1583,7 @@ const APP_COPY = {
         "ライダーが連絡できるように電話番号またはチャットリンク（WhatsApp/Kakao/Telegram）を追加してください。",
       carNoteRow: (value: string) => `車両メモ: ${value}`,
       accountManagementSignedIn:
-        "ログアウトではアカウントは残ります。コミュニティを退出すると公開投稿とドライバープロフィールが削除され、その後ログアウトします。",
+        "ログイン情報、パスワード、問い合わせ、言語、アカウント削除を管理します。",
       accountManagementGuest:
         "現在はゲスト閲覧中です。ライド保存やドライバー登録をするにはアカウントを作成してください。",
       guestMyPageMessage:
@@ -1765,8 +1769,9 @@ const APP_COPY = {
       driverRegistrationFirst:
         "先にドライバー登録を完了してください。車種とナンバープレートを保存する必要があります。",
       signInBeforeLeaving: "コミュニティを退出する前にログインしてください。",
-      leaveCommunitySuccess: "コミュニティプロフィールを削除してログアウトしました。",
-      leaveCommunityFailed: (message: string) => `コミュニティ退出に失敗しました: ${message}`,
+      leaveCommunitySuccess:
+        "アカウント削除リクエストを受け付けました。データは30日間保持され、公開検索から非表示になり、ログアウトします。",
+      leaveCommunityFailed: (message: string) => `アカウント削除リクエストに失敗しました: ${message}`,
       signInBeforePosting: "ルートを投稿する前にログインしてください。",
       saveVehicleInfoFirst: "先に車両情報を保存してください。",
       localDbSyncFailed: (message: string) =>
@@ -1805,10 +1810,10 @@ const APP_COPY = {
       routeOperatingDaysRequired: "運行曜日を少なくとも 1 つ選択してください。",
     },
     alerts: {
-      leaveCommunityTitle: "コミュニティを退出しますか？",
+      leaveCommunityTitle: "アカウントを削除しますか？",
       leaveCommunityBody:
-        "ルート投稿とドライバープロフィールが削除され、コミュニティアクセスが無効になった後にログアウトします。",
-      leaveCommunityAction: "退出",
+        "アカウントデータは30日間保持された後、完全に削除されます。公開ルート投稿は今すぐ非表示になります。",
+      leaveCommunityAction: "削除をリクエスト",
       deleteRouteTitle: (kind: string) => `${kind} 登録を削除しますか？`,
       deleteRouteBody: (kind: string) =>
         `この ${kind} 登録はライダー検索から削除されます。この操作は元に戻せません。`,
@@ -2032,7 +2037,7 @@ const APP_COPY = {
         "请添加电话或聊天链接（WhatsApp/Kakao/Telegram），方便乘客联系你。",
       carNoteRow: (value: string) => `车辆备注：${value}`,
       accountManagementSignedIn:
-        "退出登录会保留账号。离开社区会删除公开帖子和司机资料，然后退出登录。",
+        "管理登录信息、密码、支持、语言和账号删除。",
       accountManagementGuest:
         "你当前以游客身份浏览。创建账号后即可保存行程并注册为司机。",
       guestMyPageMessage:
@@ -2201,8 +2206,9 @@ const APP_COPY = {
       driverRegistrationFirst:
         "请先完成司机注册：保存车型和车牌号。",
       signInBeforeLeaving: "离开社区前请先登录。",
-      leaveCommunitySuccess: "社区资料已清理并已退出登录。",
-      leaveCommunityFailed: (message: string) => `离开社区失败：${message}`,
+      leaveCommunitySuccess:
+        "账号删除请求已提交。数据将保留 30 天，并从公开搜索中隐藏，然后退出登录。",
+      leaveCommunityFailed: (message: string) => `账号删除请求失败：${message}`,
       signInBeforePosting: "发布路线前请先登录。",
       saveVehicleInfoFirst: "请先保存车辆信息。",
       localDbSyncFailed: (message: string) =>
@@ -2240,10 +2246,10 @@ const APP_COPY = {
       routeOperatingDaysRequired: "请至少选择一个运营日期。",
     },
     alerts: {
-      leaveCommunityTitle: "确定要离开社区吗？",
+      leaveCommunityTitle: "删除账号？",
       leaveCommunityBody:
-        "这会删除你的路线帖子和司机资料，将社区访问标记为停用，然后退出登录。",
-      leaveCommunityAction: "离开",
+        "账号数据将保留 30 天后永久清理。公开路线帖子会立即隐藏。",
+      leaveCommunityAction: "请求删除",
       deleteRouteTitle: (kind: string) => `删除${kind}登记？`,
       deleteRouteBody: (kind: string) =>
         `这会将该${kind}登记从乘客搜索中移除，删除后无法恢复。`,

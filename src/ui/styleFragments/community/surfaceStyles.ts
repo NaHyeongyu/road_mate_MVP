@@ -1,8 +1,6 @@
 import type { AppColors } from "../../../brandTheme";
 import type { StyleMap } from "../styleTypes";
 
-const APP_BAR_ACTION_TEXT = "#2563EB";
-
 export const createCommunitySurfaceStyles = (colors: AppColors) =>
   ({
     notice: {
@@ -362,7 +360,7 @@ export const createCommunitySurfaceStyles = (colors: AppColors) =>
       paddingHorizontal: 2,
     },
     inlineTextButtonText: {
-      color: APP_BAR_ACTION_TEXT,
+      color: colors.link,
       fontSize: 14,
       fontWeight: "700",
     },
@@ -461,12 +459,12 @@ export const createCommunitySurfaceStyles = (colors: AppColors) =>
       borderWidth: 1,
     },
     driverOverviewStatusBadgeActive: {
-      backgroundColor: "#DCFCE7",
-      borderColor: "#BBF7D0",
+      backgroundColor: colors.success,
+      borderColor: colors.successBorder,
     },
     driverOverviewStatusBadgeDraft: {
-      backgroundColor: "#FEF3C7",
-      borderColor: "#FDE68A",
+      backgroundColor: colors.warningBg,
+      borderColor: colors.warningBorder,
     },
     driverOverviewStatusBadgeIdle: {
       backgroundColor: colors.panelAlt,

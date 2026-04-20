@@ -3,6 +3,7 @@ import { Pressable, Text, View } from "react-native";
 
 import type { RoutePost } from "../../../../model";
 import type { AppStyles } from "../../../../ui/types";
+import { useAppColors } from "../../../../ui/useAppColors";
 import { toContactLinkLabel } from "../../utils/contactLink";
 import { openContactLink, openPhoneDialer } from "./linking";
 
@@ -12,6 +13,8 @@ type PostCardContactRowProps = {
 };
 
 export function PostCardContactRow({ post, styles }: PostCardContactRowProps) {
+  const colors = useAppColors();
+
   if (!post.contactPhone && !post.contactLink) {
     return null;
   }
@@ -20,7 +23,7 @@ export function PostCardContactRow({ post, styles }: PostCardContactRowProps) {
     <View style={styles.postContactRow}>
       {post.contactPhone ? (
         <Pressable style={styles.postContactAction} onPress={() => openPhoneDialer(post.contactPhone)}>
-          <MaterialCommunityIcons name="phone-outline" size={14} color="#1D4ED8" />
+          <MaterialCommunityIcons name="phone-outline" size={14} color={colors.accent} />
           <Text numberOfLines={1} style={styles.postContactActionText}>
             {post.contactPhone}
           </Text>
@@ -28,7 +31,7 @@ export function PostCardContactRow({ post, styles }: PostCardContactRowProps) {
       ) : null}
       {post.contactLink ? (
         <Pressable style={styles.postContactAction} onPress={() => openContactLink(post.contactLink)}>
-          <MaterialCommunityIcons name="chat-outline" size={14} color="#1D4ED8" />
+          <MaterialCommunityIcons name="chat-outline" size={14} color={colors.accent} />
           <Text numberOfLines={1} style={styles.postContactActionText}>
             {toContactLinkLabel(post.contactLink)}
           </Text>

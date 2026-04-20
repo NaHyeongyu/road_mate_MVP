@@ -9,6 +9,7 @@ import type { CommunityActionsContext } from "./types";
 
 const mocked = vi.hoisted(() => ({
   deleteMyRoutePostsInDb: vi.fn(),
+  hideMyRoutePostsForAccountDeletionInDb: vi.fn(),
   isRoutePostRepositoryEnabled: vi.fn(() => false),
   deleteMyDriverProfileInDb: vi.fn(),
   isDriverProfileRepositoryEnabled: vi.fn(() => false),
@@ -18,6 +19,8 @@ const mocked = vi.hoisted(() => ({
 
 vi.mock("../data/routePostRepository", () => ({
   deleteMyRoutePostsInDb: (...args: unknown[]) => mocked.deleteMyRoutePostsInDb(...args),
+  hideMyRoutePostsForAccountDeletionInDb: (...args: unknown[]) =>
+    mocked.hideMyRoutePostsForAccountDeletionInDb(...args),
   isRoutePostRepositoryEnabled: () => mocked.isRoutePostRepositoryEnabled(),
 }));
 
@@ -180,7 +183,7 @@ describe("createCommunityAccountActions", () => {
     const ctx = createContext({ storedPosts: [ownPost, otherPost] });
 
     vi.mocked(Alert.alert).mockImplementation((_, __, buttons) => {
-      const withdrawButton = buttons?.find((button) => button.text === "Leave");
+      const withdrawButton = buttons?.find((button) => button.text === "Request deletion");
       withdrawButton?.onPress?.();
     });
 
@@ -194,9 +197,16 @@ describe("createCommunityAccountActions", () => {
 
     expect(ctx.persistPostsMock).toHaveBeenCalledWith([otherPost]);
     expect(ctx.clearCurrentUserStorageMock).toHaveBeenCalledTimes(1);
-    expect(mocked.deleteMyRoutePostsInDb).toHaveBeenCalledWith("user-1");
-    expect(mocked.deleteMyDriverProfileInDb).toHaveBeenCalledWith("user-1");
+    expect(mocked.hideMyRoutePostsForAccountDeletionInDb).toHaveBeenCalledWith("user-1");
+    expect(mocked.deleteMyRoutePostsInDb).not.toHaveBeenCalled();
+    expect(mocked.deleteMyDriverProfileInDb).not.toHaveBeenCalled();
     expect(mocked.updateUser).toHaveBeenCalledTimes(1);
+    expect(mocked.updateUser).toHaveBeenCalledWith({
+      data: expect.objectContaining({
+        account_status: "deletion_requested",
+        deletion_retention_days: 30,
+      }),
+    });
     expect(mocked.signOut).toHaveBeenCalledTimes(1);
 
     expect(ctx.setModeMock).toHaveBeenCalledWith("rider");
@@ -207,7 +217,8 @@ describe("createCommunityAccountActions", () => {
 
     expect(ctx.onNoticeMock).toHaveBeenCalledWith({
       tone: "success",
-      text: "Community profile cleared and signed out.",
+      text:
+        "Account deletion requested. Your data is retained for 30 days, hidden from public search, and you have been signed out.",
     });
   });
 });
