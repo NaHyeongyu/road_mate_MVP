@@ -45,6 +45,7 @@ type CommunityTabContentProps = {
   }) => Promise<void>;
   onOpenDriverRegistrationPage: () => void;
   onOpenRouteDetailPage: (post: RoutePost) => void;
+  onOpenPreviousNoticesPage: () => void;
   onRemoveRoute: (id: string) => void;
   onToggleSavedPost: (post: RoutePost) => void;
   isRiderSearchResultsPageVisible: boolean;
@@ -88,6 +89,7 @@ export function CommunityTabContent({
   onSaveRouteQuickSettings,
   onOpenDriverRegistrationPage,
   onOpenRouteDetailPage,
+  onOpenPreviousNoticesPage,
   onRemoveRoute,
   onToggleSavedPost,
   isRiderSearchResultsPageVisible,
@@ -122,6 +124,7 @@ export function CommunityTabContent({
     onSaveRouteQuickSettings,
     onOpenDriverRegistrationPage,
     onOpenRouteDetailPage,
+    onOpenPreviousNoticesPage,
     onRemoveRoute,
     onToggleSavedPost,
     isRiderSearchResultsPageVisible,

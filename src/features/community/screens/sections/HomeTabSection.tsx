@@ -34,6 +34,7 @@ type HomeTabSectionProps = {
   }) => Promise<void>;
   onOpenDriverRegistrationPage: () => void;
   onOpenRouteDetailPage: (post: RoutePost) => void;
+  onOpenPreviousNoticesPage: () => void;
   onRemoveRoute: (id: string) => void;
   onToggleSavedPost: (post: RoutePost) => void;
   isRiderSearchResultsPageVisible: boolean;
@@ -66,6 +67,7 @@ export function HomeTabSection({
   onSaveRouteQuickSettings,
   onOpenDriverRegistrationPage,
   onOpenRouteDetailPage,
+  onOpenPreviousNoticesPage,
   onRemoveRoute,
   onToggleSavedPost,
   isRiderSearchResultsPageVisible,
@@ -88,6 +90,7 @@ export function HomeTabSection({
             onSaveRouteQuickSettings={onSaveRouteQuickSettings}
             onOpenRouteRegistrationPage={onOpenDriverRegistrationPage}
             onOpenRouteDetailPage={onOpenRouteDetailPage}
+            onOpenPreviousNoticesPage={onOpenPreviousNoticesPage}
           />
         ) : (
           <RiderFeedSection

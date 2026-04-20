@@ -18,6 +18,7 @@ type DriverHomeSectionProps = {
   }) => Promise<void>;
   onOpenRouteRegistrationPage: () => void;
   onOpenRouteDetailPage: (post: RoutePost) => void;
+  onOpenPreviousNoticesPage: () => void;
 };
 
 export function DriverHomeSection({
@@ -31,6 +32,7 @@ export function DriverHomeSection({
   onSaveRouteQuickSettings,
   onOpenRouteRegistrationPage,
   onOpenRouteDetailPage,
+  onOpenPreviousNoticesPage,
 }: DriverHomeSectionProps) {
   const overviewState = useDriverHomeOverviewState({
     driverRouteKind,
@@ -48,6 +50,7 @@ export function DriverHomeSection({
       driverRouteKind={driverRouteKind}
       savedVehicle={savedVehicle}
       onOpenRouteDetailPage={onOpenRouteDetailPage}
+      onOpenPreviousNoticesPage={onOpenPreviousNoticesPage}
       {...overviewState}
     />
   );

@@ -37,21 +37,6 @@ export function useDriverHomeOverviewState({
 }: UseDriverHomeOverviewStateOptions) {
   const copy = useAppCopy();
   const [isQuickSettingSaving, setIsQuickSettingSaving] = useState(false);
-  const [isPreviousNoticesVisible, setIsPreviousNoticesVisible] = useState(false);
-  const [previousNoticesPeriod, setPreviousNoticesPeriod] = useState<PreviousNoticesPeriod>("all");
-
-  const toNoticeTimestamp = (post: RoutePost) => {
-    const noticeDate = String(post.noticeDate ?? "").trim();
-    if (noticeDate) {
-      const noticeTimestamp = Date.parse(`${noticeDate}T00:00:00`);
-      if (Number.isFinite(noticeTimestamp)) {
-        return noticeTimestamp;
-      }
-    }
-
-    const createdAt = Date.parse(post.createdAt);
-    return Number.isFinite(createdAt) ? createdAt : 0;
-  };
 
   const hasDraftInput = hasRouteDraftInput(routeDraft);
   const isDraftReady = isRouteDraftReady(routeDraft, hasDriverContactMethod);
@@ -85,16 +70,6 @@ export function useDriverHomeOverviewState({
         : [],
     [driverRouteKind, myPostsForActiveKind]
   );
-  const filteredPreviousOneTimePosts = useMemo(() => {
-    if (previousNoticesPeriod === "all") {
-      return previousOneTimePosts;
-    }
-
-    const days = previousNoticesPeriod === "30d" ? 30 : previousNoticesPeriod === "90d" ? 90 : 365;
-    const threshold = Date.now() - days * 24 * 60 * 60 * 1000;
-
-    return previousOneTimePosts.filter((post) => toNoticeTimestamp(post) >= threshold);
-  }, [previousNoticesPeriod, previousOneTimePosts]);
   const hasPublishedRoute = Boolean(activePublishedPost);
 
   const activeRouteDraft =
@@ -186,17 +161,10 @@ export function useDriverHomeOverviewState({
     isDraftReady,
     missingRequiredLabels,
     isQuickSettingSaving,
-    previousOneTimePosts: filteredPreviousOneTimePosts,
-    previousOneTimeCount: previousOneTimePosts.length,
     hasPreviousOneTimePosts: previousOneTimePosts.length > 0,
-    isPreviousNoticesVisible,
-    previousNoticesPeriod,
     routeDraft: activeRouteDraft,
     onOpenRouteRegistration: handleOpenRouteRegistration,
     onAdjustSeats: handleAdjustSeats,
     onRouteVisibilityChange: handleRouteVisibilityChange,
-    onTogglePreviousNoticesVisibility: () =>
-      setIsPreviousNoticesVisible((current) => !current),
-    onPreviousNoticesPeriodChange: setPreviousNoticesPeriod,
   };
 }

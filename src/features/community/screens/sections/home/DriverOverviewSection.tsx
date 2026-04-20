@@ -5,7 +5,6 @@ import { useAppCopy } from "../../../../../i18n/AppI18nContext";
 import type { RouteDraft, RouteKind, RoutePost, VehicleInfo } from "../../../../../model";
 import type { AppStyles } from "../../../../../ui/types";
 import { PostCard } from "../../../components/PostCard";
-import type { PreviousNoticesPeriod } from "./useDriverHomeOverviewState";
 
 type DriverOverviewSectionProps = {
   styles: AppStyles;
@@ -16,19 +15,14 @@ type DriverOverviewSectionProps = {
   isDraftReady: boolean;
   missingRequiredLabels: string[];
   isQuickSettingSaving: boolean;
-  previousOneTimePosts: RoutePost[];
-  previousOneTimeCount: number;
   hasPreviousOneTimePosts: boolean;
-  isPreviousNoticesVisible: boolean;
-  previousNoticesPeriod: PreviousNoticesPeriod;
   routeDraft: RouteDraft;
   savedVehicle: VehicleInfo;
   onOpenRouteRegistration: () => void;
   onOpenRouteDetailPage: (post: RoutePost) => void;
+  onOpenPreviousNoticesPage: () => void;
   onAdjustSeats: (delta: number) => void;
   onRouteVisibilityChange: (isPublic: boolean) => void;
-  onTogglePreviousNoticesVisibility: () => void;
-  onPreviousNoticesPeriodChange: (period: PreviousNoticesPeriod) => void;
 };
 
 export function DriverOverviewSection({
@@ -40,19 +34,14 @@ export function DriverOverviewSection({
   isDraftReady,
   missingRequiredLabels,
   isQuickSettingSaving,
-  previousOneTimePosts,
-  previousOneTimeCount,
   hasPreviousOneTimePosts,
-  isPreviousNoticesVisible,
-  previousNoticesPeriod,
   routeDraft,
   savedVehicle,
   onOpenRouteRegistration,
   onOpenRouteDetailPage,
+  onOpenPreviousNoticesPage,
   onAdjustSeats,
   onRouteVisibilityChange,
-  onTogglePreviousNoticesVisibility,
-  onPreviousNoticesPeriodChange,
 }: DriverOverviewSectionProps) {
   const copy = useAppCopy();
   const routeKindLabel = driverRouteKind === "regular" ? copy.common.regular : copy.common.oneTime;
@@ -225,13 +214,6 @@ export function DriverOverviewSection({
       ) : null}
     </>
   );
-  const previousPeriodOptions: Array<{ value: PreviousNoticesPeriod; label: string }> = [
-    { value: "all", label: copy.community.previousNoticesAll },
-    { value: "30d", label: copy.community.previousNotices30Days },
-    { value: "90d", label: copy.community.previousNotices90Days },
-    { value: "365d", label: copy.community.previousNotices365Days },
-  ];
-
   return (
     <>
       {!hasRouteRegistration ? (
@@ -297,9 +279,9 @@ export function DriverOverviewSection({
       )}
 
       {driverRouteKind === "one_time" && hasPreviousOneTimePosts ? (
-        <View style={{ gap: 12, marginTop: 8 }}>
+        <View style={{ marginTop: 8 }}>
           <Pressable
-            onPress={onTogglePreviousNoticesVisibility}
+            onPress={onOpenPreviousNoticesPage}
             style={({ pressed }) => [
               {
                 ...styles.primaryButton,
@@ -316,60 +298,8 @@ export function DriverOverviewSection({
             ]}
           >
             <MaterialCommunityIcons name="history" size={18} color="#0B0F14" />
-            <Text style={styles.primaryButtonText}>
-              {isPreviousNoticesVisible
-                ? copy.community.hidePreviousNotices
-                : copy.community.viewPreviousNotices}
-            </Text>
+            <Text style={styles.primaryButtonText}>{copy.community.viewPreviousNotices}</Text>
           </Pressable>
-
-          {isPreviousNoticesVisible ? (
-            <View style={{ gap: 12 }}>
-              <View>
-                <Text style={styles.cardTitle}>{copy.community.previousNotices}</Text>
-                <Text style={styles.cardBody}>{copy.community.previousNoticesDescription}</Text>
-              </View>
-
-              <View style={styles.row}>
-                {previousPeriodOptions.map((option) => (
-                  <Pressable
-                    key={option.value}
-                    style={[
-                      styles.chip,
-                      previousNoticesPeriod === option.value ? styles.chipActive : null,
-                    ]}
-                    onPress={() => onPreviousNoticesPeriodChange(option.value)}
-                  >
-                    <Text
-                      style={[
-                        styles.chipText,
-                        previousNoticesPeriod === option.value ? styles.chipTextActive : null,
-                      ]}
-                    >
-                      {option.label}
-                    </Text>
-                  </Pressable>
-                ))}
-              </View>
-
-              {previousOneTimePosts.length ? (
-                <View style={{ gap: 12 }}>
-                  {previousOneTimePosts.map((post) => (
-                    <PostCard
-                      key={post.id}
-                      post={post}
-                      styles={styles}
-                      onViewDetails={() => onOpenRouteDetailPage(post)}
-                    />
-                  ))}
-                </View>
-              ) : (
-                <View style={styles.card}>
-                  <Text style={styles.cardBody}>{copy.community.noPreviousNoticesInRange}</Text>
-                </View>
-              )}
-            </View>
-          ) : null}
         </View>
       ) : null}
     </>

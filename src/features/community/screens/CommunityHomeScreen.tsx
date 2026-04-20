@@ -19,6 +19,8 @@ import { CommunityBottomBar } from "./sections/CommunityBottomBar";
 import { CommunityTabContent } from "./sections/CommunityTabContent";
 import { SettingsTabSection } from "./sections/SettingsTabSection";
 import { DriverRouteComposerSection } from "./sections/home/DriverRouteComposerSection";
+import { PreviousNoticesPage } from "./sections/home/PreviousNoticesPage";
+import type { PreviousNoticesPeriod } from "./sections/home/useDriverHomeOverviewState";
 
 export type CommunityHomeScreenProps = {
   colors: AppColors;
@@ -122,6 +124,9 @@ export function CommunityHomeScreen({
   const isSearchDetailScreen =
     isRiderMode && mainTab === "home" && isRiderSearchResultsPageVisible;
   const [isSettingsPageVisible, setIsSettingsPageVisible] = useState(false);
+  const [isPreviousNoticesPageVisible, setIsPreviousNoticesPageVisible] = useState(false);
+  const [previousNoticesPeriod, setPreviousNoticesPeriod] =
+    useState<PreviousNoticesPeriod>("all");
   const [selectedDetailPostSnapshot, setSelectedDetailPostSnapshot] = useState<RoutePost | null>(null);
   const scrollContentStyle = [
     styles.screenContent,
@@ -178,6 +183,12 @@ export function CommunityHomeScreen({
       setIsSettingsPageVisible(false);
     }
   }, [mainTab]);
+
+  useEffect(() => {
+    if (mode !== "driver" || mainTab !== "saved") {
+      setIsPreviousNoticesPageVisible(false);
+    }
+  }, [mainTab, mode]);
 
   if (selectedDetailPost) {
     return (
@@ -353,6 +364,54 @@ export function CommunityHomeScreen({
     );
   }
 
+  if (isPreviousNoticesPageVisible) {
+    return (
+      <View style={styles.screen}>
+        <StatusBar barStyle="dark-content" backgroundColor={APP_BAR_BG} translucent={false} />
+        <View
+          style={[
+            styles.headerDock,
+            {
+              paddingTop: insets.top + 6,
+            },
+            isCompactLayout
+              ? {
+                  paddingHorizontal: 14,
+                }
+              : null,
+          ]}
+        >
+          <ScreenHeader
+            title={copy.community.previousNotices}
+            leftActionType="back"
+            leftActionLabel={copy.common.back}
+            onLeftActionPress={() => setIsPreviousNoticesPageVisible(false)}
+            styles={styles}
+          />
+        </View>
+
+        <ScrollView
+          style={styles.screenScroll}
+          contentContainerStyle={scrollContentStyle}
+          keyboardShouldPersistTaps="always"
+          keyboardDismissMode="on-drag"
+        >
+          <AnimatedEntrance delay={90} resetKey={`previous-notices-${previousNoticesPeriod}`}>
+            <PreviousNoticesPage
+              styles={styles}
+              posts={myPosts}
+              period={previousNoticesPeriod}
+              onPeriodChange={setPreviousNoticesPeriod}
+              onOpenRouteDetailPage={setSelectedDetailPostSnapshot}
+            />
+          </AnimatedEntrance>
+        </ScrollView>
+
+        <BottomBannerAd bottomInset={bottomInset} />
+      </View>
+    );
+  }
+
   return (
     <View style={styles.screen}>
       <StatusBar barStyle="dark-content" backgroundColor={colors.panelAlt} translucent={false} />
@@ -441,6 +500,7 @@ export function CommunityHomeScreen({
             onSaveRouteQuickSettings={onSaveRouteQuickSettings}
             onOpenDriverRegistrationPage={openDriverRegistrationPage}
             onOpenRouteDetailPage={setSelectedDetailPostSnapshot}
+            onOpenPreviousNoticesPage={() => setIsPreviousNoticesPageVisible(true)}
             onRemoveRoute={onRemoveRoute}
             onToggleSavedPost={onToggleSavedPost}
             isRiderSearchResultsPageVisible={isRiderSearchResultsPageVisible}
