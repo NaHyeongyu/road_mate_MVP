@@ -30,7 +30,7 @@ export function InlinePickerCard({
             <Text style={styles.timePickerInlineActionText}>{copy.common.cancel}</Text>
           </Pressable>
           <Pressable style={styles.timePickerInlineActionButton} onPress={onConfirm}>
-            <Text style={styles.timePickerInlineActionText}>Done</Text>
+            <Text style={styles.timePickerInlineActionText}>{copy.common.done}</Text>
           </Pressable>
         </View>
       </View>

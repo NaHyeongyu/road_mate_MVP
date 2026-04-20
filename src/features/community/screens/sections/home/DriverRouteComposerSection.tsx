@@ -1,10 +1,11 @@
 import { useEffect, useRef } from "react";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import { Platform, Text, TextInput, View } from "react-native";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { Platform, Pressable, Text, TextInput, View } from "react-native";
 
 import type { AppColors } from "../../../../../brandTheme";
 import { useAppCopy } from "../../../../../i18n/AppI18nContext";
-import type { OneTimeTripType, RouteDraft, RouteKind, VehicleInfo } from "../../../../../model";
+import type { OneTimeTripType, RouteDraft, RouteKind, RoutePost, VehicleInfo } from "../../../../../model";
 import type { AppStyles } from "../../../../../ui/types";
 import {
   toDateFromRouteDate,
@@ -26,6 +27,7 @@ type DriverRouteComposerSectionProps = {
   colors: AppColors;
   styles: AppStyles;
   activeRouteKind: RouteKind;
+  activeRegisteredPost: RoutePost | null;
   routeDraft: RouteDraft;
   hasVehicle: boolean;
   showVehicleSetup: boolean;
@@ -35,16 +37,19 @@ type DriverRouteComposerSectionProps = {
   onSaveVehicle: () => void;
   onRouteDraftChange: (draft: RouteDraft) => void;
   onPostRoute: () => Promise<boolean>;
+  onRemoveRoute: (id: string) => void;
 };
 
 const MIN_SEATS = 1;
 const MAX_SEATS = 8;
 const COMPOSER_SECTION_GAP = 18;
+const NOTE_MAX_LENGTH = 500;
 
 export function DriverRouteComposerSection({
   colors,
   styles,
   activeRouteKind,
+  activeRegisteredPost,
   routeDraft,
   hasVehicle,
   showVehicleSetup,
@@ -54,6 +59,7 @@ export function DriverRouteComposerSection({
   onSaveVehicle,
   onRouteDraftChange,
   onPostRoute,
+  onRemoveRoute,
 }: DriverRouteComposerSectionProps) {
   const copy = useAppCopy();
   const isOneTimeRoute = activeRouteKind === "one_time";
@@ -219,7 +225,11 @@ export function DriverRouteComposerSection({
     Platform.OS === "ios" && activeTimeField ? (
       <InlinePickerCard
         styles={styles}
-        title={activeTimeField === "schedule" ? "Select departure time" : "Select return time"}
+        title={
+          activeTimeField === "schedule"
+            ? copy.common.selectDepartureTime
+            : copy.common.selectReturnTime
+        }
         onCancel={closeTimePicker}
         onConfirm={handleConfirmIosTime}
       >
@@ -233,7 +243,11 @@ export function DriverRouteComposerSection({
     ) : Platform.OS === "ios" && isDatePickerOpen ? (
       <InlinePickerCard
         styles={styles}
-        title={activeDateField === "noticeDate" ? "Select departure date" : "Select return date"}
+        title={
+          activeDateField === "noticeDate"
+            ? copy.common.selectDepartureDate
+            : copy.common.selectReturnDate
+        }
         onCancel={closeDatePicker}
         onConfirm={handleConfirmIosDate}
       >
@@ -253,13 +267,14 @@ export function DriverRouteComposerSection({
       label={copy.common.additionalDetails}
       optional
       value={routeDraft.note}
-      onChangeText={(value) => updateRouteDraft({ note: value })}
+      onChangeText={(value) => updateRouteDraft({ note: value.slice(0, NOTE_MAX_LENGTH) })}
       placeholder={
         isOneTimeRoute
           ? "Write additional details for this one-time notice"
           : "Write additional details for this regular registration"
       }
       multiline
+      maxLength={NOTE_MAX_LENGTH}
     />
   );
 
@@ -333,6 +348,18 @@ export function DriverRouteComposerSection({
         <View>
           {saveAction}
         </View>
+
+        {activeRegisteredPost ? (
+          <Pressable
+            style={styles.dangerButton}
+            onPress={() => onRemoveRoute(activeRegisteredPost.id)}
+          >
+            <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
+              <MaterialCommunityIcons name="trash-can-outline" size={17} color="#991B1B" />
+              <Text style={styles.dangerButtonText}>{copy.common.delete}</Text>
+            </View>
+          </Pressable>
+        ) : null}
       </View>
 
       {Platform.OS === "android" && activeTimeField ? (

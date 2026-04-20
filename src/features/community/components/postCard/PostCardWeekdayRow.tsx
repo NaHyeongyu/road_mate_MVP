@@ -22,7 +22,10 @@ export function PostCardWeekdayRow({ post, styles }: PostCardWeekdayRowProps) {
         return (
           <View
             key={`${post.id}-${day}`}
-            style={[styles.postWeekdayChip, active ? styles.postWeekdayChipActive : null]}
+            style={[
+              styles.postWeekdayChip,
+              active ? styles.postWeekdayChipActive : styles.postWeekdayChipInactive,
+            ]}
           >
             <Text style={[styles.postWeekdayText, active ? styles.postWeekdayTextActive : null]}>
               {copy.weekdays[day]}

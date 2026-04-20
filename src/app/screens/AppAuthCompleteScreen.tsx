@@ -8,6 +8,7 @@ import { useAppCopy } from "../../i18n/AppI18nContext";
 import type { AppStyles } from "../../ui/types";
 
 const ROADMATE_APP_URL = "roadmate://";
+const ROADMATE_AUTH_CALLBACK_URL = "roadmate://auth/callback";
 
 function isLikelyMobileBrowser() {
   if (typeof navigator === "undefined") {
@@ -34,12 +35,25 @@ function readAuthErrorMessage() {
   );
 }
 
+function buildRoadmateOpenUrl() {
+  if (typeof window === "undefined") {
+    return ROADMATE_APP_URL;
+  }
+
+  const { search, hash } = window.location;
+  if (!search && !hash) {
+    return ROADMATE_APP_URL;
+  }
+
+  return `${ROADMATE_AUTH_CALLBACK_URL}${search}${hash}`;
+}
+
 function openRoadmateApp() {
   if (typeof window === "undefined") {
     return;
   }
 
-  window.location.assign(ROADMATE_APP_URL);
+  window.location.assign(buildRoadmateOpenUrl());
 }
 
 type AppAuthCompleteScreenProps = {

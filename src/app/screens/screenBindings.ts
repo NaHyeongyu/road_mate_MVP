@@ -1,17 +1,9 @@
 import type { AppColors } from "../../brandTheme";
-import { isSocialAuthEnabled } from "../../features/auth/config";
 import type { AuthEmailScreenProps } from "../../features/auth/screens/AuthEmailScreen";
-import type { AuthOptionsScreenProps } from "../../features/auth/screens/AuthOptionsScreen";
 import type { AuthPasswordResetScreenProps } from "../../features/auth/screens/AuthPasswordResetScreen";
 import type { CommunityHomeScreenProps } from "../../features/community/screens/CommunityHomeScreen";
 import type { AppStyles } from "../../ui/types";
 import type { RoadmateAppState } from "../useRoadmateAppState";
-
-type AuthOptionsBindingsArgs = {
-  appState: RoadmateAppState;
-  styles: AppStyles;
-  logoSource: unknown;
-};
 
 type AuthEmailBindingsArgs = {
   appState: RoadmateAppState;
@@ -33,27 +25,6 @@ type CommunityBindingsArgs = {
 
 function clearNotice(appState: RoadmateAppState) {
   appState.setNotice({ tone: "info", text: "" });
-}
-
-export function buildAuthOptionsScreenProps({
-  appState,
-  styles,
-  logoSource,
-}: AuthOptionsBindingsArgs): AuthOptionsScreenProps {
-  return {
-    logoSource,
-    styles,
-    isSocialAuthEnabled,
-    oauthProviderPending: appState.oauthProviderPending,
-    onPressEmail: () => {
-      clearNotice(appState);
-      appState.setAuthEntryMethod("email");
-    },
-    onPressGoogle: () => void appState.handleOAuthSignIn("google"),
-    onPressApple: () => void appState.handleOAuthSignIn("apple"),
-    onPressFacebook: () => void appState.handleOAuthSignIn("facebook"),
-    onPressKakao: () => void appState.handleOAuthSignIn("kakao"),
-  };
 }
 
 export function buildAuthEmailScreenProps({

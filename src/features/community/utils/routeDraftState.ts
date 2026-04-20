@@ -9,7 +9,8 @@ export const isRouteDraftReady = (routeDraft: RouteDraft, hasDriverContactMethod
       routeDraft.oneTimeTripType !== "round_trip" || isRouteTimeValue(routeDraft.returnSchedule);
 
     return Boolean(
-      isRouteDateValue(routeDraft.noticeDate) &&
+      hasDriverContactMethod &&
+        isRouteDateValue(routeDraft.noticeDate) &&
         hasReturnDate &&
         routeDraft.from.trim() &&
         routeDraft.to.trim() &&

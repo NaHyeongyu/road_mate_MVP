@@ -3,7 +3,22 @@ export type RequiredCheck = {
   done: boolean;
 };
 
+export type RequiredFieldLabels = {
+  vehicleProfile: string;
+  from: string;
+  to: string;
+  departureDate: string;
+  returnDate: string;
+  departureTime: string;
+  returnTime: string;
+  arrivalTime: string;
+  availableSeats: string;
+  operatingDay: string;
+  contact: string;
+};
+
 type BuildRequiredChecksArgs = {
+  labels: RequiredFieldLabels;
   isOneTimeRoute: boolean;
   isOneTimeRoundTrip: boolean;
   hasVehicle: boolean;
@@ -22,6 +37,7 @@ export const normalizeSeatCount = (value: number, min = 1, max = 8) =>
   Math.min(max, Math.max(min, value));
 
 export const buildRequiredChecks = ({
+  labels,
   isOneTimeRoute,
   isOneTimeRoundTrip,
   hasVehicle,
@@ -37,38 +53,26 @@ export const buildRequiredChecks = ({
 }: BuildRequiredChecksArgs): RequiredCheck[] =>
   isOneTimeRoute
     ? [
-        { label: "Vehicle profile", done: hasVehicle },
-        { label: "From", done: hasFrom },
-        { label: "To", done: hasTo },
-        { label: "Departure date", done: hasNoticeDate },
-        { label: "Departure time", done: hasDepartureTime },
+        { label: labels.vehicleProfile, done: hasVehicle },
+        { label: labels.from, done: hasFrom },
+        { label: labels.to, done: hasTo },
+        { label: labels.departureDate, done: hasNoticeDate },
+        { label: labels.departureTime, done: hasDepartureTime },
+        { label: labels.contact, done: hasContactMethod },
         ...(isOneTimeRoundTrip
           ? [
-              { label: "Return date", done: hasReturnDate },
-              { label: "Return time", done: hasReturnTime },
+              { label: labels.returnDate, done: hasReturnDate },
+              { label: labels.returnTime, done: hasReturnTime },
             ]
           : []),
       ]
     : [
-        { label: "Vehicle profile", done: hasVehicle },
-        { label: "From", done: hasFrom },
-        { label: "To", done: hasTo },
-        { label: "Departure time", done: hasDepartureTime },
-        { label: "Arrival time", done: hasReturnTime },
-        { label: "Available seats", done: hasSeats },
-        { label: "Operating day", done: hasOperatingDays },
-        { label: "Contact", done: hasContactMethod },
+        { label: labels.vehicleProfile, done: hasVehicle },
+        { label: labels.from, done: hasFrom },
+        { label: labels.to, done: hasTo },
+        { label: labels.departureTime, done: hasDepartureTime },
+        { label: labels.arrivalTime, done: hasReturnTime },
+        { label: labels.availableSeats, done: hasSeats },
+        { label: labels.operatingDay, done: hasOperatingDays },
+        { label: labels.contact, done: hasContactMethod },
       ];
-
-export const toRemainingRequiredText = (remainingRequired: string[]) => {
-  const previewRemainingRequired = remainingRequired.slice(0, 4);
-  const hiddenRequiredCount = Math.max(0, remainingRequired.length - previewRemainingRequired.length);
-
-  if (!previewRemainingRequired.length) {
-    return "";
-  }
-
-  return `Missing: ${previewRemainingRequired.join(", ")}${
-    hiddenRequiredCount > 0 ? ` +${hiddenRequiredCount} more` : ""
-  }`;
-};

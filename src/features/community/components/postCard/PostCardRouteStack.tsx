@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Pressable, Text, View } from "react-native";
 
@@ -11,9 +12,15 @@ type PostCardRouteStackProps = {
   post: RoutePost;
   styles: AppStyles;
   isRegular: boolean;
+  enableMapLinks?: boolean;
 };
 
-export function PostCardRouteStack({ post, styles, isRegular }: PostCardRouteStackProps) {
+export function PostCardRouteStack({
+  post,
+  styles,
+  isRegular,
+  enableMapLinks = false,
+}: PostCardRouteStackProps) {
   const copy = useAppCopy();
   const isOneTimeRoundTrip =
     !isRegular && (post.oneTimeTripType === "round_trip" || Boolean(post.returnSchedule));
@@ -25,36 +32,50 @@ export function PostCardRouteStack({ post, styles, isRegular }: PostCardRouteSta
     !isRegular && isOneTimeRoundTrip
       ? formatLocalizedNoticeDate(copy, post.returnDate ?? post.noticeDate, post.createdAt)
       : null;
+  const renderRouteStopBlock = (place: string, content: ReactNode) =>
+    enableMapLinks ? (
+      <Pressable
+        onPress={() => openPlaceInGoogleMaps(place)}
+        style={({ pressed }) => [
+          styles.postRouteStopBlock,
+          pressed ? styles.postRouteStopBlockPressed : null,
+        ]}
+      >
+        {content}
+      </Pressable>
+    ) : (
+      <View style={styles.postRouteStopBlock}>{content}</View>
+    );
 
   return (
     <View style={styles.postRouteStack}>
-      <Pressable
-        onPress={() => openPlaceInGoogleMaps(post.from)}
-        style={({ pressed }) => [styles.postRouteStopBlock, pressed ? styles.postRouteStopBlockPressed : null]}
-      >
-        <View style={styles.postRouteStopRow}>
-          <View style={styles.postRouteLeadIconSlot}>
-            <MaterialCommunityIcons name="map-marker-outline" size={16} color="#64748B" />
+      {renderRouteStopBlock(
+        post.from,
+        <>
+          <View style={styles.postRouteStopRow}>
+            <View style={styles.postRouteLeadIconSlot}>
+              <MaterialCommunityIcons name="map-marker-outline" size={16} color="#64748B" />
+            </View>
+            <Text numberOfLines={2} style={styles.postRouteEndpointTextPrimary}>
+              {post.from}
+            </Text>
           </View>
-          <Text numberOfLines={2} style={styles.postRouteEndpointTextPrimary}>
-            {post.from}
-          </Text>
-        </View>
-        {!isRegular ? (
+          {!isRegular ? (
+            <View style={styles.postRouteTimeRow}>
+              <View style={styles.postRouteLeadIconSlot}>
+                <MaterialCommunityIcons name="calendar-month-outline" size={14} color="#64748B" />
+              </View>
+              <Text style={styles.postRouteTimeText}>{departureDateLabel}</Text>
+            </View>
+          ) : null}
           <View style={styles.postRouteTimeRow}>
             <View style={styles.postRouteLeadIconSlot}>
-              <MaterialCommunityIcons name="calendar-month-outline" size={14} color="#64748B" />
+              <MaterialCommunityIcons name="clock-outline" size={14} color="#64748B" />
             </View>
-            <Text style={styles.postRouteTimeText}>{departureDateLabel}</Text>
+            <Text style={styles.postRouteTimeText}>{post.schedule}</Text>
           </View>
-        ) : null}
-        <View style={styles.postRouteTimeRow}>
-          <View style={styles.postRouteLeadIconSlot}>
-            <MaterialCommunityIcons name="clock-outline" size={14} color="#64748B" />
-          </View>
-          <Text style={styles.postRouteTimeText}>{post.schedule}</Text>
-        </View>
-      </Pressable>
+        </>
+      )}
 
       <View style={styles.postRouteDirectionRow}>
         <View style={styles.postRouteConnectorLine} />
@@ -74,37 +95,37 @@ export function PostCardRouteStack({ post, styles, isRegular }: PostCardRouteSta
         <View style={styles.postRouteConnectorLine} />
       </View>
 
-      <Pressable
-        onPress={() => openPlaceInGoogleMaps(post.to)}
-        style={({ pressed }) => [styles.postRouteStopBlock, pressed ? styles.postRouteStopBlockPressed : null]}
-      >
-        <View style={styles.postRouteStopRow}>
-          <View style={styles.postRouteLeadIconSlot}>
-            <MaterialCommunityIcons name="map-marker-check-outline" size={16} color="#64748B" />
+      {renderRouteStopBlock(
+        post.to,
+        <>
+          <View style={styles.postRouteStopRow}>
+            <View style={styles.postRouteLeadIconSlot}>
+              <MaterialCommunityIcons name="map-marker-check-outline" size={16} color="#64748B" />
+            </View>
+            <Text numberOfLines={2} style={styles.postRouteEndpointTextPrimary}>
+              {post.to}
+            </Text>
           </View>
-          <Text numberOfLines={2} style={styles.postRouteEndpointTextPrimary}>
-            {post.to}
-          </Text>
-        </View>
-        {shouldShowReturnTime ? (
-          <>
-            {isRegular ? null : (
+          {shouldShowReturnTime ? (
+            <>
+              {isRegular ? null : (
+                <View style={styles.postRouteTimeRow}>
+                  <View style={styles.postRouteLeadIconSlot}>
+                    <MaterialCommunityIcons name="calendar-month-outline" size={14} color="#64748B" />
+                  </View>
+                  <Text style={styles.postRouteTimeText}>{returnDateLabel}</Text>
+                </View>
+              )}
               <View style={styles.postRouteTimeRow}>
                 <View style={styles.postRouteLeadIconSlot}>
-                  <MaterialCommunityIcons name="calendar-month-outline" size={14} color="#64748B" />
+                  <MaterialCommunityIcons name="clock-outline" size={14} color="#64748B" />
                 </View>
-                <Text style={styles.postRouteTimeText}>{returnDateLabel}</Text>
+                <Text style={styles.postRouteTimeText}>{post.returnSchedule || "--:--"}</Text>
               </View>
-            )}
-            <View style={styles.postRouteTimeRow}>
-              <View style={styles.postRouteLeadIconSlot}>
-                <MaterialCommunityIcons name="clock-outline" size={14} color="#64748B" />
-              </View>
-              <Text style={styles.postRouteTimeText}>{post.returnSchedule || "--:--"}</Text>
-            </View>
-          </>
-        ) : null}
-      </Pressable>
+            </>
+          ) : null}
+        </>
+      )}
     </View>
   );
 }

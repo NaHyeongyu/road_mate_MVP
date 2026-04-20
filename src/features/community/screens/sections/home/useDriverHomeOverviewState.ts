@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 
+import { useAppCopy } from "../../../../../i18n/AppI18nContext";
 import type { RouteDraft, RouteKind, RoutePost } from "../../../../../model";
 import { isActiveOneTimePost } from "../../../utils/storage";
 import { hasRouteDraftInput, isRouteDraftReady, toDraftFromPost } from "../../../utils/routeDraftState";
@@ -34,6 +35,7 @@ export function useDriverHomeOverviewState({
   onSaveRouteQuickSettings,
   onOpenRouteRegistrationPage,
 }: UseDriverHomeOverviewStateOptions) {
+  const copy = useAppCopy();
   const [isQuickSettingSaving, setIsQuickSettingSaving] = useState(false);
   const [isPreviousNoticesVisible, setIsPreviousNoticesVisible] = useState(false);
   const [previousNoticesPeriod, setPreviousNoticesPeriod] = useState<PreviousNoticesPeriod>("all");
@@ -54,8 +56,18 @@ export function useDriverHomeOverviewState({
   const hasDraftInput = hasRouteDraftInput(routeDraft);
   const isDraftReady = isRouteDraftReady(routeDraft, hasDriverContactMethod);
   const missingRequiredLabels = useMemo(
-    () => getDriverHomeMissingRequiredLabels(routeDraft, hasDriverContactMethod),
-    [hasDriverContactMethod, routeDraft]
+    () =>
+      getDriverHomeMissingRequiredLabels(routeDraft, hasDriverContactMethod, {
+        from: copy.common.from,
+        to: copy.common.to,
+        departureDate: copy.common.departureDate,
+        returnDate: copy.common.returnDate,
+        departureTime: copy.common.departureTime,
+        returnTime: copy.common.returnTime,
+        arrivalTime: copy.common.arrivalTime,
+        contact: copy.common.contact,
+      }),
+    [copy, hasDriverContactMethod, routeDraft]
   );
 
   const myPostsForActiveKind = useMemo(

@@ -1,3 +1,4 @@
+import { Alert } from "react-native";
 import { describe, expect, it, vi, beforeEach } from "vitest";
 
 import { getAppCopy } from "../../../i18n/copy";
@@ -21,6 +22,12 @@ vi.mock("../data/routePostRepository", () => ({
   isRoutePostRepositoryEnabled: () => mockIsRoutePostRepositoryEnabled(),
   updateRouteQuickSettingsInDb: (...args: unknown[]) => mockUpdateRouteQuickSettingsInDb(...args),
   upsertRoutePostInDb: (...args: unknown[]) => mockUpsertRoutePostInDb(...args),
+}));
+
+vi.mock("react-native", () => ({
+  Alert: {
+    alert: vi.fn(),
+  },
 }));
 
 const createValidRouteDraft = (patch: Partial<RouteDraft> = {}): RouteDraft => ({
@@ -189,11 +196,37 @@ describe("createCommunityPostActions", () => {
     expect(persistedPosts).toHaveLength(2);
     expect(persistedPosts[0]?.kind).toBe("one_time");
     expect(persistedPosts[0]?.isActive).toBe(true);
+    expect(persistedPosts[0]?.vehicleModel).toBe("Kia Carnival");
+    expect(persistedPosts[0]?.vehiclePlate).toBe("123ABC");
+    expect(persistedPosts[0]?.contactPhone).toBe("0412 345 678");
     expect(persistedPosts[1]?.id).toBe("notice-old");
     expect(persistedPosts[1]?.isActive).toBe(false);
     expect(ctx.onNoticeMock).toHaveBeenCalledWith({
       tone: "success",
       text: "One-time notice posted and shared to riders.",
+    });
+  });
+
+  it("blocks one-time notices when saved driver profile has no contact method", async () => {
+    const ctx = createContext({
+      savedVehicle: createSavedVehicle({ contactPhone: "", contactLink: "" }),
+      routeDraft: createValidRouteDraft({
+        kind: "one_time",
+        oneTimeTripType: "one_way",
+        noticeDate: "2026-04-20",
+        schedule: "09:00",
+        returnSchedule: "",
+      }),
+    });
+    const { postRoute } = createCommunityPostActions(ctx);
+
+    const result = await postRoute();
+
+    expect(result).toBe(false);
+    expect(ctx.persistPostsMock).not.toHaveBeenCalled();
+    expect(ctx.onNoticeMock).toHaveBeenCalledWith({
+      tone: "error",
+      text: "Add at least one contact method in driver profile (phone or chat link).",
     });
   });
 
@@ -217,6 +250,41 @@ describe("createCommunityPostActions", () => {
     await removeToggle(post);
 
     expect(removeCtx.persistSavedPostKeysMock).toHaveBeenCalledWith(["other:1"]);
+  });
+
+  it("asks for confirmation before removing a route", async () => {
+    const targetPost = createPost({ id: "route-delete", ownerUserId: "user-1" });
+    const ctx = createContext({ storedPosts: [targetPost] });
+    const { removeRoute } = createCommunityPostActions(ctx);
+
+    await removeRoute(targetPost.id);
+
+    expect(Alert.alert).toHaveBeenCalledWith(
+      "Delete Regular?",
+      "This will remove this Regular registration from rider search. This cannot be undone.",
+      expect.any(Array),
+      { cancelable: true }
+    );
+    expect(ctx.persistPostsMock).not.toHaveBeenCalled();
+  });
+
+  it("removes a route after confirmation", async () => {
+    const targetPost = createPost({ id: "route-delete", ownerUserId: "user-1" });
+    const otherPost = createPost({ id: "other", ownerUserId: "user-2" });
+    const ctx = createContext({ storedPosts: [targetPost, otherPost] });
+    vi.mocked(Alert.alert).mockImplementation((_, __, buttons) => {
+      buttons?.[1]?.onPress?.();
+    });
+    const { removeRoute } = createCommunityPostActions(ctx);
+
+    await removeRoute(targetPost.id);
+    await Promise.resolve();
+
+    expect(ctx.persistPostsMock).toHaveBeenCalledWith([otherPost]);
+    expect(ctx.onNoticeMock).toHaveBeenCalledWith({
+      tone: "info",
+      text: "Route removed.",
+    });
   });
 
   it("updates quick settings locally with normalized seats when target route exists", async () => {

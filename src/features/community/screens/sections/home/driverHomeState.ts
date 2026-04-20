@@ -1,5 +1,6 @@
 import type { RouteDraft } from "../../../../../model";
 import { isRouteDateValue, isRouteTimeValue } from "../../../utils/routeForm";
+import type { RequiredFieldLabels } from "./driverRouteComposerState";
 
 export const DRIVER_HOME_MIN_SEATS = 1;
 export const DRIVER_HOME_MAX_SEATS = 8;
@@ -9,18 +10,30 @@ export const normalizeDriverHomeSeats = (value: number) =>
 
 export const getDriverHomeMissingRequiredLabels = (
   routeDraft: RouteDraft,
-  hasDriverContactMethod: boolean
+  hasDriverContactMethod: boolean,
+  labels: Pick<
+    RequiredFieldLabels,
+    | "from"
+    | "to"
+    | "departureDate"
+    | "returnDate"
+    | "departureTime"
+    | "returnTime"
+    | "arrivalTime"
+    | "contact"
+  >
 ): string[] => {
   if (routeDraft.kind === "one_time") {
     const checks = [
-      { label: "From", done: Boolean(routeDraft.from.trim()) },
-      { label: "To", done: Boolean(routeDraft.to.trim()) },
-      { label: "Departure date", done: isRouteDateValue(routeDraft.noticeDate) },
-      { label: "Departure time", done: isRouteTimeValue(routeDraft.schedule) },
+      { label: labels.from, done: Boolean(routeDraft.from.trim()) },
+      { label: labels.to, done: Boolean(routeDraft.to.trim()) },
+      { label: labels.departureDate, done: isRouteDateValue(routeDraft.noticeDate) },
+      { label: labels.departureTime, done: isRouteTimeValue(routeDraft.schedule) },
+      { label: labels.contact, done: hasDriverContactMethod },
       ...(routeDraft.oneTimeTripType === "round_trip"
         ? [
-            { label: "Return date", done: isRouteDateValue(routeDraft.returnDate ?? "") },
-            { label: "Return time", done: isRouteTimeValue(routeDraft.returnSchedule) },
+            { label: labels.returnDate, done: isRouteDateValue(routeDraft.returnDate ?? "") },
+            { label: labels.returnTime, done: isRouteTimeValue(routeDraft.returnSchedule) },
           ]
         : []),
     ];
@@ -29,11 +42,11 @@ export const getDriverHomeMissingRequiredLabels = (
   }
 
   const checks = [
-    { label: "From", done: Boolean(routeDraft.from.trim()) },
-    { label: "To", done: Boolean(routeDraft.to.trim()) },
-    { label: "Departure time", done: isRouteTimeValue(routeDraft.schedule) },
-    { label: "Arrival time", done: isRouteTimeValue(routeDraft.returnSchedule) },
-    { label: "Contact", done: hasDriverContactMethod },
+    { label: labels.from, done: Boolean(routeDraft.from.trim()) },
+    { label: labels.to, done: Boolean(routeDraft.to.trim()) },
+    { label: labels.departureTime, done: isRouteTimeValue(routeDraft.schedule) },
+    { label: labels.arrivalTime, done: isRouteTimeValue(routeDraft.returnSchedule) },
+    { label: labels.contact, done: hasDriverContactMethod },
   ];
 
   return checks.filter((check) => !check.done).map((check) => check.label);

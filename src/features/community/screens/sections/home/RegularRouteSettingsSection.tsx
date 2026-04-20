@@ -2,6 +2,7 @@ import { Pressable, Text, View } from "react-native";
 
 import type { RouteDraft } from "../../../../../model";
 import type { AppStyles } from "../../../../../ui/types";
+import { useAppCopy } from "../../../../../i18n/AppI18nContext";
 import { Label } from "../../../../shared/components/Label";
 import { ToggleChip } from "../../../../shared/components/ToggleChip";
 import { OperatingDaysChips } from "./OperatingDaysChips";
@@ -25,9 +26,11 @@ export function RegularRouteSettingsSection({
   onRouteDraftChange,
   onSetVisibility,
 }: RegularRouteSettingsSectionProps) {
+  const copy = useAppCopy();
+
   return (
     <>
-      <Label text="Available seats" styles={styles} />
+      <Label text={copy.common.availableSeats} styles={styles} />
       <View style={styles.row}>
         <Pressable style={styles.chip} onPress={onDecreaseSeats}>
           <Text style={styles.chipText}>-</Text>
@@ -42,26 +45,28 @@ export function RegularRouteSettingsSection({
 
       <View style={styles.routeComposerDivider} />
 
-      <Label text="Operating days" styles={styles} />
+      <Label text={copy.common.operatingDays} styles={styles} />
       <OperatingDaysChips styles={styles} routeDraft={routeDraft} onRouteDraftChange={onRouteDraftChange} />
 
       <View style={styles.routeComposerDivider} />
 
-      <Label text="Visibility" styles={styles} />
+      <Label text={copy.common.visibility} styles={styles} />
       <Text style={styles.cardBody}>
         {routeDraft.isPublic
-          ? "Public: riders can discover this route."
-          : "Private: hidden from rider search and visible only to you."}
+          ? copy.community.publicVisibilityDescription
+          : copy.community.privateVisibilityDescription}
       </Text>
       <View style={styles.row}>
         <ToggleChip
-          label="Public"
+          label={copy.common.public}
+          iconName="earth"
           active={routeDraft.isPublic}
           onPress={() => onSetVisibility(true)}
           styles={styles}
         />
         <ToggleChip
-          label="Private"
+          label={copy.common.private}
+          iconName="lock-outline"
           active={!routeDraft.isPublic}
           onPress={() => onSetVisibility(false)}
           styles={styles}

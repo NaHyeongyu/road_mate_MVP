@@ -1,4 +1,5 @@
 import type { RouteDraft } from "../../../model";
+import type { AppLanguage } from "../../../i18n/types";
 
 export const WEEKDAY_OPTIONS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"] as const;
 export const ROUTE_TIME_PATTERN = /^([01]\d|2[0-3]):([0-5]\d)$/;
@@ -10,6 +11,14 @@ const to12HourLabel = (hour24: number, minute: number) => {
   const period = hour24 >= 12 ? "PM" : "AM";
   const hour12 = hour24 % 12 || 12;
   return `${hour12}:${padTimeSegment(minute)} ${period}`;
+};
+
+const DATE_DISPLAY_LOCALE_BY_LANGUAGE: Record<AppLanguage, string> = {
+  en: "en-AU",
+  fr: "fr-FR",
+  ko: "ko-KR",
+  ja: "ja-JP",
+  zh: "zh-CN",
 };
 
 export const formatRouteTime = (hour24: number, minute: number) =>
@@ -112,14 +121,14 @@ export const toDateFromRouteDate = (value: string) => {
   return date;
 };
 
-export const toRouteDateDisplayLabel = (value: string) => {
+export const toRouteDateDisplayLabel = (value: string, language: AppLanguage = "en") => {
   if (!isRouteDateValue(value)) {
     return "";
   }
 
   const date = toDateFromRouteDate(value);
   try {
-    return date.toLocaleDateString("en-AU", {
+    return date.toLocaleDateString(DATE_DISPLAY_LOCALE_BY_LANGUAGE[language], {
       weekday: "short",
       month: "short",
       day: "numeric",

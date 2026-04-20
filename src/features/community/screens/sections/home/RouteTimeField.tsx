@@ -1,6 +1,7 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Pressable, Text, View } from "react-native";
 
+import { useAppCopy } from "../../../../../i18n/AppI18nContext";
 import type { AppStyles } from "../../../../../ui/types";
 import { toRouteTimeDisplayLabel } from "../../../utils/routeForm";
 import { Label } from "../../../../shared/components/Label";
@@ -20,6 +21,7 @@ export function RouteTimeField({
   placeholder,
   onPress,
 }: RouteTimeFieldProps) {
+  const copy = useAppCopy();
   const displayLabel = toRouteTimeDisplayLabel(value);
   const hasValue = Boolean(displayLabel);
 
@@ -39,7 +41,7 @@ export function RouteTimeField({
               {hasValue ? displayLabel : placeholder}
             </Text>
             <Text style={styles.timeFieldButtonHint}>
-              {hasValue ? "Tap to change" : "Tap to select"}
+              {hasValue ? copy.common.tapToChange : copy.common.tapToSelect}
             </Text>
           </View>
         </View>

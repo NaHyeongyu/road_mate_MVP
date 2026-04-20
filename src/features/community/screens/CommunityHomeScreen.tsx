@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { KeyboardAvoidingView, Platform, ScrollView, StatusBar, View, useWindowDimensions } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -12,6 +12,8 @@ import { AnimatedEntrance } from "../../shared/components/AnimatedEntrance";
 import { BottomBannerAd } from "../../ads/components/BottomBannerAd";
 import type { MainTab, Mode, StateFilter } from "../types";
 import { RoleModeToggle } from "../components/RoleModeToggle";
+import { RoutePostDetailPage } from "../components/RoutePostDetailPage";
+import { getPostSaveKey } from "../utils/storage";
 import { useDriverRegistrationPageState } from "./useDriverRegistrationPageState";
 import { CommunityBottomBar } from "./sections/CommunityBottomBar";
 import { CommunityTabContent } from "./sections/CommunityTabContent";
@@ -120,6 +122,7 @@ export function CommunityHomeScreen({
   const isSearchDetailScreen =
     isRiderMode && mainTab === "home" && isRiderSearchResultsPageVisible;
   const [isSettingsPageVisible, setIsSettingsPageVisible] = useState(false);
+  const [selectedDetailPostSnapshot, setSelectedDetailPostSnapshot] = useState<RoutePost | null>(null);
   const scrollContentStyle = [
     styles.screenContent,
     isCompactLayout
@@ -134,6 +137,7 @@ export function CommunityHomeScreen({
   const {
     isDriverRegistrationPageVisible,
     activeDriverRouteKind,
+    activeRegisteredPost,
     activeRouteDraft,
     openDriverRegistrationPage,
     closeDriverRegistrationPage,
@@ -147,6 +151,21 @@ export function CommunityHomeScreen({
     onRouteDraftChange,
     onPostRoute,
   });
+  const selectedDetailPost = useMemo(() => {
+    if (!selectedDetailPostSnapshot) {
+      return null;
+    }
+
+    return (
+      [...visiblePosts, ...myPosts, ...savedPosts].find(
+        (post) => post.id === selectedDetailPostSnapshot.id
+      ) ?? selectedDetailPostSnapshot
+    );
+  }, [myPosts, savedPosts, selectedDetailPostSnapshot, visiblePosts]);
+  const isSelectedDetailPostSaved = selectedDetailPost
+    ? savedPostKeys.includes(getPostSaveKey(selectedDetailPost))
+    : false;
+  const isSelectedDetailPostOwned = selectedDetailPost?.ownerUserId === currentUserId;
 
   useEffect(() => {
     if (!isRiderMode || mainTab !== "home") {
@@ -159,6 +178,58 @@ export function CommunityHomeScreen({
       setIsSettingsPageVisible(false);
     }
   }, [mainTab]);
+
+  if (selectedDetailPost) {
+    return (
+      <View style={styles.screen}>
+        <StatusBar barStyle="dark-content" backgroundColor={APP_BAR_BG} translucent={false} />
+        <View
+          style={[
+            styles.headerDock,
+            {
+              paddingTop: insets.top + 6,
+            },
+            isCompactLayout
+              ? {
+                  paddingHorizontal: 14,
+                }
+              : null,
+          ]}
+        >
+          <ScreenHeader
+            title={copy.common.rideDetails}
+            leftActionType="back"
+            leftActionLabel={copy.common.back}
+            onLeftActionPress={() => setSelectedDetailPostSnapshot(null)}
+            styles={styles}
+          />
+        </View>
+
+        <ScrollView
+          style={styles.screenScroll}
+          contentContainerStyle={scrollContentStyle}
+          keyboardShouldPersistTaps="always"
+          keyboardDismissMode="on-drag"
+        >
+          <AnimatedEntrance delay={70} resetKey={selectedDetailPost.id}>
+            <RoutePostDetailPage
+              post={selectedDetailPost}
+              styles={styles}
+              isOwnedByCurrentUser={isSelectedDetailPostOwned}
+              isSaved={isSelectedDetailPostSaved}
+              onToggleSave={
+                !isSelectedDetailPostOwned
+                  ? () => onToggleSavedPost(selectedDetailPost)
+                  : undefined
+              }
+            />
+          </AnimatedEntrance>
+        </ScrollView>
+
+        <BottomBannerAd bottomInset={bottomInset} />
+      </View>
+    );
+  }
 
   if (isDriverRegistrationPageVisible) {
     return (
@@ -205,6 +276,7 @@ export function CommunityHomeScreen({
                 colors={colors}
                 styles={styles}
                 activeRouteKind={activeDriverRouteKind}
+                activeRegisteredPost={activeRegisteredPost}
                 routeDraft={activeRouteDraft}
                 hasVehicle={hasVehicle}
                 showVehicleSetup={!hasVehicle}
@@ -214,6 +286,7 @@ export function CommunityHomeScreen({
                 onSaveVehicle={onSaveVehicle}
                 onRouteDraftChange={onRouteDraftChange}
                 onPostRoute={handleSaveRouteRegistration}
+                onRemoveRoute={onRemoveRoute}
               />
             </AnimatedEntrance>
           </ScrollView>
@@ -265,6 +338,8 @@ export function CommunityHomeScreen({
                 colors={colors}
                 styles={styles}
                 isAuthenticated={isAuthenticated}
+                currentUserId={currentUserId}
+                currentUserEmail={currentUserEmail}
                 onSignOut={onSignOut}
                 onWithdrawAccount={onWithdrawAccount}
                 onRequestAuth={onRequestAuth}
@@ -365,6 +440,7 @@ export function CommunityHomeScreen({
             onPostRoute={onPostRoute}
             onSaveRouteQuickSettings={onSaveRouteQuickSettings}
             onOpenDriverRegistrationPage={openDriverRegistrationPage}
+            onOpenRouteDetailPage={setSelectedDetailPostSnapshot}
             onRemoveRoute={onRemoveRoute}
             onToggleSavedPost={onToggleSavedPost}
             isRiderSearchResultsPageVisible={isRiderSearchResultsPageVisible}

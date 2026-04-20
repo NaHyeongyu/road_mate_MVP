@@ -9,6 +9,33 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      admin_accounts: {
+        Row: {
+          email: string;
+          display_name: string;
+          role: "owner" | "operator";
+          enabled: boolean;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          email: string;
+          display_name?: string;
+          role?: "owner" | "operator";
+          enabled?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          email?: string;
+          display_name?: string;
+          role?: "owner" | "operator";
+          enabled?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
       route_posts: {
         Row: {
           id: string;
@@ -130,13 +157,71 @@ export type Database = {
           },
         ];
       };
+      support_requests: {
+        Row: {
+          id: string;
+          category: "inquiry" | "bug" | "change_request" | "other";
+          status: "open" | "in_progress" | "resolved" | "closed";
+          user_id: string | null;
+          user_email: string;
+          title: string;
+          message: string;
+          admin_note: string;
+          created_at: string;
+          updated_at: string;
+          resolved_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          category: "inquiry" | "bug" | "change_request" | "other";
+          status?: "open" | "in_progress" | "resolved" | "closed";
+          user_id?: string | null;
+          user_email: string;
+          title: string;
+          message: string;
+          admin_note?: string;
+          created_at?: string;
+          updated_at?: string;
+          resolved_at?: string | null;
+        };
+        Update: {
+          id?: string;
+          category?: "inquiry" | "bug" | "change_request" | "other";
+          status?: "open" | "in_progress" | "resolved" | "closed";
+          user_id?: string | null;
+          user_email?: string;
+          title?: string;
+          message?: string;
+          admin_note?: string;
+          created_at?: string;
+          updated_at?: string;
+          resolved_at?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "support_requests_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
     };
     Views: Record<string, never>;
     Functions: {
+      claim_initial_admin_account: {
+        Args: Record<PropertyKey, never>;
+        Returns: Database["public"]["Tables"]["admin_accounts"]["Row"];
+      };
       is_email_registered: {
         Args: {
           check_email: string;
         };
+        Returns: boolean;
+      };
+      is_current_user_admin: {
+        Args: Record<PropertyKey, never>;
         Returns: boolean;
       };
     };

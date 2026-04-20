@@ -1,11 +1,11 @@
 import { useState } from "react";
 
+import { useAppCopy } from "../../../../../i18n/AppI18nContext";
 import type { RouteDraft, VehicleInfo } from "../../../../../model";
 import { isRouteDateValue, isRouteTimeValue } from "../../../../community/utils/routeForm";
 import {
   buildRequiredChecks,
   normalizeSeatCount,
-  toRemainingRequiredText,
 } from "./driverRouteComposerState";
 
 type UseDriverComposerSubmitStateOptions = {
@@ -31,6 +31,7 @@ export function useDriverComposerSubmitState({
   onPatchDraft,
   onPostRoute,
 }: UseDriverComposerSubmitStateOptions) {
+  const copy = useAppCopy();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const currentSeatCount = normalizeSeatCount(
@@ -55,6 +56,19 @@ export function useDriverComposerSubmitState({
   const hasContactMethod = Boolean(savedVehicle.contactPhone.trim() || savedVehicle.contactLink.trim());
 
   const requiredChecks = buildRequiredChecks({
+    labels: {
+      vehicleProfile: copy.common.driverProfile,
+      from: copy.common.from,
+      to: copy.common.to,
+      departureDate: copy.common.departureDate,
+      returnDate: copy.common.returnDate,
+      departureTime: copy.common.departureTime,
+      returnTime: copy.common.returnTime,
+      arrivalTime: copy.common.arrivalTime,
+      availableSeats: copy.common.availableSeats,
+      operatingDay: copy.common.operatingDays,
+      contact: copy.common.contact,
+    },
     isOneTimeRoute,
     isOneTimeRoundTrip,
     hasVehicle,
@@ -71,7 +85,11 @@ export function useDriverComposerSubmitState({
 
   const remainingRequired = requiredChecks.filter((check) => !check.done).map((check) => check.label);
   const isReadyToSave = remainingRequired.length === 0;
-  const remainingRequiredText = toRemainingRequiredText(remainingRequired);
+  const previewRemainingRequired = remainingRequired.slice(0, 4);
+  const hiddenRequiredCount = Math.max(0, remainingRequired.length - previewRemainingRequired.length);
+  const remainingRequiredText = previewRemainingRequired.length
+    ? copy.community.missingPreview(previewRemainingRequired, hiddenRequiredCount)
+    : "";
 
   const handlePressSaveRegistration = async () => {
     if (isSubmitting || !isReadyToSave) {

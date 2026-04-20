@@ -44,9 +44,10 @@ const APP_COPY = {
       hint: "Once those values are set, this login page will use real Supabase Auth instead of the previous local-only mock.",
     },
     common: {
-      back: "Back",
-      cancel: "Cancel",
-      guest: "Guest",
+	      back: "Back",
+	      cancel: "Cancel",
+	      done: "Done",
+	      guest: "Guest",
       role: "Role",
       home: "Home",
       saved: "Saved",
@@ -58,7 +59,10 @@ const APP_COPY = {
       edit: "Edit",
       delete: "Delete",
       driver: "Driver",
+      driverProfile: "Driver profile",
+      driverInfo: "Driver info",
       rider: "Rider",
+      contact: "Contact",
       state: "State",
       allStates: "All states",
       from: "From",
@@ -68,6 +72,14 @@ const APP_COPY = {
       anyDestination: "Any destination",
       seats: "Seats",
       visibility: "Visibility",
+      tripType: "Trip type",
+      departureDate: "Departure date",
+      returnDate: "Return date",
+      departureTime: "Departure time",
+      returnTime: "Return time",
+      arrivalTime: "Arrival time",
+      availableSeats: "Available seats",
+      operatingDays: "Operating days",
       public: "Public",
       private: "Private",
       additionalDetails: "Additional details",
@@ -86,9 +98,15 @@ const APP_COPY = {
       today: "Today",
       tomorrow: "Tomorrow",
       past: "Past",
-      recently: "Recently",
-      me: "Me",
-    },
+	      recently: "Recently",
+	      me: "Me",
+	      tapToChange: "Tap to change",
+	      tapToSelect: "Tap to select",
+	      selectDepartureTime: "Select departure time",
+	      selectReturnTime: "Select return time",
+	      selectDepartureDate: "Select departure date",
+	      selectReturnDate: "Select return date",
+	    },
     auth: {
       getStarted: "Get Started with Roadmate",
       emailEnabled: "Email sign-in is enabled for this build.",
@@ -140,6 +158,20 @@ const APP_COPY = {
       switchHint: "Don’t have an account? Switch to Sign Up.",
       verificationHint: "Email verification may be required after sign-up.",
       createAccountWithEmail: "Create account with email",
+      verificationEmailSentEyebrow: "Verification email sent",
+      verificationEmailSentBody:
+        "Open the newest verification email on this phone. When confirmation finishes, Roadmate opens and signs you in automatically.",
+      verificationEmailStepOpenNewest:
+        "Open the newest verification email from Roadmate.",
+      verificationEmailStepComplete:
+        "Complete confirmation in the browser page that opens.",
+      verificationEmailStepReturnAutomatically:
+        "Roadmate will reopen and finish sign-in automatically.",
+      resendEmail: "Resend email",
+      signInAfterVerificationHint:
+        "If the app does not reopen automatically, open Roadmate and sign in with the same email.",
+      emailVerificationAutomaticHint:
+        "After email confirmation, Roadmate signs you in automatically on this device.",
     },
     community: {
       regularRegistration: "Regular registration",
@@ -155,10 +187,10 @@ const APP_COPY = {
       savedRecent: "Saved recent",
       noticeRecent: "Notice recent",
       noSavedRides: "No saved rides yet.",
-      chooseSearchPrompt: (isNotice: boolean) =>
-        isNotice
-          ? "Choose a state or enter both from and to to search notices."
-          : "Choose a state or enter both from and to to search rides.",
+	      chooseSearchPrompt: (isNotice: boolean) =>
+	        isNotice
+	          ? "Enter both from and to to search notices."
+	          : "Enter both from and to to search rides.",
       tapSearchPrompt: (isNotice: boolean) =>
         isNotice ? "Tap search to view notices." : "Tap search to view rides.",
       pastOnlyPrompt: "Only past notices match this filter or search.",
@@ -251,6 +283,8 @@ const APP_COPY = {
       regularSettingsSectionTitle: "Driver settings",
       regularSettingsSectionDescription:
         "Adjust seats, operating days, contact overrides, and visibility in one place.",
+      publicVisibilityDescription: "Public: riders can discover this route.",
+      privateVisibilityDescription: "Private: hidden from rider search and visible only to you.",
       noteSectionTitle: "Additional details",
       oneTimeNoteDescription: "Optional: add pickup notes or extra instructions for riders.",
       regularNoteDescription:
@@ -321,7 +355,7 @@ const APP_COPY = {
       authenticationCouldNotBeCompleted: (message: string) =>
         `Authentication could not be completed: ${message}`,
       verificationEmailSent: (email: string) =>
-        `Verification email sent to ${email}. Open the confirmation page from that email, then return to Roadmate and sign in.`,
+        `Verification email sent to ${email}. Open it on this phone; Roadmate will sign you in automatically after confirmation.`,
       emailVerificationStillNeeded: (email: string) =>
         `This account still needs email verification. Open the email sent to ${email}, then return to Roadmate.`,
       enterEmailBeforeResendingVerification:
@@ -333,8 +367,11 @@ const APP_COPY = {
         "Enter your email address first so the password reset email can be sent.",
       passwordResetEmailSent: (email: string) =>
         `Password reset email sent to ${email}. Open that link on this device to set a new password.`,
-      passwordResetReady: "Password reset verified. Enter a new password to finish.",
-      passwordResetComplete: "Password updated successfully.",
+	      passwordResetReady:
+	        "Password reset verified. Tap the password change button to finish.",
+	      passwordResetLinkInvalid:
+	        "Password reset link is invalid or expired. Request a new reset email.",
+	      passwordResetComplete: "Password updated successfully.",
       passwordResetFailed: (message: string) => `Password reset failed: ${message}`,
       passwordResetEmailCheckFailed: (message: string) =>
         `Could not verify whether this email is registered: ${message}`,
@@ -342,9 +379,11 @@ const APP_COPY = {
         `${email} is not registered. Password reset is unavailable for this email.`,
       duplicateEmailFound: (email: string) => `${email} is already registered. Please sign in instead.`,
       emailAvailableForSignUp: (email: string) => `${email} is available for sign-up.`,
-      emailDuplicateCheckUnavailable:
-        "Email duplicate check is unavailable until the latest Supabase migration is applied.",
-      duplicateCheckFailed: (message: string) => `Could not check email availability: ${message}`,
+	      emailDuplicateCheckUnavailable:
+	        "Email duplicate check is unavailable until the latest Supabase migration is applied.",
+	      emailDuplicateCheckRequired:
+	        "Please complete email availability check before signing up.",
+	      duplicateCheckFailed: (message: string) => `Could not check email availability: ${message}`,
       signedOut: "Signed out.",
       oauthCanceled: (providerLabel: string) => `${providerLabel} sign-in was canceled.`,
       oauthMissingAuthorizationUrl: "Unable to start OAuth flow. Missing authorization URL.",
@@ -381,12 +420,25 @@ const APP_COPY = {
       validEmail: "Please enter a valid email address.",
       passwordLength: "Password must be at least 6 characters.",
       passwordConfirmMismatch: "Passwords do not match.",
+      routeNoticeDateRequired: "Set notice date using calendar picker.",
+      routeEndpointsRequired: "Add both from and to before posting.",
+      routeDepartureTimeRequired: "Set departure time in HH:MM format (24-hour).",
+      routeAvailableSeatsRequired: "Set available seats to at least 1.",
+      routeContactRequired:
+        "Add at least one contact method in driver profile (phone or chat link).",
+      routeReturnDateRequired: "Set return date using calendar picker for round-trip notice.",
+      routeReturnTimeRequired: "Set return time in HH:MM format (24-hour) for round-trip notice.",
+      routeArrivalTimeRequired: "Set arrival time in HH:MM format (24-hour).",
+      routeOperatingDaysRequired: "Select at least one operating day.",
     },
     alerts: {
       leaveCommunityTitle: "Leave community?",
       leaveCommunityBody:
         "This removes your route posts and driver profile, marks your community access inactive, and signs you out.",
       leaveCommunityAction: "Leave",
+      deleteRouteTitle: (kind: string) => `Delete ${kind}?`,
+      deleteRouteBody: (kind: string) =>
+        `This will remove this ${kind} registration from rider search. This cannot be undone.`,
     },
     weekdays: {
       Mon: "Mon",
@@ -441,9 +493,10 @@ const APP_COPY = {
       hint: "Une fois ces valeurs définies, cette page de connexion utilisera le vrai système Auth de Supabase au lieu de l’ancienne maquette locale.",
     },
     common: {
-      back: "Retour",
-      cancel: "Annuler",
-      guest: "Invité",
+	      back: "Retour",
+	      cancel: "Annuler",
+	      done: "Terminé",
+	      guest: "Invité",
       role: "Rôle",
       home: "Accueil",
       saved: "Enregistrés",
@@ -455,7 +508,10 @@ const APP_COPY = {
       edit: "Modifier",
       delete: "Supprimer",
       driver: "Conducteur",
+      driverProfile: "Profil conducteur",
+      driverInfo: "Infos conducteur",
       rider: "Passager",
+      contact: "Contact",
       state: "État",
       allStates: "Tous les États",
       from: "Départ",
@@ -465,6 +521,14 @@ const APP_COPY = {
       anyDestination: "N’importe quelle arrivée",
       seats: "Places",
       visibility: "Visibilité",
+      tripType: "Type de trajet",
+      departureDate: "Date de départ",
+      returnDate: "Date de retour",
+      departureTime: "Heure de départ",
+      returnTime: "Heure de retour",
+      arrivalTime: "Heure d’arrivée",
+      availableSeats: "Places disponibles",
+      operatingDays: "Jours de service",
       public: "Public",
       private: "Privé",
       additionalDetails: "Détails supplémentaires",
@@ -483,9 +547,15 @@ const APP_COPY = {
       today: "Aujourd’hui",
       tomorrow: "Demain",
       past: "Passé",
-      recently: "Récent",
-      me: "Moi",
-    },
+	      recently: "Récent",
+	      me: "Moi",
+	      tapToChange: "Touchez pour modifier",
+	      tapToSelect: "Touchez pour sélectionner",
+	      selectDepartureTime: "Choisir l’heure de départ",
+	      selectReturnTime: "Choisir l’heure de retour",
+	      selectDepartureDate: "Choisir la date de départ",
+	      selectReturnDate: "Choisir la date de retour",
+	    },
     auth: {
       getStarted: "Commencez avec Roadmate",
       emailEnabled: "La connexion par e-mail est activée pour cette version.",
@@ -539,6 +609,20 @@ const APP_COPY = {
       switchHint: "Vous n’avez pas de compte ? Passez à l’inscription.",
       verificationHint: "Une vérification par e-mail peut être requise après l’inscription.",
       createAccountWithEmail: "Créer un compte par e-mail",
+      verificationEmailSentEyebrow: "E-mail de vérification envoyé",
+      verificationEmailSentBody:
+        "Ouvrez le dernier e-mail de vérification sur ce téléphone. Une fois la confirmation terminée, Roadmate se rouvre et vous connecte automatiquement.",
+      verificationEmailStepOpenNewest:
+        "Ouvrez le dernier e-mail de vérification de Roadmate.",
+      verificationEmailStepComplete:
+        "Terminez la confirmation dans la page navigateur qui s’ouvre.",
+      verificationEmailStepReturnAutomatically:
+        "Roadmate se rouvrira et terminera la connexion automatiquement.",
+      resendEmail: "Renvoyer l’e-mail",
+      signInAfterVerificationHint:
+        "Si l’app ne se rouvre pas automatiquement, ouvrez Roadmate et connectez-vous avec le même e-mail.",
+      emailVerificationAutomaticHint:
+        "Après confirmation de l’e-mail, Roadmate vous connecte automatiquement sur cet appareil.",
     },
     community: {
       regularRegistration: "Inscription régulière",
@@ -554,10 +638,10 @@ const APP_COPY = {
       savedRecent: "Enregistrés récents",
       noticeRecent: "Annonces récentes",
       noSavedRides: "Aucun trajet enregistré pour le moment.",
-      chooseSearchPrompt: (isNotice: boolean) =>
-        isNotice
-          ? "Choisissez un État ou renseignez départ et arrivée pour rechercher des annonces."
-          : "Choisissez un État ou renseignez départ et arrivée pour rechercher des trajets.",
+	      chooseSearchPrompt: (isNotice: boolean) =>
+	        isNotice
+	          ? "Renseignez départ et arrivée pour rechercher des annonces."
+	          : "Renseignez départ et arrivée pour rechercher des trajets.",
       tapSearchPrompt: (isNotice: boolean) =>
         isNotice ? "Touchez Rechercher pour voir les annonces." : "Touchez Rechercher pour voir les trajets.",
       pastOnlyPrompt: "Seules des annonces passées correspondent à ce filtre ou à cette recherche.",
@@ -656,6 +740,9 @@ const APP_COPY = {
       regularSettingsSectionTitle: "Réglages conducteur",
       regularSettingsSectionDescription:
         "Ajustez les places, les jours de circulation, les contacts et la visibilité au même endroit.",
+      publicVisibilityDescription: "Public : les passagers peuvent trouver ce trajet.",
+      privateVisibilityDescription:
+        "Privé : masqué de la recherche passager et visible seulement par vous.",
       noteSectionTitle: "Détails supplémentaires",
       oneTimeNoteDescription:
         "Optionnel : ajoutez le lieu de prise en charge ou toute information utile pour les passagers.",
@@ -730,7 +817,7 @@ const APP_COPY = {
       authenticationCouldNotBeCompleted: (message: string) =>
         `L’authentification n’a pas pu être terminée : ${message}`,
       verificationEmailSent: (email: string) =>
-        `Un e-mail de vérification a été envoyé à ${email}. Ouvrez la page de confirmation depuis cet e-mail, puis revenez dans Roadmate pour vous connecter.`,
+        `Un e-mail de vérification a été envoyé à ${email}. Ouvrez-le sur ce téléphone ; Roadmate vous connectera automatiquement après confirmation.`,
       emailVerificationStillNeeded: (email: string) =>
         `Ce compte nécessite encore une vérification par e-mail. Ouvrez l’e-mail envoyé à ${email}, puis revenez dans Roadmate.`,
       enterEmailBeforeResendingVerification:
@@ -743,9 +830,11 @@ const APP_COPY = {
         "Saisissez d’abord votre adresse e-mail pour envoyer l’e-mail de réinitialisation du mot de passe.",
       passwordResetEmailSent: (email: string) =>
         `Un e-mail de réinitialisation du mot de passe a été envoyé à ${email}. Ouvrez ce lien sur cet appareil pour définir un nouveau mot de passe.`,
-      passwordResetReady:
-        "La réinitialisation du mot de passe a été vérifiée. Saisissez un nouveau mot de passe pour terminer.",
-      passwordResetComplete: "Mot de passe mis à jour avec succès.",
+	      passwordResetReady:
+	        "La réinitialisation du mot de passe a été vérifiée. Touchez le bouton de changement de mot de passe pour terminer.",
+	      passwordResetLinkInvalid:
+	        "Le lien de réinitialisation est invalide ou expiré. Demandez un nouvel e-mail.",
+	      passwordResetComplete: "Mot de passe mis à jour avec succès.",
       passwordResetFailed: (message: string) =>
         `La réinitialisation du mot de passe a échoué : ${message}`,
       passwordResetEmailCheckFailed: (message: string) =>
@@ -756,10 +845,12 @@ const APP_COPY = {
         `${email} est déjà enregistré. Connectez-vous à la place.`,
       emailAvailableForSignUp: (email: string) =>
         `${email} est disponible pour l’inscription.`,
-      emailDuplicateCheckUnavailable:
-        "La vérification de doublon d’e-mail n’est pas disponible tant que la dernière migration Supabase n’est pas appliquée.",
-      duplicateCheckFailed: (message: string) =>
-        `Impossible de vérifier la disponibilité de l’e-mail : ${message}`,
+	      emailDuplicateCheckUnavailable:
+	        "La vérification de doublon d’e-mail n’est pas disponible tant que la dernière migration Supabase n’est pas appliquée.",
+	      emailDuplicateCheckRequired:
+	        "Veuillez vérifier la disponibilité de l’e-mail avant l’inscription.",
+	      duplicateCheckFailed: (message: string) =>
+	        `Impossible de vérifier la disponibilité de l’e-mail : ${message}`,
       signedOut: "Déconnecté.",
       oauthCanceled: (providerLabel: string) => `La connexion ${providerLabel} a été annulée.`,
       oauthMissingAuthorizationUrl:
@@ -801,12 +892,27 @@ const APP_COPY = {
       validEmail: "Veuillez saisir une adresse e-mail valide.",
       passwordLength: "Le mot de passe doit comporter au moins 6 caractères.",
       passwordConfirmMismatch: "Les mots de passe ne correspondent pas.",
+      routeNoticeDateRequired: "Choisissez la date de l’annonce avec le calendrier.",
+      routeEndpointsRequired: "Ajoutez le départ et l’arrivée avant de publier.",
+      routeDepartureTimeRequired: "Définissez l’heure de départ au format HH:MM (24 h).",
+      routeAvailableSeatsRequired: "Définissez au moins 1 place disponible.",
+      routeContactRequired:
+        "Ajoutez au moins un moyen de contact dans le profil conducteur (téléphone ou lien de chat).",
+      routeReturnDateRequired:
+        "Choisissez la date de retour avec le calendrier pour l’annonce aller-retour.",
+      routeReturnTimeRequired:
+        "Définissez l’heure de retour au format HH:MM (24 h) pour l’annonce aller-retour.",
+      routeArrivalTimeRequired: "Définissez l’heure d’arrivée au format HH:MM (24 h).",
+      routeOperatingDaysRequired: "Sélectionnez au moins un jour de service.",
     },
     alerts: {
       leaveCommunityTitle: "Quitter la communauté ?",
       leaveCommunityBody:
         "Cela supprime vos publications de trajet et votre profil conducteur, marque votre accès communautaire comme inactif et vous déconnecte.",
       leaveCommunityAction: "Quitter",
+      deleteRouteTitle: (kind: string) => `Supprimer ${kind} ?`,
+      deleteRouteBody: (kind: string) =>
+        `Cette inscription ${kind} sera retirée de la recherche des passagers. Cette action est définitive.`,
     },
     weekdays: {
       Mon: "Lun",
@@ -861,9 +967,10 @@ const APP_COPY = {
       hint: "값을 설정하면 이 로그인 화면은 이전 로컬 전용 목업 대신 실제 Supabase Auth를 사용합니다.",
     },
     common: {
-      back: "뒤로",
-      cancel: "취소",
-      guest: "게스트",
+	      back: "뒤로",
+	      cancel: "취소",
+	      done: "완료",
+	      guest: "게스트",
       role: "역할",
       home: "홈",
       saved: "저장됨",
@@ -875,7 +982,10 @@ const APP_COPY = {
       edit: "수정",
       delete: "삭제",
       driver: "드라이버",
+      driverProfile: "드라이버 프로필",
+      driverInfo: "드라이버 정보",
       rider: "라이더",
+      contact: "연락처",
       state: "주",
       allStates: "전체 주",
       from: "출발지",
@@ -885,6 +995,14 @@ const APP_COPY = {
       anyDestination: "어디든",
       seats: "좌석",
       visibility: "공개 범위",
+      tripType: "이동 방식",
+      departureDate: "출발 날짜",
+      returnDate: "복귀 날짜",
+      departureTime: "출발 시간",
+      returnTime: "복귀 시간",
+      arrivalTime: "도착 시간",
+      availableSeats: "가능 좌석 수",
+      operatingDays: "운행 요일",
       public: "공개",
       private: "비공개",
       additionalDetails: "추가 안내",
@@ -903,9 +1021,15 @@ const APP_COPY = {
       today: "오늘",
       tomorrow: "내일",
       past: "지난 일정",
-      recently: "최근",
-      me: "나",
-    },
+	      recently: "최근",
+	      me: "나",
+	      tapToChange: "눌러서 변경",
+	      tapToSelect: "눌러서 선택",
+	      selectDepartureTime: "출발 시간 선택",
+	      selectReturnTime: "복귀 시간 선택",
+	      selectDepartureDate: "출발 날짜 선택",
+	      selectReturnDate: "복귀 날짜 선택",
+	    },
     auth: {
       getStarted: "Roadmate 시작하기",
       emailEnabled: "이 빌드에서는 이메일 로그인이 활성화되어 있습니다.",
@@ -956,6 +1080,18 @@ const APP_COPY = {
       switchHint: "계정이 없나요? 회원가입으로 전환하세요.",
       verificationHint: "회원가입 후 이메일 인증이 필요할 수 있습니다.",
       createAccountWithEmail: "이메일로 계정 만들기",
+      verificationEmailSentEyebrow: "인증 메일 발송 완료",
+      verificationEmailSentBody:
+        "이 휴대폰에서 가장 최근 인증 메일을 여세요. 인증이 끝나면 Roadmate가 다시 열리고 자동으로 로그인됩니다.",
+      verificationEmailStepOpenNewest: "Roadmate에서 보낸 최신 인증 메일을 엽니다.",
+      verificationEmailStepComplete: "열린 브라우저 페이지에서 이메일 인증을 완료합니다.",
+      verificationEmailStepReturnAutomatically:
+        "Roadmate가 다시 열리며 로그인을 자동으로 마무리합니다.",
+      resendEmail: "이메일 다시 보내기",
+      signInAfterVerificationHint:
+        "앱이 자동으로 열리지 않으면 Roadmate를 직접 열고 같은 이메일로 로그인하세요.",
+      emailVerificationAutomaticHint:
+        "이메일 인증이 끝나면 이 기기에서 Roadmate가 자동으로 로그인합니다.",
     },
     community: {
       regularRegistration: "정기 등록",
@@ -971,10 +1107,10 @@ const APP_COPY = {
       savedRecent: "최근 저장순",
       noticeRecent: "공지 최신순",
       noSavedRides: "아직 저장한 라이드가 없습니다.",
-      chooseSearchPrompt: (isNotice: boolean) =>
-        isNotice
-          ? "주를 선택하거나 출발지와 도착지를 모두 입력해 공지를 검색하세요."
-          : "주를 선택하거나 출발지와 도착지를 모두 입력해 라이드를 검색하세요.",
+	      chooseSearchPrompt: (isNotice: boolean) =>
+	        isNotice
+	          ? "출발지와 도착지를 모두 입력해 공지를 검색하세요."
+	          : "출발지와 도착지를 모두 입력해 라이드를 검색하세요.",
       tapSearchPrompt: (isNotice: boolean) =>
         isNotice ? "검색 버튼을 눌러 공지를 확인하세요." : "검색 버튼을 눌러 라이드를 확인하세요.",
       pastOnlyPrompt: "이 필터 또는 검색에는 지난 공지만 일치합니다.",
@@ -1064,6 +1200,8 @@ const APP_COPY = {
       regularSettingsSectionTitle: "드라이버 설정",
       regularSettingsSectionDescription:
         "좌석 수, 운행 요일, 연락처 오버라이드, 공개 범위를 한 번에 조정하세요.",
+      publicVisibilityDescription: "공개: 라이더가 이 경로를 검색할 수 있습니다.",
+      privateVisibilityDescription: "비공개: 라이더 검색에서는 숨기고 본인에게만 표시합니다.",
       noteSectionTitle: "추가 안내",
       oneTimeNoteDescription: "선택 사항: 탑승 위치나 추가 안내가 있다면 적어두세요.",
       regularNoteDescription:
@@ -1130,7 +1268,7 @@ const APP_COPY = {
       emailVerifiedAndSignedIn: "이메일 인증이 완료되어 바로 로그인되었습니다.",
       authenticationCouldNotBeCompleted: (message: string) => `인증을 완료할 수 없습니다: ${message}`,
       verificationEmailSent: (email: string) =>
-        `${email}로 인증 메일을 보냈습니다. 메일의 확인 페이지를 완료한 뒤 Roadmate로 돌아와 로그인하세요.`,
+        `${email}로 인증 메일을 보냈습니다. 이 휴대폰에서 열면 인증 후 Roadmate가 자동으로 로그인합니다.`,
       emailVerificationStillNeeded: (email: string) =>
         `이 계정은 아직 이메일 인증이 필요합니다. ${email}로 온 메일을 열어 인증한 뒤 Roadmate로 돌아오세요.`,
       enterEmailBeforeResendingVerification:
@@ -1142,8 +1280,11 @@ const APP_COPY = {
         "비밀번호 재설정 메일을 보내려면 먼저 이메일 주소를 입력하세요.",
       passwordResetEmailSent: (email: string) =>
         `${email}로 비밀번호 재설정 메일을 보냈습니다. 이 기기에서 링크를 열어 새 비밀번호를 설정하세요.`,
-      passwordResetReady: "비밀번호 재설정 인증이 확인되었습니다. 새 비밀번호를 입력해 마무리하세요.",
-      passwordResetComplete: "비밀번호가 변경되었습니다.",
+	      passwordResetReady:
+	        "비밀번호 재설정 인증이 확인되었습니다. 비밀번호 변경하기 버튼을 눌러 마무리하세요.",
+	      passwordResetLinkInvalid:
+	        "비밀번호 재설정 링크가 유효하지 않거나 만료되었습니다. 재설정 메일을 다시 요청하세요.",
+	      passwordResetComplete: "비밀번호가 변경되었습니다.",
       passwordResetFailed: (message: string) => `비밀번호 재설정 실패: ${message}`,
       passwordResetEmailCheckFailed: (message: string) =>
         `이 이메일이 가입된 계정인지 확인하지 못했습니다: ${message}`,
@@ -1152,9 +1293,10 @@ const APP_COPY = {
       duplicateEmailFound: (email: string) =>
         `${email}은(는) 이미 가입된 이메일입니다. 로그인으로 진행하세요.`,
       emailAvailableForSignUp: (email: string) => `${email}은(는) 가입 가능한 이메일입니다.`,
-      emailDuplicateCheckUnavailable:
-        "최신 Supabase 마이그레이션이 적용되기 전까지는 이메일 중복 확인을 사용할 수 없습니다.",
-      duplicateCheckFailed: (message: string) => `이메일 중복 확인에 실패했습니다: ${message}`,
+	      emailDuplicateCheckUnavailable:
+	        "최신 Supabase 마이그레이션이 적용되기 전까지는 이메일 중복 확인을 사용할 수 없습니다.",
+	      emailDuplicateCheckRequired: "회원가입 전에 이메일 중복 확인을 완료하세요.",
+	      duplicateCheckFailed: (message: string) => `이메일 중복 확인에 실패했습니다: ${message}`,
       signedOut: "로그아웃되었습니다.",
       oauthCanceled: (providerLabel: string) => `${providerLabel} 로그인이 취소되었습니다.`,
       oauthMissingAuthorizationUrl: "OAuth를 시작할 수 없습니다. 인증 URL이 없습니다.",
@@ -1192,12 +1334,25 @@ const APP_COPY = {
       validEmail: "올바른 이메일 주소를 입력하세요.",
       passwordLength: "비밀번호는 최소 6자 이상이어야 합니다.",
       passwordConfirmMismatch: "비밀번호가 서로 일치하지 않습니다.",
+      routeNoticeDateRequired: "달력에서 공지 날짜를 선택하세요.",
+      routeEndpointsRequired: "등록 전에 출발지와 도착지를 모두 입력하세요.",
+      routeDepartureTimeRequired: "출발 시간을 HH:MM 형식(24시간)으로 설정하세요.",
+      routeAvailableSeatsRequired: "가능 좌석 수는 최소 1석 이상이어야 합니다.",
+      routeContactRequired:
+        "드라이버 프로필에 연락 수단을 최소 1개 추가하세요. (전화번호 또는 채팅 링크)",
+      routeReturnDateRequired: "왕복 공지는 달력에서 복귀 날짜를 선택해야 합니다.",
+      routeReturnTimeRequired: "왕복 공지는 복귀 시간을 HH:MM 형식(24시간)으로 설정해야 합니다.",
+      routeArrivalTimeRequired: "도착 시간을 HH:MM 형식(24시간)으로 설정하세요.",
+      routeOperatingDaysRequired: "운행 요일을 최소 1개 선택하세요.",
     },
     alerts: {
       leaveCommunityTitle: "커뮤니티에서 나가시겠어요?",
       leaveCommunityBody:
         "공개 경로 게시물과 드라이버 프로필이 삭제되고, 커뮤니티 접근이 비활성화된 뒤 로그아웃됩니다.",
       leaveCommunityAction: "나가기",
+      deleteRouteTitle: (kind: string) => `${kind} 등록을 삭제할까요?`,
+      deleteRouteBody: (kind: string) =>
+        `이 ${kind} 등록은 라이더 검색에서 사라지며, 삭제 후에는 되돌릴 수 없습니다.`,
     },
     weekdays: {
       Mon: "월",
@@ -1252,9 +1407,10 @@ const APP_COPY = {
       hint: "これらの値を設定すると、このログイン画面は以前のローカル専用モックではなく実際の Supabase Auth を使います。",
     },
     common: {
-      back: "戻る",
-      cancel: "キャンセル",
-      guest: "ゲスト",
+	      back: "戻る",
+	      cancel: "キャンセル",
+	      done: "完了",
+	      guest: "ゲスト",
       role: "役割",
       home: "ホーム",
       saved: "保存",
@@ -1266,7 +1422,10 @@ const APP_COPY = {
       edit: "編集",
       delete: "削除",
       driver: "ドライバー",
+      driverProfile: "ドライバープロフィール",
+      driverInfo: "ドライバー情報",
       rider: "ライダー",
+      contact: "連絡先",
       state: "州",
       allStates: "すべての州",
       from: "出発地",
@@ -1276,6 +1435,14 @@ const APP_COPY = {
       anyDestination: "到着地指定なし",
       seats: "座席",
       visibility: "公開範囲",
+      tripType: "移動タイプ",
+      departureDate: "出発日",
+      returnDate: "復路日",
+      departureTime: "出発時刻",
+      returnTime: "復路時刻",
+      arrivalTime: "到着時刻",
+      availableSeats: "空き座席数",
+      operatingDays: "運行曜日",
       public: "公開",
       private: "非公開",
       additionalDetails: "追加情報",
@@ -1294,9 +1461,15 @@ const APP_COPY = {
       today: "今日",
       tomorrow: "明日",
       past: "終了",
-      recently: "最近",
-      me: "自分",
-    },
+	      recently: "最近",
+	      me: "自分",
+	      tapToChange: "タップして変更",
+	      tapToSelect: "タップして選択",
+	      selectDepartureTime: "出発時刻を選択",
+	      selectReturnTime: "復路時刻を選択",
+	      selectDepartureDate: "出発日を選択",
+	      selectReturnDate: "復路日を選択",
+	    },
     auth: {
       getStarted: "Roadmate を始める",
       emailEnabled: "このビルドではメールサインインが有効です。",
@@ -1350,6 +1523,18 @@ const APP_COPY = {
       switchHint: "アカウントがありませんか？ 登録に切り替えてください。",
       verificationHint: "登録後にメール認証が必要になる場合があります。",
       createAccountWithEmail: "メールでアカウント作成",
+      verificationEmailSentEyebrow: "認証メールを送信しました",
+      verificationEmailSentBody:
+        "この端末で最新の認証メールを開いてください。確認が完了すると Roadmate が再度開き、自動でログインします。",
+      verificationEmailStepOpenNewest: "Roadmate からの最新の認証メールを開きます。",
+      verificationEmailStepComplete: "開いたブラウザページで確認を完了します。",
+      verificationEmailStepReturnAutomatically:
+        "Roadmate が再度開き、ログインを自動で完了します。",
+      resendEmail: "メールを再送信",
+      signInAfterVerificationHint:
+        "アプリが自動で開かない場合は、Roadmate を開いて同じメールでログインしてください。",
+      emailVerificationAutomaticHint:
+        "メール確認後、この端末で Roadmate が自動ログインします。",
     },
     community: {
       regularRegistration: "定期登録",
@@ -1365,10 +1550,10 @@ const APP_COPY = {
       savedRecent: "保存順",
       noticeRecent: "お知らせ新着順",
       noSavedRides: "まだ保存したライドはありません。",
-      chooseSearchPrompt: (isNotice: boolean) =>
-        isNotice
-          ? "州を選ぶか、出発地と到着地の両方を入力してお知らせを検索してください。"
-          : "州を選ぶか、出発地と到着地の両方を入力してライドを検索してください。",
+	      chooseSearchPrompt: (isNotice: boolean) =>
+	        isNotice
+	          ? "出発地と到着地の両方を入力してお知らせを検索してください。"
+	          : "出発地と到着地の両方を入力してライドを検索してください。",
       tapSearchPrompt: (isNotice: boolean) =>
         isNotice ? "検索を押してお知らせを表示します。" : "検索を押してライドを表示します。",
       pastOnlyPrompt: "この条件では過去のお知らせのみ一致しています。",
@@ -1465,6 +1650,8 @@ const APP_COPY = {
       regularSettingsSectionTitle: "ドライバー設定",
       regularSettingsSectionDescription:
         "座席数、運行曜日、連絡先の上書き、公開範囲をまとめて調整できます。",
+      publicVisibilityDescription: "公開：ライダーがこのルートを検索できます。",
+      privateVisibilityDescription: "非公開：ライダー検索では非表示になり、自分だけに表示されます。",
       noteSectionTitle: "追加メモ",
       oneTimeNoteDescription: "任意: 乗車場所や補足案内があればここに書いておけます。",
       regularNoteDescription:
@@ -1537,7 +1724,7 @@ const APP_COPY = {
       authenticationCouldNotBeCompleted: (message: string) =>
         `認証を完了できませんでした: ${message}`,
       verificationEmailSent: (email: string) =>
-        `${email} に確認メールを送りました。メール内の確認ページを完了したあと、Roadmate に戻ってログインしてください。`,
+        `${email} に確認メールを送りました。この端末で開くと、確認後 Roadmate が自動でログインします。`,
       emailVerificationStillNeeded: (email: string) =>
         `このアカウントはまだメール認証が必要です。${email} に送られたメールを開いてから Roadmate に戻ってください。`,
       enterEmailBeforeResendingVerification:
@@ -1550,9 +1737,11 @@ const APP_COPY = {
         "パスワード再設定メールを送るには、先にメールアドレスを入力してください。",
       passwordResetEmailSent: (email: string) =>
         `${email} にパスワード再設定メールを送りました。この端末でそのリンクを開いて新しいパスワードを設定してください。`,
-      passwordResetReady:
-        "パスワード再設定の認証が確認されました。新しいパスワードを入力して完了してください。",
-      passwordResetComplete: "パスワードを更新しました。",
+	      passwordResetReady:
+	        "パスワード再設定の認証が確認されました。パスワード変更ボタンを押して完了してください。",
+	      passwordResetLinkInvalid:
+	        "パスワード再設定リンクが無効または期限切れです。再設定メールを再度リクエストしてください。",
+	      passwordResetComplete: "パスワードを更新しました。",
       passwordResetFailed: (message: string) => `パスワード再設定に失敗しました: ${message}`,
       passwordResetEmailCheckFailed: (message: string) =>
         `このメールアドレスが登録済みか確認できませんでした: ${message}`,
@@ -1562,10 +1751,11 @@ const APP_COPY = {
         `${email} はすでに登録されています。代わりにログインしてください。`,
       emailAvailableForSignUp: (email: string) =>
         `${email} は登録に使用できます。`,
-      emailDuplicateCheckUnavailable:
-        "最新の Supabase マイグレーションが適用されるまで、メール重複確認は利用できません。",
-      duplicateCheckFailed: (message: string) =>
-        `メール重複確認に失敗しました: ${message}`,
+	      emailDuplicateCheckUnavailable:
+	        "最新の Supabase マイグレーションが適用されるまで、メール重複確認は利用できません。",
+	      emailDuplicateCheckRequired: "登録前にメール重複確認を完了してください。",
+	      duplicateCheckFailed: (message: string) =>
+	        `メール重複確認に失敗しました: ${message}`,
       signedOut: "ログアウトしました。",
       oauthCanceled: (providerLabel: string) => `${providerLabel} ログインはキャンセルされました。`,
       oauthMissingAuthorizationUrl: "OAuth を開始できません。認証 URL がありません。",
@@ -1603,12 +1793,25 @@ const APP_COPY = {
       validEmail: "有効なメールアドレスを入力してください。",
       passwordLength: "パスワードは 6 文字以上である必要があります。",
       passwordConfirmMismatch: "パスワードが一致しません。",
+      routeNoticeDateRequired: "カレンダーでお知らせ日を選択してください。",
+      routeEndpointsRequired: "投稿前に出発地と到着地を両方入力してください。",
+      routeDepartureTimeRequired: "出発時刻を HH:MM 形式（24時間）で設定してください。",
+      routeAvailableSeatsRequired: "空き座席数は 1 以上に設定してください。",
+      routeContactRequired:
+        "ドライバープロフィールに連絡手段を少なくとも 1 つ追加してください（電話またはチャットリンク）。",
+      routeReturnDateRequired: "往復のお知らせではカレンダーで復路日を選択してください。",
+      routeReturnTimeRequired: "往復のお知らせでは復路時刻を HH:MM 形式（24時間）で設定してください。",
+      routeArrivalTimeRequired: "到着時刻を HH:MM 形式（24時間）で設定してください。",
+      routeOperatingDaysRequired: "運行曜日を少なくとも 1 つ選択してください。",
     },
     alerts: {
       leaveCommunityTitle: "コミュニティを退出しますか？",
       leaveCommunityBody:
         "ルート投稿とドライバープロフィールが削除され、コミュニティアクセスが無効になった後にログアウトします。",
       leaveCommunityAction: "退出",
+      deleteRouteTitle: (kind: string) => `${kind} 登録を削除しますか？`,
+      deleteRouteBody: (kind: string) =>
+        `この ${kind} 登録はライダー検索から削除されます。この操作は元に戻せません。`,
     },
     weekdays: {
       Mon: "月",
@@ -1663,9 +1866,10 @@ const APP_COPY = {
       hint: "设置完成后，此登录页将使用真实的 Supabase Auth，而不是之前的本地 mock。",
     },
     common: {
-      back: "返回",
-      cancel: "取消",
-      guest: "游客",
+	      back: "返回",
+	      cancel: "取消",
+	      done: "完成",
+	      guest: "游客",
       role: "角色",
       home: "首页",
       saved: "已保存",
@@ -1677,7 +1881,10 @@ const APP_COPY = {
       edit: "编辑",
       delete: "删除",
       driver: "司机",
+      driverProfile: "司机资料",
+      driverInfo: "司机信息",
       rider: "乘客",
+      contact: "联系方式",
       state: "州",
       allStates: "所有州",
       from: "出发地",
@@ -1687,6 +1894,14 @@ const APP_COPY = {
       anyDestination: "任意目的地",
       seats: "座位",
       visibility: "可见范围",
+      tripType: "行程类型",
+      departureDate: "出发日期",
+      returnDate: "返回日期",
+      departureTime: "出发时间",
+      returnTime: "返回时间",
+      arrivalTime: "到达时间",
+      availableSeats: "可用座位",
+      operatingDays: "运营日期",
       public: "公开",
       private: "私密",
       additionalDetails: "附加说明",
@@ -1705,9 +1920,15 @@ const APP_COPY = {
       today: "今天",
       tomorrow: "明天",
       past: "已过期",
-      recently: "最近",
-      me: "我",
-    },
+	      recently: "最近",
+	      me: "我",
+	      tapToChange: "点击更改",
+	      tapToSelect: "点击选择",
+	      selectDepartureTime: "选择出发时间",
+	      selectReturnTime: "选择返回时间",
+	      selectDepartureDate: "选择出发日期",
+	      selectReturnDate: "选择返回日期",
+	    },
     auth: {
       getStarted: "开始使用 Roadmate",
       emailEnabled: "此版本已启用邮箱登录。",
@@ -1758,6 +1979,17 @@ const APP_COPY = {
       switchHint: "还没有账号？切换到注册。",
       verificationHint: "注册后可能需要进行邮箱验证。",
       createAccountWithEmail: "用邮箱创建账号",
+      verificationEmailSentEyebrow: "验证邮件已发送",
+      verificationEmailSentBody:
+        "请在这台手机上打开最新的验证邮件。确认完成后，Roadmate 会重新打开并自动登录。",
+      verificationEmailStepOpenNewest: "打开 Roadmate 发送的最新验证邮件。",
+      verificationEmailStepComplete: "在打开的浏览器页面中完成确认。",
+      verificationEmailStepReturnAutomatically: "Roadmate 会重新打开并自动完成登录。",
+      resendEmail: "重新发送邮件",
+      signInAfterVerificationHint:
+        "如果应用没有自动打开，请手动打开 Roadmate 并使用同一邮箱登录。",
+      emailVerificationAutomaticHint:
+        "邮箱确认后，Roadmate 会在此设备上自动登录。",
     },
     community: {
       regularRegistration: "固定行程登记",
@@ -1773,10 +2005,10 @@ const APP_COPY = {
       savedRecent: "按最近保存",
       noticeRecent: "按通知时间",
       noSavedRides: "还没有保存的行程。",
-      chooseSearchPrompt: (isNotice: boolean) =>
-        isNotice
-          ? "请选择州，或同时填写出发地和目的地以搜索通知。"
-          : "请选择州，或同时填写出发地和目的地以搜索行程。",
+	      chooseSearchPrompt: (isNotice: boolean) =>
+	        isNotice
+	          ? "同时填写出发地和目的地以搜索通知。"
+	          : "同时填写出发地和目的地以搜索行程。",
       tapSearchPrompt: (isNotice: boolean) =>
         isNotice ? "点击搜索以查看通知。" : "点击搜索以查看行程。",
       pastOnlyPrompt: "当前筛选或搜索仅匹配到已过期通知。",
@@ -1867,6 +2099,8 @@ const APP_COPY = {
       regularSettingsSectionTitle: "司机设置",
       regularSettingsSectionDescription:
         "在这里统一调整座位数、运行日期、联系方式覆盖和公开范围。",
+      publicVisibilityDescription: "公开：乘客可以搜索到这条路线。",
+      privateVisibilityDescription: "私密：从乘客搜索中隐藏，仅自己可见。",
       noteSectionTitle: "补充说明",
       oneTimeNoteDescription: "可选：如果有上车地点或补充说明，可以写在这里。",
       regularNoteDescription:
@@ -1933,7 +2167,7 @@ const APP_COPY = {
       emailVerifiedAndSignedIn: "邮箱已验证，现在已登录。",
       authenticationCouldNotBeCompleted: (message: string) => `无法完成身份验证：${message}`,
       verificationEmailSent: (email: string) =>
-        `验证邮件已发送到 ${email}。请先完成邮件中的确认页面，然后返回 Roadmate 再登录。`,
+        `验证邮件已发送到 ${email}。请在这台手机上打开；确认后 Roadmate 会自动登录。`,
       emailVerificationStillNeeded: (email: string) =>
         `该账号仍需进行邮箱验证。请打开发送到 ${email} 的邮件，然后再返回 Roadmate。`,
       enterEmailBeforeResendingVerification: "请先输入邮箱地址，再重新发送验证邮件。",
@@ -1943,18 +2177,21 @@ const APP_COPY = {
       enterEmailBeforePasswordReset: "请先输入邮箱地址，再发送密码重置邮件。",
       passwordResetEmailSent: (email: string) =>
         `密码重置邮件已发送到 ${email}。请在这台设备上打开邮件中的链接并设置新密码。`,
-      passwordResetReady: "密码重置验证已完成。请输入新密码以继续。",
+      passwordResetReady: "密码重置验证已完成。点击修改密码按钮即可继续。",
       passwordResetComplete: "密码已更新。",
       passwordResetFailed: (message: string) => `密码重置失败：${message}`,
       passwordResetEmailCheckFailed: (message: string) =>
         `无法确认该邮箱是否已注册：${message}`,
-      passwordResetEmailNotRegistered: (email: string) =>
-        `${email} 尚未注册，无法为这个邮箱找回密码。`,
-      duplicateEmailFound: (email: string) => `${email} 已经注册，请直接登录。`,
+	      passwordResetEmailNotRegistered: (email: string) =>
+	        `${email} 尚未注册，无法为这个邮箱找回密码。`,
+	      passwordResetLinkInvalid:
+	        "密码重置链接无效或已过期。请重新请求重置邮件。",
+	      duplicateEmailFound: (email: string) => `${email} 已经注册，请直接登录。`,
       emailAvailableForSignUp: (email: string) => `${email} 可用于注册。`,
-      emailDuplicateCheckUnavailable:
-        "在应用最新的 Supabase migration 之前，暂时无法检查邮箱是否重复。",
-      duplicateCheckFailed: (message: string) => `无法检查邮箱是否可用：${message}`,
+	      emailDuplicateCheckUnavailable:
+	        "在应用最新的 Supabase migration 之前，暂时无法检查邮箱是否重复。",
+	      emailDuplicateCheckRequired: "注册前请先完成邮箱重复检查。",
+	      duplicateCheckFailed: (message: string) => `无法检查邮箱是否可用：${message}`,
       signedOut: "已退出登录。",
       oauthCanceled: (providerLabel: string) => `${providerLabel} 登录已取消。`,
       oauthMissingAuthorizationUrl: "无法启动 OAuth 流程，缺少授权 URL。",
@@ -1992,12 +2229,24 @@ const APP_COPY = {
       validEmail: "请输入有效的邮箱地址。",
       passwordLength: "密码至少需要 6 位。",
       passwordConfirmMismatch: "两次输入的密码不一致。",
+      routeNoticeDateRequired: "请使用日历选择通知日期。",
+      routeEndpointsRequired: "发布前请同时填写出发地和目的地。",
+      routeDepartureTimeRequired: "请按 HH:MM 格式（24小时制）设置出发时间。",
+      routeAvailableSeatsRequired: "可用座位至少需要 1 个。",
+      routeContactRequired: "请在司机资料中至少添加一种联系方式（电话或聊天链接）。",
+      routeReturnDateRequired: "往返通知需要使用日历选择返回日期。",
+      routeReturnTimeRequired: "往返通知需要按 HH:MM 格式（24小时制）设置返回时间。",
+      routeArrivalTimeRequired: "请按 HH:MM 格式（24小时制）设置到达时间。",
+      routeOperatingDaysRequired: "请至少选择一个运营日期。",
     },
     alerts: {
       leaveCommunityTitle: "确定要离开社区吗？",
       leaveCommunityBody:
         "这会删除你的路线帖子和司机资料，将社区访问标记为停用，然后退出登录。",
       leaveCommunityAction: "离开",
+      deleteRouteTitle: (kind: string) => `删除${kind}登记？`,
+      deleteRouteBody: (kind: string) =>
+        `这会将该${kind}登记从乘客搜索中移除，删除后无法恢复。`,
     },
     weekdays: {
       Mon: "周一",

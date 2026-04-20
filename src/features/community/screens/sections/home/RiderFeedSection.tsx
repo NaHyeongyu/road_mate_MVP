@@ -34,6 +34,7 @@ type RiderFeedSectionProps = {
   onStateFilterChange: (value: StateFilter) => void;
   onFromSearchQueryChange: (value: string) => void;
   onToSearchQueryChange: (value: string) => void;
+  onOpenRouteDetailPage: (post: RoutePost) => void;
   onToggleSavedPost: (post: RoutePost) => void;
   isSearchResultsPageVisible: boolean;
   canLoadMoreSearchResults: boolean;
@@ -55,6 +56,7 @@ export function RiderFeedSection({
   onStateFilterChange,
   onFromSearchQueryChange,
   onToSearchQueryChange,
+  onOpenRouteDetailPage,
   onToggleSavedPost,
   isSearchResultsPageVisible,
   canLoadMoreSearchResults,
@@ -204,9 +206,10 @@ export function RiderFeedSection({
                   styles={styles}
                   containerStyle={styles.riderFeedPostCard}
                   isSaved={savedPostKeySet.has(getPostSaveKey(post))}
+                  onViewDetails={() => onOpenRouteDetailPage(post)}
                   onToggleSave={() => onToggleSavedPost(post)}
                   extraContent={
-                    post.note.trim() ? (
+                    post.kind === "regular" && post.note.trim() ? (
                       <View style={styles.postSummaryRow}>
                         <Text style={styles.postSummaryText}>{copy.common.note}</Text>
                         <Text numberOfLines={5} ellipsizeMode="tail" style={styles.postNote}>

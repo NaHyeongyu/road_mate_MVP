@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from "react";
+import type { ReactNode } from "react";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import {
   Pressable,
@@ -17,7 +17,6 @@ import {
 } from "../../../i18n/formatters";
 import type { RoutePost } from "../../../model";
 import type { AppStyles } from "../../../ui/types";
-import { RoutePostDetailModal } from "./RoutePostDetailModal";
 import { PostCardActions } from "./postCard/PostCardActions";
 import { PostCardContactRow } from "./postCard/PostCardContactRow";
 import { PostCardHeader } from "./postCard/PostCardHeader";
@@ -30,7 +29,9 @@ type PostCardProps = {
   isOwnedByCurrentUser?: boolean;
   isSaved?: boolean;
   viewDetailsLabel?: string;
-  disableDetailModal?: boolean;
+  disableDetails?: boolean;
+  hideOwnedEditAction?: boolean;
+  showNoticeNotePreview?: boolean;
   containerStyle?: StyleProp<ViewStyle>;
   onViewDetails?: () => void;
   extraContent?: ReactNode;
@@ -44,7 +45,9 @@ export function PostCard({
   isOwnedByCurrentUser = false,
   isSaved = false,
   viewDetailsLabel,
-  disableDetailModal = false,
+  disableDetails = false,
+  hideOwnedEditAction = false,
+  showNoticeNotePreview = true,
   containerStyle,
   onViewDetails,
   extraContent,
@@ -87,21 +90,17 @@ export function PostCard({
         ? `${noticeDateLabel} -> ${returnDateLabel}`
         : copy.community.noticeFor(noticeDateLabel)
       : "";
-  const [isDetailOpen, setIsDetailOpen] = useState(false);
+  const canOpenDetails = Boolean(onViewDetails) && !disableDetails;
   const handleViewDetails = () => {
-    if (onViewDetails) {
-      onViewDetails();
-      return;
-    }
-
-    if (!disableDetailModal) {
-      setIsDetailOpen(true);
+    if (canOpenDetails) {
+      onViewDetails?.();
     }
   };
-  const canOpenDetails = Boolean(onViewDetails || !disableDetailModal);
-  const shouldShowEditAction = isOwnedByCurrentUser && canOpenDetails && Boolean(onDelete || onViewDetails);
+  const shouldShowEditAction = isOwnedByCurrentUser && canOpenDetails && !hideOwnedEditAction;
   const shouldShowSaveAction = !isOwnedByCurrentUser && Boolean(onToggleSave);
   const editLabel = viewDetailsLabel ?? copy.common.edit;
+  const notePreview = post.note.trim();
+  const shouldShowNoticeNotePreview = !isRegular && showNoticeNotePreview && Boolean(notePreview);
 
   const cardBodyContent = (
     <>
@@ -179,6 +178,15 @@ export function PostCard({
         </View>
       )}
 
+      {shouldShowNoticeNotePreview ? (
+        <View style={styles.postSummaryRow}>
+          <Text style={styles.postSummaryText}>{copy.common.note}</Text>
+          <Text numberOfLines={5} ellipsizeMode="tail" style={styles.postNote}>
+            {notePreview}
+          </Text>
+        </View>
+      ) : null}
+
       {extraContent}
 
       <PostCardContactRow post={post} styles={styles} />
@@ -224,19 +232,6 @@ export function PostCard({
           onDelete={onDelete}
         />
       </View>
-
-      {!disableDetailModal ? (
-        <RoutePostDetailModal
-          visible={isDetailOpen}
-          post={post}
-          styles={styles}
-          isOwnedByCurrentUser={isOwnedByCurrentUser}
-          isSaved={isSaved}
-          onDelete={onDelete}
-          onToggleSave={onToggleSave}
-          onClose={() => setIsDetailOpen(false)}
-        />
-      ) : null}
     </>
   );
 }

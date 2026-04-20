@@ -3,6 +3,7 @@ import { Platform, useColorScheme, View } from "react-native";
 
 import RoadmateLogoDark from "./assets/branding/logo_dark.svg";
 import RoadmateLogoLight from "./assets/branding/logo_light.svg";
+import { AppAdminOperationsScreen } from "./src/app/screens/AppAdminOperationsScreen";
 import { AppAuthExperienceScreen } from "./src/app/screens/AppAuthExperienceScreen";
 import { AppAuthCompleteScreen } from "./src/app/screens/AppAuthCompleteScreen";
 import { AppCommunityExperienceScreen } from "./src/app/screens/AppCommunityExperienceScreen";
@@ -24,15 +25,21 @@ export default function App() {
     Platform.OS === "web" &&
     typeof window !== "undefined" &&
     window.location.pathname.replace(/\/+$/, "") === "/auth/complete";
+  const isWebAdminRoute =
+    Platform.OS === "web" &&
+    typeof window !== "undefined" &&
+    window.location.pathname.replace(/\/+$/, "") === "/admin";
 
   const isSupabaseReady = appState.isSupabaseConfigured && Boolean(supabase);
   const isLanguageSelectionExperience = !appState.hasCompletedLanguageSelection;
   const isAuthExperience = appState.authEntryMethod !== "options";
   const shouldUseLightShell =
-    isLanguageSelectionExperience || isAuthExperience || isWebAuthCompleteRoute;
+    !isWebAdminRoute && (isLanguageSelectionExperience || isAuthExperience || isWebAuthCompleteRoute);
   const colors = shouldUseLightShell
     ? brandPalette.light
-    : isDarkMode
+    : isWebAdminRoute
+      ? brandPalette.dark
+      : isDarkMode
       ? brandPalette.dark
       : brandPalette.light;
   const logoSource = shouldUseLightShell
@@ -41,12 +48,14 @@ export default function App() {
       ? (RoadmateLogoDark as unknown)
       : (RoadmateLogoLight as unknown);
   const styles = useMemo(() => createStyles(colors), [colors]);
-  useAppOpenAd({ enabled: Boolean(appState.currentUser) });
+  useAppOpenAd({ enabled: Boolean(appState.currentUser) && !isWebAdminRoute });
 
   return (
     <AppI18nProvider language={appState.appLanguage} onChangeLanguage={appState.setAppLanguage}>
       <View style={{ flex: 1 }}>
-        {isWebAuthCompleteRoute ? (
+        {isWebAdminRoute ? (
+          <AppAdminOperationsScreen appState={appState} isSupabaseReady={isSupabaseReady} />
+        ) : isWebAuthCompleteRoute ? (
           <AppAuthCompleteScreen colors={colors} styles={styles} logoSource={logoSource} />
         ) : appState.loading || (appState.currentUserId && appState.isVehicleLoading) ? (
           <AppLoadingScreen colors={colors} styles={styles} scheme={scheme} />

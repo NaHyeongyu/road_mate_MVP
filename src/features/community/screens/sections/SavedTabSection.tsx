@@ -13,6 +13,7 @@ type SavedTabSectionProps = {
   savedPosts: RoutePost[];
   currentUserId: string;
   savedPostKeys: string[];
+  onOpenRouteDetailPage: (post: RoutePost) => void;
   onToggleSavedPost: (post: RoutePost) => void;
 };
 
@@ -22,6 +23,7 @@ export function SavedTabSection({
   savedPosts,
   currentUserId,
   savedPostKeys,
+  onOpenRouteDetailPage,
   onToggleSavedPost,
 }: SavedTabSectionProps) {
   const copy = useAppCopy();
@@ -122,6 +124,7 @@ export function SavedTabSection({
             post={post}
             styles={styles}
             isSaved={savedPostKeySet.has(getPostSaveKey(post))}
+            onViewDetails={() => onOpenRouteDetailPage(post)}
             onToggleSave={() => onToggleSavedPost(post)}
           />
         ))

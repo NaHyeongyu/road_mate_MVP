@@ -1,7 +1,33 @@
+import type { AppCopy } from "../../../i18n/copy";
 import type { RouteDraft, RoutePost, VehicleInfo } from "../../../model";
 import { isRouteDateValue, isRouteTimeValue } from "./routeForm";
 
 const MAX_SEATS = 8;
+
+type RouteValidationCopy = Pick<
+  AppCopy["validation"],
+  | "routeNoticeDateRequired"
+  | "routeEndpointsRequired"
+  | "routeDepartureTimeRequired"
+  | "routeAvailableSeatsRequired"
+  | "routeContactRequired"
+  | "routeReturnDateRequired"
+  | "routeReturnTimeRequired"
+  | "routeArrivalTimeRequired"
+  | "routeOperatingDaysRequired"
+>;
+
+const DEFAULT_ROUTE_VALIDATION_COPY: RouteValidationCopy = {
+  routeNoticeDateRequired: "Set notice date using calendar picker.",
+  routeEndpointsRequired: "Add both from and to before posting.",
+  routeDepartureTimeRequired: "Set departure time in HH:MM format (24-hour).",
+  routeAvailableSeatsRequired: "Set available seats to at least 1.",
+  routeContactRequired: "Add at least one contact method in driver profile (phone or chat link).",
+  routeReturnDateRequired: "Set return date using calendar picker for round-trip notice.",
+  routeReturnTimeRequired: "Set return time in HH:MM format (24-hour) for round-trip notice.",
+  routeArrivalTimeRequired: "Set arrival time in HH:MM format (24-hour).",
+  routeOperatingDaysRequired: "Select at least one operating day.",
+};
 
 type BuildRoutePostArgs = {
   routeDraft: RouteDraft;
@@ -62,21 +88,28 @@ export const buildRoutePost = ({
   };
 };
 
-export const validateRoutePost = (routePost: RoutePost): string | null => {
+export const validateRoutePost = (
+  routePost: RoutePost,
+  validationCopy: RouteValidationCopy = DEFAULT_ROUTE_VALIDATION_COPY
+): string | null => {
   if (routePost.kind === "one_time" && !isRouteDateValue(routePost.noticeDate ?? "")) {
-    return "Set notice date using calendar picker.";
+    return validationCopy.routeNoticeDateRequired;
   }
 
   if (!routePost.from || !routePost.to) {
-    return "Add both from and to before posting.";
+    return validationCopy.routeEndpointsRequired;
   }
 
   if (!routePost.schedule || !isRouteTimeValue(routePost.schedule)) {
-    return "Set departure time in HH:MM format (24-hour).";
+    return validationCopy.routeDepartureTimeRequired;
   }
 
   if (!Number.isFinite(routePost.availableSeats) || routePost.availableSeats < 1) {
-    return "Set available seats to at least 1.";
+    return validationCopy.routeAvailableSeatsRequired;
+  }
+
+  if (!routePost.contactPhone && !routePost.contactLink) {
+    return validationCopy.routeContactRequired;
   }
 
   if (
@@ -84,7 +117,7 @@ export const validateRoutePost = (routePost: RoutePost): string | null => {
     routePost.oneTimeTripType === "round_trip" &&
     (!routePost.returnDate || !isRouteDateValue(routePost.returnDate))
   ) {
-    return "Set return date using calendar picker for round-trip notice.";
+    return validationCopy.routeReturnDateRequired;
   }
 
   if (
@@ -92,21 +125,18 @@ export const validateRoutePost = (routePost: RoutePost): string | null => {
     routePost.oneTimeTripType === "round_trip" &&
     (!routePost.returnSchedule || !isRouteTimeValue(routePost.returnSchedule))
   ) {
-    return "Set return time in HH:MM format (24-hour) for round-trip notice.";
+    return validationCopy.routeReturnTimeRequired;
   }
 
   if (routePost.kind === "regular") {
     if (!routePost.returnSchedule || !isRouteTimeValue(routePost.returnSchedule)) {
-      return "Set arrival time in HH:MM format (24-hour).";
+      return validationCopy.routeArrivalTimeRequired;
     }
 
     if (!routePost.operatingDays.length) {
-      return "Select at least one operating day.";
+      return validationCopy.routeOperatingDaysRequired;
     }
 
-    if (!routePost.contactPhone && !routePost.contactLink) {
-      return "Add at least one contact method in driver profile (phone or chat link).";
-    }
   }
 
   return null;

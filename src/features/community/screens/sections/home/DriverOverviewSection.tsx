@@ -24,7 +24,7 @@ type DriverOverviewSectionProps = {
   routeDraft: RouteDraft;
   savedVehicle: VehicleInfo;
   onOpenRouteRegistration: () => void;
-  onDeleteActiveRoute: (id: string) => void;
+  onOpenRouteDetailPage: (post: RoutePost) => void;
   onAdjustSeats: (delta: number) => void;
   onRouteVisibilityChange: (isPublic: boolean) => void;
   onTogglePreviousNoticesVisibility: () => void;
@@ -48,7 +48,7 @@ export function DriverOverviewSection({
   routeDraft,
   savedVehicle,
   onOpenRouteRegistration,
-  onDeleteActiveRoute,
+  onOpenRouteDetailPage,
   onAdjustSeats,
   onRouteVisibilityChange,
   onTogglePreviousNoticesVisibility,
@@ -102,13 +102,13 @@ export function DriverOverviewSection({
     contactPhone: isRegular
       ? profileContactPhone || undefined
       : profileContactPhone || routeDraft.contactPhone || undefined,
-    contactLink: isRegular
-      ? profileContactLink || undefined
-      : profileContactLink || routeDraft.contactLink || undefined,
-    note: routeDraft.note,
-    vehicleModel: "",
-    vehiclePlate: "",
-    ownerUserId: "me",
+	    contactLink: isRegular
+	      ? profileContactLink || undefined
+	      : profileContactLink || routeDraft.contactLink || undefined,
+	    note: routeDraft.note,
+	    vehicleModel: savedVehicle.model.trim(),
+	    vehiclePlate: savedVehicle.plate.trim(),
+	    ownerUserId: "me",
     ownerName: copy.common.me,
     isPublic: routeDraft.isPublic,
     createdAt: new Date().toISOString(),
@@ -259,16 +259,41 @@ export function DriverOverviewSection({
           </Pressable>
         </View>
       ) : (
-        <PostCard
-          post={activePublishedPost ?? previewPost}
-          styles={styles}
-          isOwnedByCurrentUser
-          viewDetailsLabel={copy.common.edit}
-          onViewDetails={onOpenRouteRegistration}
-          onDelete={activePublishedPost ? () => onDeleteActiveRoute(activePublishedPost.id) : undefined}
-          disableDetailModal
-          extraContent={previewExtraContent}
-        />
+        <View style={{ gap: 10 }}>
+          <PostCard
+            post={activePublishedPost ?? previewPost}
+            styles={styles}
+            isOwnedByCurrentUser
+            disableDetails={!activePublishedPost}
+            hideOwnedEditAction
+            showNoticeNotePreview={false}
+            onViewDetails={
+              activePublishedPost ? () => onOpenRouteDetailPage(activePublishedPost) : undefined
+            }
+            extraContent={previewExtraContent}
+          />
+
+          <Pressable
+            onPress={onOpenRouteRegistration}
+            style={({ pressed }) => [
+              styles.primaryButton,
+              {
+                marginTop: 0,
+                backgroundColor: "#FFFFFF",
+                borderWidth: 1,
+                borderColor: "#E2E8F0",
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: 8,
+              },
+              pressed ? styles.primaryButtonDisabled : null,
+            ]}
+          >
+            <MaterialCommunityIcons name="square-edit-outline" size={17} color="#0B0F14" />
+            <Text style={styles.primaryButtonText}>{copy.common.edit}</Text>
+          </Pressable>
+        </View>
       )}
 
       {driverRouteKind === "one_time" && hasPreviousOneTimePosts ? (
@@ -334,6 +359,7 @@ export function DriverOverviewSection({
                       key={post.id}
                       post={post}
                       styles={styles}
+                      onViewDetails={() => onOpenRouteDetailPage(post)}
                     />
                   ))}
                 </View>

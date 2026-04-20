@@ -1,3 +1,5 @@
+import { Alert } from "react-native";
+
 import type { RoutePost } from "../../../model";
 import {
   deactivateOneTimeRoutePostsInDb,
@@ -65,7 +67,7 @@ export const createCommunityPostActions = (context: CommunityActionsContext) => 
       currentUserId: context.currentUserId,
       currentUserName: context.currentUserName,
     });
-    const validationError = validateRoutePost(nextRoute);
+    const validationError = validateRoutePost(nextRoute, copy.validation);
     if (validationError) {
       context.onNotice({
         tone: "error",
@@ -163,26 +165,47 @@ export const createCommunityPostActions = (context: CommunityActionsContext) => 
       return;
     }
 
-    const nextPosts = context.storedPosts.filter(
-      (post) => !(post.id === id && post.ownerUserId === context.currentUserId)
+    const targetRoute = context.storedPosts.find(
+      (post) => post.id === id && post.ownerUserId === context.currentUserId
     );
+    const routeKind = targetRoute?.kind === "one_time" ? copy.common.oneTime : copy.common.regular;
 
-    if (isRoutePostRepositoryEnabled()) {
-      try {
-        await deleteRoutePostInDb(id, context.currentUserId);
-      } catch (error) {
-        context.onNotice({
-          tone: "error",
-          text: copy.notices.routeDeleteFailed(describeRouteDbError(error)),
-        });
-      }
-    }
+    Alert.alert(
+      copy.alerts.deleteRouteTitle(routeKind),
+      copy.alerts.deleteRouteBody(routeKind),
+      [
+        { text: copy.common.cancel, style: "cancel" },
+        {
+          text: copy.common.delete,
+          style: "destructive",
+          onPress: () => {
+            void (async () => {
+              const nextPosts = context.storedPosts.filter(
+                (post) => !(post.id === id && post.ownerUserId === context.currentUserId)
+              );
 
-    await context.persistPosts(nextPosts);
-    context.onNotice({
-      tone: "info",
-      text: copy.notices.routeRemoved,
-    });
+              if (isRoutePostRepositoryEnabled()) {
+                try {
+                  await deleteRoutePostInDb(id, context.currentUserId);
+                } catch (error) {
+                  context.onNotice({
+                    tone: "error",
+                    text: copy.notices.routeDeleteFailed(describeRouteDbError(error)),
+                  });
+                }
+              }
+
+              await context.persistPosts(nextPosts);
+              context.onNotice({
+                tone: "info",
+                text: copy.notices.routeRemoved,
+              });
+            })();
+          },
+        },
+      ],
+      { cancelable: true }
+    );
   };
 
   const toggleSavedPost = async (post: RoutePost) => {

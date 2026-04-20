@@ -40,8 +40,6 @@ type PasswordResetEmailStatus = "idle" | "registered" | "missing";
 const OAUTH_REDIRECT_PATH = "auth/callback";
 const OAUTH_SCHEME = "roadmate";
 const EMAIL_AUTH_REDIRECT_URL = `${OAUTH_SCHEME}://${OAUTH_REDIRECT_PATH}`;
-const DEFAULT_AUTH_WEB_URL = "https://rodematemvp.vercel.app";
-const SIGNUP_COMPLETE_PATH = "/auth/complete";
 const PASSWORD_RESET_EMAIL_COOLDOWN_SECONDS = 90;
 
 const getOAuthProviderLabel = (provider: OAuthProvider) => {
@@ -62,11 +60,7 @@ const getOAuthProviderLabel = (provider: OAuthProvider) => {
 
 const getAuthRedirectUrl = () => Linking.createURL(OAUTH_REDIRECT_PATH, { scheme: OAUTH_SCHEME });
 const getPasswordResetRedirectUrl = () => EMAIL_AUTH_REDIRECT_URL;
-const getSignupEmailRedirectUrl = () => {
-  const configuredSiteUrl = String(process.env.EXPO_PUBLIC_SITE_URL ?? "").trim();
-  const baseUrl = (configuredSiteUrl || DEFAULT_AUTH_WEB_URL).replace(/\/+$/, "");
-  return `${baseUrl}${SIGNUP_COMPLETE_PATH}`;
-};
+const getSignupEmailRedirectUrl = () => EMAIL_AUTH_REDIRECT_URL;
 
 function isMissingEmailCheckFunctionError(message: string) {
   return /is_email_registered|function .*does not exist|could not find the function/i.test(
@@ -400,14 +394,18 @@ export function useAuthFlow({ copy, onNotice, onResetSignedInExperience }: UseAu
       setAuthEmail(resolvedUserEmail);
 
       if (callbackFlow === "recovery") {
+        if (!user?.id || !resolvedUserEmail) {
+          throw new Error(copy.notices.passwordResetLinkInvalid);
+        }
+
         setAuthMode("signIn");
         setAuthEntryMethod("passwordReset");
-        setIsPasswordRecoveryMode(true);
+        setIsPasswordRecoveryMode(false);
         setPasswordResetCheckedEmail(resolvedUserEmail);
         setPasswordResetEmailStatus("registered");
         setPasswordResetSentEmail(resolvedUserEmail);
         setPasswordResetEmailCooldownSeconds(0);
-        setIsPasswordResetReadyToChange(false);
+        setIsPasswordResetReadyToChange(true);
       } else {
         setIsPasswordRecoveryMode(false);
         setAuthEntryMethod("options");
@@ -531,6 +529,7 @@ export function useAuthFlow({ copy, onNotice, onResetSignedInExperience }: UseAu
   const handleStartPasswordResetRecovery = () => {
     setAuthPassword("");
     setAuthPasswordConfirm("");
+    setIsPasswordResetReadyToChange(false);
     setIsPasswordRecoveryMode(true);
   };
 
@@ -773,7 +772,7 @@ export function useAuthFlow({ copy, onNotice, onResetSignedInExperience }: UseAu
         if (cachedEmailCheckStatus !== "available") {
           const duplicateCheckResult = await runEmailDuplicateCheck(normalizedEmail, {
             announceResult: false,
-            surfaceErrors: false,
+            surfaceErrors: true,
           });
 
           if (duplicateCheckResult === "duplicate") {
@@ -781,6 +780,10 @@ export function useAuthFlow({ copy, onNotice, onResetSignedInExperience }: UseAu
               tone: "error",
               text: copy.notices.duplicateEmailFound(normalizedEmail),
             });
+            return;
+          }
+
+          if (duplicateCheckResult !== "available") {
             return;
           }
         }

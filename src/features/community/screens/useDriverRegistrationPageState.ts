@@ -78,6 +78,7 @@ export function useDriverRegistrationPageState({
   return {
     isDriverRegistrationPageVisible: isDriverRegistrationPageOpen && mode === "driver",
     activeDriverRouteKind,
+    activeRegisteredPost: latestRegisteredPost,
     activeRouteDraft,
     openDriverRegistrationPage: () => setIsDriverRegistrationPageOpen(true),
     closeDriverRegistrationPage: () => setIsDriverRegistrationPageOpen(false),

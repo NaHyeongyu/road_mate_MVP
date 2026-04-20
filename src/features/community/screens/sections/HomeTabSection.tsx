@@ -33,6 +33,7 @@ type HomeTabSectionProps = {
     isPublic: boolean;
   }) => Promise<void>;
   onOpenDriverRegistrationPage: () => void;
+  onOpenRouteDetailPage: (post: RoutePost) => void;
   onRemoveRoute: (id: string) => void;
   onToggleSavedPost: (post: RoutePost) => void;
   isRiderSearchResultsPageVisible: boolean;
@@ -64,6 +65,7 @@ export function HomeTabSection({
   onRouteDraftChange,
   onSaveRouteQuickSettings,
   onOpenDriverRegistrationPage,
+  onOpenRouteDetailPage,
   onRemoveRoute,
   onToggleSavedPost,
   isRiderSearchResultsPageVisible,
@@ -85,7 +87,7 @@ export function HomeTabSection({
             onRouteDraftChange={onRouteDraftChange}
             onSaveRouteQuickSettings={onSaveRouteQuickSettings}
             onOpenRouteRegistrationPage={onOpenDriverRegistrationPage}
-            onRemoveRoute={onRemoveRoute}
+            onOpenRouteDetailPage={onOpenRouteDetailPage}
           />
         ) : (
           <RiderFeedSection
@@ -102,6 +104,7 @@ export function HomeTabSection({
             onStateFilterChange={onStateFilterChange}
             onFromSearchQueryChange={onFromSearchQueryChange}
             onToSearchQueryChange={onToSearchQueryChange}
+            onOpenRouteDetailPage={onOpenRouteDetailPage}
             onToggleSavedPost={onToggleSavedPost}
             isSearchResultsPageVisible={isRiderSearchResultsPageVisible}
             canLoadMoreSearchResults={canLoadMoreRiderSearchResults}

@@ -2,6 +2,7 @@ import type { OneTimeTripType, RouteDraft } from "../../../../../model";
 import type { AppStyles } from "../../../../../ui/types";
 import { View } from "react-native";
 
+import { useAppCopy } from "../../../../../i18n/AppI18nContext";
 import { Label } from "../../../../shared/components/Label";
 import { ToggleChip } from "../../../../shared/components/ToggleChip";
 import { RouteDateField } from "./RouteDateField";
@@ -30,20 +31,22 @@ export function RouteScheduleSection({
   onPressScheduleTime,
   onPressReturnTime,
 }: RouteScheduleSectionProps) {
+  const copy = useAppCopy();
+
   return (
     <>
       {isOneTimeRoute ? (
         <>
-          <Label text="Trip type" styles={styles} />
+          <Label text={copy.common.tripType} styles={styles} />
           <View style={styles.row}>
             <ToggleChip
-              label="One-way"
+              label={copy.tripTypes.oneWay}
               active={!isOneTimeRoundTrip}
               onPress={() => onChangeOneTimeTripType("one_way")}
               styles={styles}
             />
             <ToggleChip
-              label="Round-trip"
+              label={copy.tripTypes.roundTrip}
               active={isOneTimeRoundTrip}
               onPress={() => onChangeOneTimeTripType("round_trip")}
               styles={styles}
@@ -52,18 +55,18 @@ export function RouteScheduleSection({
 
           <RouteDateField
             styles={styles}
-            label="Departure date"
+            label={copy.common.departureDate}
             value={routeDraft.noticeDate}
-            placeholder="Select departure date"
+            placeholder={copy.common.departureDate}
             onPress={onPressDepartureDate}
           />
 
           {isOneTimeRoundTrip ? (
             <RouteDateField
               styles={styles}
-              label="Return date"
+              label={copy.common.returnDate}
               value={routeDraft.returnDate ?? ""}
-              placeholder="Select return date"
+              placeholder={copy.common.returnDate}
               onPress={onPressReturnDate}
             />
           ) : null}
@@ -72,17 +75,17 @@ export function RouteScheduleSection({
 
       <RouteTimeField
         styles={styles}
-        label={isOneTimeRoute ? "Departure time" : "Departure time"}
+        label={copy.common.departureTime}
         value={routeDraft.schedule}
-        placeholder={isOneTimeRoute ? "Select departure time" : "Select departure time"}
+        placeholder={copy.common.departureTime}
         onPress={onPressScheduleTime}
       />
       {!isOneTimeRoute || isOneTimeRoundTrip ? (
         <RouteTimeField
           styles={styles}
-          label={isOneTimeRoute ? "Return time" : "Arrival time"}
+          label={isOneTimeRoute ? copy.common.returnTime : copy.common.arrivalTime}
           value={routeDraft.returnSchedule}
-          placeholder={isOneTimeRoute ? "Select return time" : "Select arrival time"}
+          placeholder={isOneTimeRoute ? copy.common.returnTime : copy.common.arrivalTime}
           onPress={onPressReturnTime}
         />
       ) : null}

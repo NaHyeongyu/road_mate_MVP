@@ -111,35 +111,36 @@ export function AuthEmailFormCard({
               <MaterialCommunityIcons name="email-check-outline" size={22} color={colors.hero} />
             </View>
             <View style={styles.authVerificationHeaderCopy}>
-              <Text style={styles.authVerificationEyebrow}>Verification email sent</Text>
+              <Text style={styles.authVerificationEyebrow}>
+                {copy.auth.verificationEmailSentEyebrow}
+              </Text>
               <Text style={styles.authVerificationTitle}>{pendingVerificationEmail}</Text>
             </View>
           </View>
 
           <Text style={styles.authVerificationText}>
-            Open the newest verification email, finish confirmation, then return to Roadmate and
-            sign in with the same email.
+            {copy.auth.verificationEmailSentBody}
           </Text>
 
           <View style={styles.authVerificationSteps}>
             <View style={styles.authVerificationStepRow}>
               <Text style={styles.authVerificationStepBullet}>1</Text>
               <Text style={styles.authVerificationStepText}>
-                Open the newest verification email from Roadmate.
+                {copy.auth.verificationEmailStepOpenNewest}
               </Text>
             </View>
             <View style={styles.authVerificationStepRow}>
               <Text style={styles.authVerificationStepBullet}>2</Text>
-                <Text style={styles.authVerificationStepText}>
-                  Complete confirmation in the browser page that opens.
-                </Text>
-              </View>
-              <View style={styles.authVerificationStepRow}>
-                <Text style={styles.authVerificationStepBullet}>3</Text>
-                <Text style={styles.authVerificationStepText}>
-                  Return to Roadmate and sign in again if the app does not reopen automatically.
-                </Text>
-              </View>
+              <Text style={styles.authVerificationStepText}>
+                {copy.auth.verificationEmailStepComplete}
+              </Text>
+            </View>
+            <View style={styles.authVerificationStepRow}>
+              <Text style={styles.authVerificationStepBullet}>3</Text>
+              <Text style={styles.authVerificationStepText}>
+                {copy.auth.verificationEmailStepReturnAutomatically}
+              </Text>
+            </View>
           </View>
 
           <View style={styles.authInlineActions}>
@@ -152,7 +153,7 @@ export function AuthEmailFormCard({
               ]}
             >
               <Text style={styles.authSubmitButtonText}>
-                {isResendingVerification ? copy.auth.working : "Resend email"}
+                {isResendingVerification ? copy.auth.working : copy.auth.resendEmail}
               </Text>
             </Pressable>
           </View>
@@ -331,9 +332,9 @@ export function AuthEmailFormCard({
         <Text style={styles.authEntryHint}>
           {authMode === "signIn"
             ? hasPendingVerification
-              ? "Already verified? Sign in manually if the email link did not reopen the app."
-              : "Need an account first? Switch to Sign Up."
-            : "We keep the verification step explicit so users can see exactly what happened after sign-up."}
+              ? copy.auth.signInAfterVerificationHint
+              : copy.auth.switchHint
+            : copy.auth.emailVerificationAutomaticHint}
         </Text>
       )}
     </View>

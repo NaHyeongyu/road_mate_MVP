@@ -200,7 +200,7 @@ export const createCommunityComposerStyles = (colors: AppColors) =>
       fontSize: 15,
     },
     multiline: {
-      minHeight: 86,
+      minHeight: 132,
       textAlignVertical: "top",
     },
     primaryButton: {
