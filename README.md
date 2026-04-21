@@ -29,6 +29,8 @@ Create or update `.env` with:
 ```bash
 EXPO_PUBLIC_ENABLE_SEED_POSTS=false
 EXPO_PUBLIC_ENABLE_ADS=false
+EXPO_PUBLIC_ENABLE_IOS_ADS=false
+EXPO_PUBLIC_ENABLE_ANDROID_ADS=false
 EXPO_PUBLIC_ENABLE_SOCIAL_AUTH=false
 EXPO_PUBLIC_SUPABASE_URL=...
 EXPO_PUBLIC_SUPABASE_ANON_KEY=...
@@ -36,15 +38,22 @@ ADMOB_ANDROID_APP_ID=...
 ADMOB_IOS_APP_ID=...
 EXPO_PUBLIC_ADMOB_BANNER_UNIT_ID=...
 EXPO_PUBLIC_ADMOB_APP_OPEN_UNIT_ID=...
+EXPO_PUBLIC_ADMOB_IOS_BANNER_UNIT_ID=...
+EXPO_PUBLIC_ADMOB_IOS_APP_OPEN_UNIT_ID=...
+EXPO_PUBLIC_ADMOB_ANDROID_BANNER_UNIT_ID=...
+EXPO_PUBLIC_ADMOB_ANDROID_APP_OPEN_UNIT_ID=...
 ```
 
 AdMob note:
 
 - The app uses `react-native-google-mobile-ads` (banner + app open ad)
 - Ads stay disabled unless `EXPO_PUBLIC_ENABLE_ADS=true`
+- Platform-specific flags override the global flag, so production keeps Android ads on with `EXPO_PUBLIC_ENABLE_ANDROID_ADS=true` and iOS ads off with `EXPO_PUBLIC_ENABLE_IOS_ADS=false`
 - Use a development build (`npx expo run:android` / `npx expo run:ios`), not Expo Go
-- Set real `ADMOB_ANDROID_APP_ID`, `ADMOB_IOS_APP_ID`, and production unit IDs before any non-development build
-- When ads are enabled in development without production unit IDs, the app falls back to Google test ad units
+- Set the real native AdMob App ID only for platforms where ads are enabled
+- Production builds use the Roadmate iOS/Android banner and app-open ad unit IDs in `eas.json`
+- Ad requests are configured as non-personalized, iOS app measurement initialization is delayed, and the iOS ATT usage description is omitted because the app does not request tracking permission
+- When ads are enabled in development without unit IDs, the app falls back to Google test ad units
 
 OAuth note:
 

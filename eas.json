@@ -8,6 +8,8 @@
       "env": {
         "EXPO_PUBLIC_ENABLE_SEED_POSTS": "false",
         "EXPO_PUBLIC_ENABLE_ADS": "false",
+        "EXPO_PUBLIC_ENABLE_IOS_ADS": "false",
+        "EXPO_PUBLIC_ENABLE_ANDROID_ADS": "false",
         "EXPO_PUBLIC_ENABLE_SOCIAL_AUTH": "false"
       }
     },
@@ -26,6 +28,16 @@
     "production": {
       "extends": "base",
       "autoIncrement": true,
+      "env": {
+        "EXPO_PUBLIC_ENABLE_ADS": "true",
+        "EXPO_PUBLIC_ENABLE_IOS_ADS": "false",
+        "EXPO_PUBLIC_ENABLE_ANDROID_ADS": "true",
+        "ADMOB_ANDROID_APP_ID": "ca-app-pub-3379249817166010~4380711285",
+        "EXPO_PUBLIC_ADMOB_IOS_BANNER_UNIT_ID": "ca-app-pub-3379249817166010/9214235562",
+        "EXPO_PUBLIC_ADMOB_IOS_APP_OPEN_UNIT_ID": "ca-app-pub-3379249817166010/3083941481",
+        "EXPO_PUBLIC_ADMOB_ANDROID_BANNER_UNIT_ID": "ca-app-pub-3379249817166010/7824523465",
+        "EXPO_PUBLIC_ADMOB_ANDROID_APP_OPEN_UNIT_ID": "ca-app-pub-3379249817166010/6532231906"
+      },
       "ios": {
         "autoIncrement": "buildNumber"
       }

@@ -8,7 +8,7 @@
     "icon": "./assets/roadmate-app-icon.png",
     "userInterfaceStyle": "automatic",
     "ios": {
-      "supportsTablet": true,
+      "supportsTablet": false,
       "bundleIdentifier": "com.roadmate.web",
       "buildNumber": "1",
       "infoPlist": {
@@ -16,7 +16,7 @@
       }
     },
     "android": {
-      "package": "com.roadmate.app",
+      "package": "com.roadmate.com",
       "versionCode": 1
     },
     "plugins": [

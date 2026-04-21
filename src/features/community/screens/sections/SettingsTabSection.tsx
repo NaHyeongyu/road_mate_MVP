@@ -28,7 +28,7 @@ type SettingsTabSectionProps = {
   onAppThemeModeChange: (mode: AppThemeMode) => void;
 };
 
-type SettingsRoute = "home" | "account" | "support" | "supportHistory";
+type SettingsRoute = "home" | "account" | "support" | "supportHistory" | "appearance" | "language";
 
 const SUPPORT_CATEGORY_OPTIONS: Array<{
   value: SupportRequestCategory;
@@ -587,31 +587,6 @@ export function SettingsTabSection({
     </Pressable>
   );
 
-  const renderBackIcon = (onPress: () => void) => (
-    <Pressable
-      accessibilityLabel={copy.common.back}
-      onPress={onPress}
-      style={({ pressed }) => [
-        {
-          alignSelf: "flex-start",
-          width: 38,
-          height: 38,
-          borderRadius: 999,
-          borderWidth: 1,
-          borderColor: colors.border,
-          backgroundColor: colors.panel,
-          alignItems: "center",
-          justifyContent: "center",
-          gap: 6,
-          marginBottom: 12,
-        },
-        pressed ? { opacity: 0.8 } : null,
-      ]}
-    >
-      <MaterialCommunityIcons name="arrow-left" size={16} color={colors.text} />
-    </Pressable>
-  );
-
   const handleConfirmSignOut = () => {
     Alert.alert(copy.community.confirmSignOut, copy.community.confirmSignOutPrompt, [
       { text: copy.common.cancel, style: "cancel" },
@@ -778,10 +753,6 @@ export function SettingsTabSection({
   if (settingsRoute === "account") {
     return (
       <View>
-        {renderBackIcon(() => {
-          setSettingsRoute("home");
-        })}
-
         {!isAuthenticated ? (
           <View style={groupedListStyle}>
             {renderRow({
@@ -890,8 +861,6 @@ export function SettingsTabSection({
   if (settingsRoute === "supportHistory") {
     return (
       <View>
-        {renderBackIcon(() => setSettingsRoute("support"))}
-
         {!isAuthenticated ? (
           <View style={groupedListStyle}>
             {renderRow({
@@ -952,8 +921,6 @@ export function SettingsTabSection({
   if (settingsRoute === "support") {
     return (
       <View>
-        {renderBackIcon(() => setSettingsRoute("home"))}
-
         <View style={{ marginBottom: 18 }}>
           <Text style={sectionLabelStyle}>{settingsCopy.support}</Text>
           <View style={groupedListStyle}>
@@ -1080,6 +1047,22 @@ export function SettingsTabSection({
     );
   }
 
+  if (settingsRoute === "appearance") {
+    return (
+      <View>
+        {renderThemeSettings()}
+      </View>
+    );
+  }
+
+  if (settingsRoute === "language") {
+    return (
+      <View>
+        {renderLanguageSettings()}
+      </View>
+    );
+  }
+
   return (
     <>
       <View style={{ marginBottom: 22 }}>
@@ -1104,6 +1087,7 @@ export function SettingsTabSection({
             title: settingsCopy.appearance,
             detail: settingsCopy.appearanceDetail,
             rightLabel: selectedThemeLabel,
+            onPress: () => setSettingsRoute("appearance"),
           })}
           {renderDivider()}
           {renderRow({
@@ -1111,12 +1095,10 @@ export function SettingsTabSection({
             title: settingsCopy.language,
             detail: settingsCopy.languageDetail,
             rightLabel: selectedLanguageLabel,
+            onPress: () => setSettingsRoute("language"),
           })}
         </View>
       </View>
-
-      {renderThemeSettings()}
-      {renderLanguageSettings()}
     </>
   );
 }

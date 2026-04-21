@@ -1,7 +1,7 @@
 import type { ComponentType } from "react";
 import { View } from "react-native";
 
-import { getBannerAdUnitId, isAdMobSupportedPlatform } from "../adMobUnits";
+import { getBannerAdUnitId, isAdMobEnabled, isAdMobSupportedPlatform } from "../adMobUnits";
 import { getMobileAdsModule } from "../mobileAdsRuntime";
 
 type BottomBannerAdProps = {
@@ -9,9 +9,17 @@ type BottomBannerAdProps = {
 };
 
 export function BottomBannerAd({ bottomInset = 0 }: BottomBannerAdProps) {
-  const module = getMobileAdsModule();
+  if (!isAdMobEnabled || !isAdMobSupportedPlatform) {
+    return null;
+  }
+
   const unitId = getBannerAdUnitId();
-  if (!isAdMobSupportedPlatform || !module || !unitId) {
+  if (!unitId) {
+    return null;
+  }
+
+  const module = getMobileAdsModule();
+  if (!module) {
     return null;
   }
 

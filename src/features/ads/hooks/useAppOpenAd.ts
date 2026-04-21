@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import { AppState } from "react-native";
 
-import { getAppOpenAdUnitId, isAdMobSupportedPlatform } from "../adMobUnits";
+import { getAppOpenAdUnitId, isAdMobEnabled, isAdMobSupportedPlatform } from "../adMobUnits";
 import { getMobileAdsModule } from "../mobileAdsRuntime";
 
 type UseAppOpenAdOptions = {
@@ -15,9 +15,6 @@ export function useAppOpenAd({ enabled }: UseAppOpenAdOptions) {
   const hasShownInSessionRef = useRef(false);
 
   useEffect(() => {
-    const module = getMobileAdsModule();
-    const mobileAdsFactory = module?.default;
-    const adUnitId = getAppOpenAdUnitId();
     if (!enabled) {
       isLoadedRef.current = false;
       isShowingRef.current = false;
@@ -26,11 +23,20 @@ export function useAppOpenAd({ enabled }: UseAppOpenAdOptions) {
 
     if (
       !enabled ||
-      !isAdMobSupportedPlatform ||
-      !adUnitId ||
-      !module ||
-      typeof mobileAdsFactory !== "function"
+      !isAdMobEnabled ||
+      !isAdMobSupportedPlatform
     ) {
+      return;
+    }
+
+    const adUnitId = getAppOpenAdUnitId();
+    if (!adUnitId) {
+      return;
+    }
+
+    const module = getMobileAdsModule();
+    const mobileAdsFactory = module?.default;
+    if (!module || typeof mobileAdsFactory !== "function") {
       return;
     }
 
