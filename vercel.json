@@ -4,6 +4,10 @@
   "outputDirectory": "dist",
   "rewrites": [
     {
+      "source": "/admin",
+      "destination": "/index.html"
+    },
+    {
       "source": "/auth/complete",
       "destination": "/index.html"
     }
