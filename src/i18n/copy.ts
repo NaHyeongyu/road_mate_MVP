@@ -189,8 +189,8 @@ const APP_COPY = {
       noSavedRides: "No saved rides yet.",
 	      chooseSearchPrompt: (isNotice: boolean) =>
 	        isNotice
-	          ? "Enter both from and to to search notices."
-	          : "Enter both from and to to search rides.",
+	          ? "Select both from and to to search notices."
+	          : "Select both from and to to search rides.",
       tapSearchPrompt: (isNotice: boolean) =>
         isNotice ? "Tap search to view notices." : "Tap search to view rides.",
       pastOnlyPrompt: "Only past notices match this filter or search.",
@@ -422,7 +422,7 @@ const APP_COPY = {
       passwordLength: "Password must be at least 6 characters.",
       passwordConfirmMismatch: "Passwords do not match.",
       routeNoticeDateRequired: "Set notice date using calendar picker.",
-      routeEndpointsRequired: "Add both from and to before posting.",
+      routeEndpointsRequired: "Select both from and to before posting.",
       routeDepartureTimeRequired: "Set departure time in HH:MM format (24-hour).",
       routeAvailableSeatsRequired: "Set available seats to at least 1.",
       routeContactRequired:
@@ -641,8 +641,8 @@ const APP_COPY = {
       noSavedRides: "Aucun trajet enregistré pour le moment.",
 	      chooseSearchPrompt: (isNotice: boolean) =>
 	        isNotice
-	          ? "Renseignez départ et arrivée pour rechercher des annonces."
-	          : "Renseignez départ et arrivée pour rechercher des trajets.",
+	          ? "Sélectionnez départ et arrivée pour rechercher des annonces."
+	          : "Sélectionnez départ et arrivée pour rechercher des trajets.",
       tapSearchPrompt: (isNotice: boolean) =>
         isNotice ? "Touchez Rechercher pour voir les annonces." : "Touchez Rechercher pour voir les trajets.",
       pastOnlyPrompt: "Seules des annonces passées correspondent à ce filtre ou à cette recherche.",
@@ -896,7 +896,7 @@ const APP_COPY = {
       passwordLength: "Le mot de passe doit comporter au moins 6 caractères.",
       passwordConfirmMismatch: "Les mots de passe ne correspondent pas.",
       routeNoticeDateRequired: "Choisissez la date de l’annonce avec le calendrier.",
-      routeEndpointsRequired: "Ajoutez le départ et l’arrivée avant de publier.",
+      routeEndpointsRequired: "Sélectionnez le départ et l’arrivée avant de publier.",
       routeDepartureTimeRequired: "Définissez l’heure de départ au format HH:MM (24 h).",
       routeAvailableSeatsRequired: "Définissez au moins 1 place disponible.",
       routeContactRequired:
@@ -1112,8 +1112,8 @@ const APP_COPY = {
       noSavedRides: "아직 저장한 라이드가 없습니다.",
 	      chooseSearchPrompt: (isNotice: boolean) =>
 	        isNotice
-	          ? "출발지와 도착지를 모두 입력해 공지를 검색하세요."
-	          : "출발지와 도착지를 모두 입력해 라이드를 검색하세요.",
+	          ? "출발지와 도착지를 모두 선택해 공지를 검색하세요."
+	          : "출발지와 도착지를 모두 선택해 라이드를 검색하세요.",
       tapSearchPrompt: (isNotice: boolean) =>
         isNotice ? "검색 버튼을 눌러 공지를 확인하세요." : "검색 버튼을 눌러 라이드를 확인하세요.",
       pastOnlyPrompt: "이 필터 또는 검색에는 지난 공지만 일치합니다.",
@@ -1339,7 +1339,7 @@ const APP_COPY = {
       passwordLength: "비밀번호는 최소 6자 이상이어야 합니다.",
       passwordConfirmMismatch: "비밀번호가 서로 일치하지 않습니다.",
       routeNoticeDateRequired: "달력에서 공지 날짜를 선택하세요.",
-      routeEndpointsRequired: "등록 전에 출발지와 도착지를 모두 입력하세요.",
+      routeEndpointsRequired: "등록 전에 출발지와 도착지를 모두 선택하세요.",
       routeDepartureTimeRequired: "출발 시간을 HH:MM 형식(24시간)으로 설정하세요.",
       routeAvailableSeatsRequired: "가능 좌석 수는 최소 1석 이상이어야 합니다.",
       routeContactRequired:
@@ -1556,8 +1556,8 @@ const APP_COPY = {
       noSavedRides: "まだ保存したライドはありません。",
 	      chooseSearchPrompt: (isNotice: boolean) =>
 	        isNotice
-	          ? "出発地と到着地の両方を入力してお知らせを検索してください。"
-	          : "出発地と到着地の両方を入力してライドを検索してください。",
+	          ? "出発地と到着地の両方を選択してお知らせを検索してください。"
+	          : "出発地と到着地の両方を選択してライドを検索してください。",
       tapSearchPrompt: (isNotice: boolean) =>
         isNotice ? "検索を押してお知らせを表示します。" : "検索を押してライドを表示します。",
       pastOnlyPrompt: "この条件では過去のお知らせのみ一致しています。",
@@ -1799,7 +1799,7 @@ const APP_COPY = {
       passwordLength: "パスワードは 6 文字以上である必要があります。",
       passwordConfirmMismatch: "パスワードが一致しません。",
       routeNoticeDateRequired: "カレンダーでお知らせ日を選択してください。",
-      routeEndpointsRequired: "投稿前に出発地と到着地を両方入力してください。",
+      routeEndpointsRequired: "投稿前に出発地と到着地を両方選択してください。",
       routeDepartureTimeRequired: "出発時刻を HH:MM 形式（24時間）で設定してください。",
       routeAvailableSeatsRequired: "空き座席数は 1 以上に設定してください。",
       routeContactRequired:
@@ -2012,8 +2012,8 @@ const APP_COPY = {
       noSavedRides: "还没有保存的行程。",
 	      chooseSearchPrompt: (isNotice: boolean) =>
 	        isNotice
-	          ? "同时填写出发地和目的地以搜索通知。"
-	          : "同时填写出发地和目的地以搜索行程。",
+	          ? "同时选择出发地和目的地以搜索通知。"
+	          : "同时选择出发地和目的地以搜索行程。",
       tapSearchPrompt: (isNotice: boolean) =>
         isNotice ? "点击搜索以查看通知。" : "点击搜索以查看行程。",
       pastOnlyPrompt: "当前筛选或搜索仅匹配到已过期通知。",
@@ -2236,7 +2236,7 @@ const APP_COPY = {
       passwordLength: "密码至少需要 6 位。",
       passwordConfirmMismatch: "两次输入的密码不一致。",
       routeNoticeDateRequired: "请使用日历选择通知日期。",
-      routeEndpointsRequired: "发布前请同时填写出发地和目的地。",
+      routeEndpointsRequired: "发布前请同时选择出发地和目的地。",
       routeDepartureTimeRequired: "请按 HH:MM 格式（24小时制）设置出发时间。",
       routeAvailableSeatsRequired: "可用座位至少需要 1 个。",
       routeContactRequired: "请在司机资料中至少添加一种联系方式（电话或聊天链接）。",

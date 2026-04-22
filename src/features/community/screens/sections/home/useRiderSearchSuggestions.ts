@@ -5,6 +5,7 @@ import type { TextInput } from "react-native";
 
 import { usePlaceSuggestions } from "../../../hooks/usePlaceSuggestions";
 import type { StateFilter } from "../../../types";
+import { normalizeEnglishPlaceInput } from "../../../utils/placeInput";
 
 type SearchField = "from" | "to";
 
@@ -27,14 +28,44 @@ export function useRiderSearchSuggestions({
 }: UseRiderSearchSuggestionsOptions) {
   const blurTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [activeField, setActiveField] = useState<SearchField | null>(null);
+  const [fromInputValue, setFromInputValue] = useState(fromSearchQuery);
+  const [toInputValue, setToInputValue] = useState(toSearchQuery);
+  const selectedFromRef = useRef(fromSearchQuery);
+  const selectedToRef = useRef(toSearchQuery);
+  const fromInputValueRef = useRef(fromSearchQuery);
+  const toInputValueRef = useRef(toSearchQuery);
 
-  const fromSuggestions = usePlaceSuggestions(fromSearchQuery, 8, stateFilter, activeField === "from");
-  const toSuggestions = usePlaceSuggestions(toSearchQuery, 8, stateFilter, activeField === "to");
+  const updateFromInputValue = (value: string) => {
+    fromInputValueRef.current = value;
+    setFromInputValue(value);
+  };
+
+  const updateToInputValue = (value: string) => {
+    toInputValueRef.current = value;
+    setToInputValue(value);
+  };
+
+  const fromSuggestions = usePlaceSuggestions(fromInputValue, 8, stateFilter, activeField === "from");
+  const toSuggestions = usePlaceSuggestions(toInputValue, 8, stateFilter, activeField === "to");
 
   const showFromSuggestions =
-    activeField === "from" && fromSearchQuery.trim().length > 0 && fromSuggestions.length > 0;
+    activeField === "from" && fromInputValue.trim().length > 0 && fromSuggestions.length > 0;
   const showToSuggestions =
-    activeField === "to" && toSearchQuery.trim().length > 0 && toSuggestions.length > 0;
+    activeField === "to" && toInputValue.trim().length > 0 && toSuggestions.length > 0;
+  const hasSelectedFrom =
+    fromSearchQuery.trim().length > 0 && fromInputValue.trim() === fromSearchQuery.trim();
+  const hasSelectedTo =
+    toSearchQuery.trim().length > 0 && toInputValue.trim() === toSearchQuery.trim();
+
+  useEffect(() => {
+    selectedFromRef.current = fromSearchQuery;
+    updateFromInputValue(fromSearchQuery);
+  }, [fromSearchQuery]);
+
+  useEffect(() => {
+    selectedToRef.current = toSearchQuery;
+    updateToInputValue(toSearchQuery);
+  }, [toSearchQuery]);
 
   const clearBlurTimeout = () => {
     if (blurTimeoutRef.current) {
@@ -52,6 +83,12 @@ export function useRiderSearchSuggestions({
     clearBlurTimeout();
     blurTimeoutRef.current = setTimeout(() => {
       setActiveField((prev) => (prev === field ? null : prev));
+      if (field === "from" && fromInputValueRef.current.trim() !== selectedFromRef.current.trim()) {
+        updateFromInputValue(selectedFromRef.current);
+      }
+      if (field === "to" && toInputValueRef.current.trim() !== selectedToRef.current.trim()) {
+        updateToInputValue(selectedToRef.current);
+      }
     }, 120);
   };
 
@@ -63,33 +100,53 @@ export function useRiderSearchSuggestions({
   );
 
   const handleSelectFromSuggestion = (value: string) => {
+    const selectedValue = value.trim();
     clearBlurTimeout();
-    onFromSearchQueryChange(value);
+    selectedFromRef.current = selectedValue;
+    updateFromInputValue(selectedValue);
+    onFromSearchQueryChange(selectedValue);
     setActiveField("to");
     toInputRef.current?.focus();
   };
 
   const handleSelectToSuggestion = (value: string) => {
+    const selectedValue = value.trim();
     clearBlurTimeout();
-    onToSearchQueryChange(value);
+    selectedToRef.current = selectedValue;
+    updateToInputValue(selectedValue);
+    onToSearchQueryChange(selectedValue);
     setActiveField(null);
     Keyboard.dismiss();
   };
 
   return {
+    fromInputValue,
+    toInputValue,
     fromSuggestions,
     toSuggestions,
     showFromSuggestions,
     showToSuggestions,
+    hasSelectedFrom,
+    hasSelectedTo,
+    handleFromChangeText: (value: string) => {
+      updateFromInputValue(normalizeEnglishPlaceInput(value));
+    },
+    handleToChangeText: (value: string) => {
+      updateToInputValue(normalizeEnglishPlaceInput(value));
+    },
     handleFromFocus: () => focusField("from"),
     handleToFocus: () => focusField("to"),
     handleFromBlur: () => scheduleCloseSuggestions("from"),
     handleToBlur: () => scheduleCloseSuggestions("to"),
     handleClearFrom: () => {
+      selectedFromRef.current = "";
+      updateFromInputValue("");
       onFromSearchQueryChange("");
       focusField("from");
     },
     handleClearTo: () => {
+      selectedToRef.current = "";
+      updateToInputValue("");
       onToSearchQueryChange("");
       focusField("to");
     },

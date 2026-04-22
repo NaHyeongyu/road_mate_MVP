@@ -16,6 +16,8 @@ type UseDriverComposerSubmitStateOptions = {
   isOneTimeRoundTrip: boolean;
   minSeats: number;
   maxSeats: number;
+  hasSelectedFrom: boolean;
+  hasSelectedTo: boolean;
   onPatchDraft: (patch: Partial<RouteDraft>) => void;
   onPostRoute: () => Promise<boolean>;
 };
@@ -28,6 +30,8 @@ export function useDriverComposerSubmitState({
   isOneTimeRoundTrip,
   minSeats,
   maxSeats,
+  hasSelectedFrom,
+  hasSelectedTo,
   onPatchDraft,
   onPostRoute,
 }: UseDriverComposerSubmitStateOptions) {
@@ -45,8 +49,8 @@ export function useDriverComposerSubmitState({
     onPatchDraft({ availableSeats: String(normalized) });
   };
 
-  const hasFrom = Boolean(routeDraft.from.trim());
-  const hasTo = Boolean(routeDraft.to.trim());
+  const hasFrom = hasSelectedFrom;
+  const hasTo = hasSelectedTo;
   const hasNoticeDate = isRouteDateValue(routeDraft.noticeDate);
   const hasReturnDate = isRouteDateValue(routeDraft.returnDate ?? "");
   const hasDepartureTime = isRouteTimeValue(routeDraft.schedule);

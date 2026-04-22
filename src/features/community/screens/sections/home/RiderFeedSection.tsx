@@ -17,7 +17,6 @@ import { RiderStateFilterSelect } from "./RiderStateFilterSelect";
 import { useRiderFeedViewState } from "./useRiderFeedViewState";
 import { useRiderSearchSuggestions } from "./useRiderSearchSuggestions";
 import { STATE_FILTER_OPTIONS } from "../../../data/australianStates";
-import { normalizeEnglishPlaceInput } from "../../../utils/placeInput";
 import type { StateFilter } from "../../../types";
 
 type RiderFeedSectionProps = {
@@ -69,26 +68,18 @@ export function RiderFeedSection({
   const isCompactLayout = width < 390;
   const savedPostKeySet = useMemo(() => new Set(savedPostKeys), [savedPostKeys]);
   const hasStateSelected = stateFilter !== "ALL";
-  const hasRoutePairQuery = Boolean(fromSearchQuery.trim() && toSearchQuery.trim());
-  const isSearchReady = hasRoutePairQuery || hasStateSelected;
   const toInputRef = useRef<TextInput>(null);
-  const stateFilterLabel = useMemo(
-    () =>
-      STATE_FILTER_OPTIONS.find((option) => option.value === stateFilter)?.label ??
-      copy.common.allStates,
-    [copy.common.allStates, stateFilter]
-  );
-  const routeSummary = useMemo(() => {
-    const fromLabel = fromSearchQuery.trim() || copy.common.anyOrigin;
-    const toLabel = toSearchQuery.trim() || copy.common.anyDestination;
-    return copy.community.searchScopeSummary(fromLabel, toLabel);
-  }, [copy, fromSearchQuery, toSearchQuery]);
-
   const {
+    fromInputValue,
+    toInputValue,
     fromSuggestions,
     toSuggestions,
     showFromSuggestions,
     showToSuggestions,
+    hasSelectedFrom,
+    hasSelectedTo,
+    handleFromChangeText,
+    handleToChangeText,
     handleFromFocus,
     handleToFocus,
     handleFromBlur,
@@ -105,6 +96,22 @@ export function RiderFeedSection({
     onFromSearchQueryChange,
     onToSearchQueryChange,
   });
+  const hasRoutePairQuery = hasSelectedFrom && hasSelectedTo;
+  const hasUnselectedRouteQuery = Boolean(
+    (fromInputValue.trim() && !hasSelectedFrom) || (toInputValue.trim() && !hasSelectedTo)
+  );
+  const isSearchReady = (hasRoutePairQuery || hasStateSelected) && !hasUnselectedRouteQuery;
+  const stateFilterLabel = useMemo(
+    () =>
+      STATE_FILTER_OPTIONS.find((option) => option.value === stateFilter)?.label ??
+      copy.common.allStates,
+    [copy.common.allStates, stateFilter]
+  );
+  const routeSummary = useMemo(() => {
+    const fromLabel = fromSearchQuery.trim() || copy.common.anyOrigin;
+    const toLabel = toSearchQuery.trim() || copy.common.anyDestination;
+    return copy.community.searchScopeSummary(fromLabel, toLabel);
+  }, [copy, fromSearchQuery, toSearchQuery]);
 
   const {
     isNoticeFilter,
@@ -275,16 +282,20 @@ export function RiderFeedSection({
             styles={styles}
             label={copy.common.from}
             leadingIconName="map-marker-outline"
-            value={fromSearchQuery}
-            placeholder="e.g. Collingwood, VIC 3066"
+            value={fromInputValue}
+            placeholder="Search suburb or region"
             suggestions={fromSuggestions}
             showSuggestions={showFromSuggestions}
             returnKeyType="next"
             blurOnSubmit={false}
-            onChangeText={(value) => onFromSearchQueryChange(normalizeEnglishPlaceInput(value))}
+            onChangeText={handleFromChangeText}
             onFocus={handleFromFocus}
             onBlur={handleFromBlur}
-            onSubmitEditing={() => toInputRef.current?.focus()}
+            onSubmitEditing={() => {
+              if (hasSelectedFrom) {
+                toInputRef.current?.focus();
+              }
+            }}
             onClear={handleClearFrom}
             onSelectSuggestion={handleSelectFromSuggestion}
           />
@@ -294,17 +305,19 @@ export function RiderFeedSection({
             styles={styles}
             label={copy.common.to}
             leadingIconName="map-marker"
-            value={toSearchQuery}
-            placeholder="e.g. Perth, WA 6000"
+            value={toInputValue}
+            placeholder="Search suburb or region"
             suggestions={toSuggestions}
             showSuggestions={showToSuggestions}
             returnKeyType="search"
             inputRef={toInputRef}
-            onChangeText={(value) => onToSearchQueryChange(normalizeEnglishPlaceInput(value))}
+            onChangeText={handleToChangeText}
             onFocus={handleToFocus}
             onBlur={handleToBlur}
             onSubmitEditing={() => {
-              handleRunSearch();
+              if (hasSelectedTo || !toInputValue.trim()) {
+                handleRunSearch();
+              }
             }}
             onClear={handleClearTo}
             onSelectSuggestion={handleSelectToSuggestion}

@@ -61,6 +61,55 @@ describe("useRouteComposerPlaces", () => {
     expect(result.current.showFromSuggestions).toBe(true);
   });
 
+  it("keeps typed from text out of the route draft until a suggestion is selected", () => {
+    const onPatchDraft = vi.fn();
+    const onCompleteDestination = vi.fn();
+    const toInputRef = createToInputRef();
+
+    const { result } = renderHook(() =>
+      useRouteComposerPlaces({
+        routeDraft: createDraft({ from: "" }),
+        toInputRef,
+        onPatchDraft,
+        onCompleteDestination,
+      })
+    );
+
+    act(() => {
+      result.current.handleFromChangeText("123 George St");
+    });
+
+    expect(result.current.fromInputValue).toBe("123 George St");
+    expect(result.current.hasSelectedFrom).toBe(false);
+    expect(onPatchDraft).not.toHaveBeenCalled();
+  });
+
+  it("restores unselected from text on blur", () => {
+    const onPatchDraft = vi.fn();
+    const onCompleteDestination = vi.fn();
+    const toInputRef = createToInputRef();
+
+    const { result } = renderHook(() =>
+      useRouteComposerPlaces({
+        routeDraft: createDraft({ from: "Brisbane CBD, QLD" }),
+        toInputRef,
+        onPatchDraft,
+        onCompleteDestination,
+      })
+    );
+
+    act(() => {
+      result.current.handleFromFocus();
+      result.current.handleFromChangeText("123 George St");
+      result.current.handleFromBlur();
+      vi.advanceTimersByTime(120);
+    });
+
+    expect(result.current.fromInputValue).toBe("Brisbane CBD, QLD");
+    expect(result.current.hasSelectedFrom).toBe(true);
+    expect(onPatchDraft).not.toHaveBeenCalled();
+  });
+
   it("selecting a from suggestion patches draft and focuses the to input", () => {
     const onPatchDraft = vi.fn();
     const onCompleteDestination = vi.fn();

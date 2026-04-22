@@ -19,7 +19,7 @@ type RouteValidationCopy = Pick<
 
 const DEFAULT_ROUTE_VALIDATION_COPY: RouteValidationCopy = {
   routeNoticeDateRequired: "Set notice date using calendar picker.",
-  routeEndpointsRequired: "Add both from and to before posting.",
+  routeEndpointsRequired: "Select both from and to before posting.",
   routeDepartureTimeRequired: "Set departure time in HH:MM format (24-hour).",
   routeAvailableSeatsRequired: "Set available seats to at least 1.",
   routeContactRequired: "Add at least one contact method in driver profile (phone or chat link).",

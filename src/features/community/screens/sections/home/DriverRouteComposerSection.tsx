@@ -21,7 +21,6 @@ import { InlinePickerCard } from "./InlinePickerCard";
 import { useDriverComposerSubmitState } from "./useDriverComposerSubmitState";
 import { useRouteComposerPickers } from "./useRouteComposerPickers";
 import { useRouteComposerPlaces } from "./useRouteComposerPlaces";
-import { normalizeEnglishPlaceInput } from "../../../utils/placeInput";
 
 type DriverRouteComposerSectionProps = {
   colors: AppColors;
@@ -129,10 +128,16 @@ export function DriverRouteComposerSection({
   };
 
   const {
+    fromInputValue,
+    toInputValue,
     fromSuggestions,
     toSuggestions,
     showFromSuggestions,
     showToSuggestions,
+    hasSelectedFrom,
+    hasSelectedTo,
+    handleFromChangeText,
+    handleToChangeText,
     handleFromFocus,
     handleToFocus,
     handleFromBlur,
@@ -163,6 +168,8 @@ export function DriverRouteComposerSection({
     isOneTimeRoundTrip,
     minSeats: MIN_SEATS,
     maxSeats: MAX_SEATS,
+    hasSelectedFrom,
+    hasSelectedTo,
     onPatchDraft: updateRouteDraft,
     onPostRoute,
   });
@@ -173,15 +180,19 @@ export function DriverRouteComposerSection({
         colors={colors}
         styles={styles}
         label={copy.common.from}
-        value={routeDraft.from}
-        placeholder="Collingwood, VIC 3066"
+        value={fromInputValue}
+        placeholder="Search suburb or region"
         suggestions={fromSuggestions}
         showSuggestions={showFromSuggestions}
         returnKeyType="next"
-        onChangeText={(value) => updateRouteDraft({ from: normalizeEnglishPlaceInput(value) })}
+        onChangeText={handleFromChangeText}
         onFocus={handleFromFocus}
         onBlur={handleFromBlur}
-        onSubmitEditing={() => toInputRef.current?.focus()}
+        onSubmitEditing={() => {
+          if (hasSelectedFrom) {
+            toInputRef.current?.focus();
+          }
+        }}
         onClear={handleClearFrom}
         onSelectSuggestion={handleSelectFromSuggestion}
       />
@@ -190,16 +201,20 @@ export function DriverRouteComposerSection({
         colors={colors}
         styles={styles}
         label={copy.common.to}
-        value={routeDraft.to}
-        placeholder="Sydney, NSW 2000"
+        value={toInputValue}
+        placeholder="Search suburb or region"
         suggestions={toSuggestions}
         showSuggestions={showToSuggestions}
         inputRef={toInputRef}
         returnKeyType="done"
-        onChangeText={(value) => updateRouteDraft({ to: normalizeEnglishPlaceInput(value) })}
+        onChangeText={handleToChangeText}
         onFocus={handleToFocus}
         onBlur={handleToBlur}
-        onSubmitEditing={handleCompleteDestination}
+        onSubmitEditing={() => {
+          if (hasSelectedTo) {
+            handleCompleteDestination();
+          }
+        }}
         onClear={handleClearTo}
         onSelectSuggestion={handleSelectToSuggestion}
       />
