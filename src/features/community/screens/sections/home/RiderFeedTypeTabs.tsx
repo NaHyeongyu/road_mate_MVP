@@ -1,10 +1,11 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { Pressable, Text, View, useWindowDimensions } from "react-native";
+import { Pressable, Text, View } from "react-native";
 
 import type { AppColors } from "../../../../../brandTheme";
 import { useAppCopy } from "../../../../../i18n/AppI18nContext";
 import type { RouteKind } from "../../../../../model";
 import type { AppStyles } from "../../../../../ui/types";
+import { useAppViewport } from "../../../../../ui/viewport";
 
 type RiderFeedTypeTabsProps = {
   colors: AppColors;
@@ -20,7 +21,7 @@ export function RiderFeedTypeTabs({
   onFilterChange,
 }: RiderFeedTypeTabsProps) {
   const copy = useAppCopy();
-  const { width } = useWindowDimensions();
+  const { width } = useAppViewport();
   const isCompactLayout = width < 390;
 
   return (

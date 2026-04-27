@@ -7,6 +7,7 @@ import { formatLocalizedNoticeDate } from "../../../../i18n/formatters";
 import type { RoutePost } from "../../../../model";
 import type { AppStyles } from "../../../../ui/types";
 import { useAppColors } from "../../../../ui/useAppColors";
+import { formatPlaceWithPostcode } from "../../utils/placePostcode";
 import { openPlaceInGoogleMaps } from "./linking";
 
 type PostCardRouteStackProps = {
@@ -34,6 +35,8 @@ export function PostCardRouteStack({
     !isRegular && isOneTimeRoundTrip
       ? formatLocalizedNoticeDate(copy, post.returnDate ?? post.noticeDate, post.createdAt)
       : null;
+  const fromDisplayLabel = formatPlaceWithPostcode(post.from);
+  const toDisplayLabel = formatPlaceWithPostcode(post.to);
   const renderRouteStopBlock = (place: string, content: ReactNode) =>
     enableMapLinks ? (
       <Pressable
@@ -52,14 +55,14 @@ export function PostCardRouteStack({
   return (
     <View style={styles.postRouteStack}>
       {renderRouteStopBlock(
-        post.from,
+        fromDisplayLabel,
         <>
           <View style={styles.postRouteStopRow}>
             <View style={styles.postRouteLeadIconSlot}>
               <MaterialCommunityIcons name="map-marker-outline" size={16} color={colors.mutedIcon} />
             </View>
-            <Text numberOfLines={2} style={styles.postRouteEndpointTextPrimary}>
-              {post.from}
+            <Text numberOfLines={3} style={styles.postRouteEndpointTextPrimary}>
+              {fromDisplayLabel}
             </Text>
           </View>
           {!isRegular ? (
@@ -98,14 +101,14 @@ export function PostCardRouteStack({
       </View>
 
       {renderRouteStopBlock(
-        post.to,
+        toDisplayLabel,
         <>
           <View style={styles.postRouteStopRow}>
             <View style={styles.postRouteLeadIconSlot}>
               <MaterialCommunityIcons name="map-marker-check-outline" size={16} color={colors.mutedIcon} />
             </View>
-            <Text numberOfLines={2} style={styles.postRouteEndpointTextPrimary}>
-              {post.to}
+            <Text numberOfLines={3} style={styles.postRouteEndpointTextPrimary}>
+              {toDisplayLabel}
             </Text>
           </View>
           {shouldShowReturnTime ? (

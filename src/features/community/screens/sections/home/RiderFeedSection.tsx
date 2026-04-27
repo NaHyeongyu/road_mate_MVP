@@ -1,11 +1,12 @@
 import { useMemo, useRef } from "react";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { Keyboard, Pressable, Text, TextInput, View, useWindowDimensions } from "react-native";
+import { Keyboard, Pressable, Text, TextInput, View } from "react-native";
 
 import type { AppColors } from "../../../../../brandTheme";
 import { useAppCopy } from "../../../../../i18n/AppI18nContext";
 import type { RouteKind, RoutePost } from "../../../../../model";
 import type { AppStyles } from "../../../../../ui/types";
+import { PHONE_VIEWPORT_MAX_WIDTH, useAppViewport } from "../../../../../ui/viewport";
 import { AnimatedEntrance } from "../../../../shared/components/AnimatedEntrance";
 import { PostCard } from "../../../components/PostCard";
 import { getPostSaveKey } from "../../../utils/storage";
@@ -63,8 +64,8 @@ export function RiderFeedSection({
   onLoadMoreSearchResults,
 }: RiderFeedSectionProps) {
   const copy = useAppCopy();
-  const { width } = useWindowDimensions();
-  const isPhoneLayout = width < 430;
+  const { width } = useAppViewport();
+  const isPhoneLayout = width <= PHONE_VIEWPORT_MAX_WIDTH;
   const isCompactLayout = width < 390;
   const savedPostKeySet = useMemo(() => new Set(savedPostKeys), [savedPostKeys]);
   const hasStateSelected = stateFilter !== "ALL";

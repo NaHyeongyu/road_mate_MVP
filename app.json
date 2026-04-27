@@ -9,6 +9,7 @@
     "userInterfaceStyle": "automatic",
     "ios": {
       "supportsTablet": false,
+      "requireFullScreen": true,
       "bundleIdentifier": "com.roadmate.web",
       "buildNumber": "1",
       "infoPlist": {

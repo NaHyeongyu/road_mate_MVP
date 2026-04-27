@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { KeyboardAvoidingView, Platform, ScrollView, StatusBar, View, useWindowDimensions } from "react-native";
+import { KeyboardAvoidingView, Platform, ScrollView, StatusBar, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import type { AppThemeMode } from "../../../app/theme";
@@ -7,6 +7,7 @@ import { isDarkAppColors, type AppColors } from "../../../brandTheme";
 import { useAppCopy } from "../../../i18n/AppI18nContext";
 import type { RouteDraft, RouteKind, RoutePost, VehicleInfo } from "../../../model";
 import type { AppStyles } from "../../../ui/types";
+import { useAppViewport } from "../../../ui/viewport";
 import { ScreenHeader } from "../../shared/components/ScreenHeader";
 import { AnimatedEntrance } from "../../shared/components/AnimatedEntrance";
 import { BottomBannerAd } from "../../ads/components/BottomBannerAd";
@@ -121,7 +122,7 @@ export function CommunityHomeScreen({
 }: CommunityHomeScreenProps) {
   const copy = useAppCopy();
   const insets = useSafeAreaInsets();
-  const { width } = useWindowDimensions();
+  const { width } = useAppViewport();
   const bottomInset = Math.max(insets.bottom, 8);
   const isCompactLayout = width < 390;
   const isRiderMode = mode === "rider";

@@ -4,7 +4,6 @@ import {
   Pressable,
   Text,
   View,
-  useWindowDimensions,
   type StyleProp,
   type ViewStyle,
 } from "react-native";
@@ -18,6 +17,7 @@ import {
 import type { RoutePost } from "../../../model";
 import type { AppStyles } from "../../../ui/types";
 import { useAppColors } from "../../../ui/useAppColors";
+import { useAppViewport } from "../../../ui/viewport";
 import { PostCardActions } from "./postCard/PostCardActions";
 import { PostCardContactRow } from "./postCard/PostCardContactRow";
 import { PostCardHeader } from "./postCard/PostCardHeader";
@@ -57,7 +57,7 @@ export function PostCard({
 }: PostCardProps) {
   const copy = useAppCopy();
   const colors = useAppColors();
-  const { width } = useWindowDimensions();
+  const { width } = useAppViewport();
   const isCompactLayout = width < 390;
   const isRegular = post.kind === "regular";
   const seatsLabel = isRegular ? copy.community.seatsLeft(post.availableSeats) : undefined;

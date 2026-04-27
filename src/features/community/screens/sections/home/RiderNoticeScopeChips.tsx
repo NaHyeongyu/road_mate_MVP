@@ -1,7 +1,8 @@
-import { Pressable, Text, View, useWindowDimensions } from "react-native";
+import { Pressable, Text, View } from "react-native";
 
 import { useAppCopy } from "../../../../../i18n/AppI18nContext";
 import type { AppStyles } from "../../../../../ui/types";
+import { useAppViewport } from "../../../../../ui/viewport";
 
 type NoticeScope = "upcoming" | "all";
 
@@ -17,7 +18,7 @@ export function RiderNoticeScopeChips({
   onNoticeScopeChange,
 }: RiderNoticeScopeChipsProps) {
   const copy = useAppCopy();
-  const { width } = useWindowDimensions();
+  const { width } = useAppViewport();
   const isCompactLayout = width < 390;
 
   return (
