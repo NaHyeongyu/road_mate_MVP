@@ -98,6 +98,27 @@ describe("useCommunityCollections", () => {
     expect(result.current.visiblePosts.map((item) => item.id)).toContain("post-1");
   });
 
+  it("ignores postcode tokens when matching route queries", () => {
+    const post = createPost({
+      from: "Brisbane CBD, QLD",
+      to: "St Lucia, QLD",
+    });
+
+    const { result } = renderHook(() =>
+      useCommunityCollections({
+        currentUserId: "rider-1",
+        filter: "regular",
+        stateFilter: "QLD",
+        fromSearchQuery: "Brisbane CBD, QLD 4000",
+        toSearchQuery: "St Lucia, QLD 4067",
+        storedPosts: [post],
+        savedPostKeys: [],
+      })
+    );
+
+    expect(result.current.visiblePosts.map((item) => item.id)).toContain("post-1");
+  });
+
   it("prioritizes exact route matches before partial matches", () => {
     const bothExact = createPost({
       id: "post-both",

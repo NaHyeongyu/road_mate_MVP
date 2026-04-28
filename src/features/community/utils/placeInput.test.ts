@@ -1,6 +1,10 @@
 import { describe, expect, it } from "vitest";
 
-import { normalizeEnglishPlaceInput } from "./placeInput";
+import {
+  findExactPlaceSuggestionMatch,
+  normalizeEnglishPlaceInput,
+  normalizePlaceSearchText,
+} from "./placeInput";
 
 describe("normalizeEnglishPlaceInput", () => {
   it("removes non-English characters from place input", () => {
@@ -13,5 +17,18 @@ describe("normalizeEnglishPlaceInput", () => {
     expect(normalizeEnglishPlaceInput("St Kilda Rd / South Yarra (East)")).toBe(
       "St Kilda Rd / South Yarra (East)"
     );
+  });
+
+  it("normalizes postcode tokens out of place search text", () => {
+    expect(normalizePlaceSearchText("Brisbane CBD, QLD 4000")).toBe("brisbane cbd qld");
+  });
+
+  it("matches exact suggestions while tolerating punctuation and postcode differences", () => {
+    expect(
+      findExactPlaceSuggestionMatch("Brisbane CBD QLD 4000", [
+        "Brisbane CBD, QLD",
+        "South Brisbane, QLD",
+      ])
+    ).toBe("Brisbane CBD, QLD");
   });
 });

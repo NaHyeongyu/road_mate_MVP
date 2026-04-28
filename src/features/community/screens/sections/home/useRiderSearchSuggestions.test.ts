@@ -75,6 +75,75 @@ describe("useRiderSearchSuggestions", () => {
     expect(focus).toHaveBeenCalledTimes(1);
   });
 
+  it("resolves exact typed suggestions when search is submitted", () => {
+    const onFromSearchQueryChange = vi.fn();
+    const onToSearchQueryChange = vi.fn();
+    const toInputRef = createToInputRef();
+
+    const { result } = renderHook(() =>
+      useRiderSearchSuggestions({
+        stateFilter: "ALL",
+        fromSearchQuery: "",
+        toSearchQuery: "",
+        toInputRef,
+        onFromSearchQueryChange,
+        onToSearchQueryChange,
+      })
+    );
+
+    act(() => {
+      result.current.handleFromChangeText("Sydney CBD NSW 2000");
+      result.current.handleToChangeText("North Sydney NSW");
+    });
+
+    expect(result.current.canResolveFromInput).toBe(true);
+    expect(result.current.canResolveToInput).toBe(true);
+
+    act(() => {
+      expect(result.current.resolvePendingSearchSelections()).toMatchObject({
+        isValid: true,
+        from: "Sydney CBD, NSW",
+        to: "North Sydney, NSW",
+      });
+    });
+
+    expect(onFromSearchQueryChange).toHaveBeenCalledWith("Sydney CBD, NSW");
+    expect(onToSearchQueryChange).toHaveBeenCalledWith("North Sydney, NSW");
+  });
+
+  it("rejects typed search text that does not exactly match a suggestion", () => {
+    const onFromSearchQueryChange = vi.fn();
+    const onToSearchQueryChange = vi.fn();
+    const toInputRef = createToInputRef();
+
+    const { result } = renderHook(() =>
+      useRiderSearchSuggestions({
+        stateFilter: "ALL",
+        fromSearchQuery: "",
+        toSearchQuery: "",
+        toInputRef,
+        onFromSearchQueryChange,
+        onToSearchQueryChange,
+      })
+    );
+
+    act(() => {
+      result.current.handleFromChangeText("123 George St");
+      result.current.handleToChangeText("North Sydney NSW");
+    });
+
+    expect(result.current.canResolveFromInput).toBe(false);
+
+    act(() => {
+      expect(result.current.resolvePendingSearchSelections()).toMatchObject({
+        isValid: false,
+        invalidField: "from",
+      });
+    });
+
+    expect(onFromSearchQueryChange).not.toHaveBeenCalled();
+  });
+
   it("restores unselected rider search text on blur", () => {
     const onFromSearchQueryChange = vi.fn();
     const onToSearchQueryChange = vi.fn();

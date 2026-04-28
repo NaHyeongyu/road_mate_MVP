@@ -5,7 +5,10 @@ import type { TextInput } from "react-native";
 
 import { usePlaceSuggestions } from "../../../hooks/usePlaceSuggestions";
 import type { StateFilter } from "../../../types";
-import { normalizeEnglishPlaceInput } from "../../../utils/placeInput";
+import {
+  findExactPlaceSuggestionMatch,
+  normalizeEnglishPlaceInput,
+} from "../../../utils/placeInput";
 
 type SearchField = "from" | "to";
 
@@ -56,6 +59,10 @@ export function useRiderSearchSuggestions({
     fromSearchQuery.trim().length > 0 && fromInputValue.trim() === fromSearchQuery.trim();
   const hasSelectedTo =
     toSearchQuery.trim().length > 0 && toInputValue.trim() === toSearchQuery.trim();
+  const fromExactSuggestion = findExactPlaceSuggestionMatch(fromInputValue, fromSuggestions);
+  const toExactSuggestion = findExactPlaceSuggestionMatch(toInputValue, toSuggestions);
+  const canResolveFromInput = !fromInputValue.trim() || hasSelectedFrom || Boolean(fromExactSuggestion);
+  const canResolveToInput = !toInputValue.trim() || hasSelectedTo || Boolean(toExactSuggestion);
 
   useEffect(() => {
     selectedFromRef.current = fromSearchQuery;
@@ -119,6 +126,58 @@ export function useRiderSearchSuggestions({
     Keyboard.dismiss();
   };
 
+  const resolvePendingSearchSelections = () => {
+    const fromInput = fromInputValueRef.current.trim();
+    const toInput = toInputValueRef.current.trim();
+    const resolvedFrom = fromInput
+      ? selectedFromRef.current.trim() === fromInput
+        ? selectedFromRef.current.trim()
+        : findExactPlaceSuggestionMatch(fromInput, fromSuggestions)
+      : "";
+    const resolvedTo = toInput
+      ? selectedToRef.current.trim() === toInput
+        ? selectedToRef.current.trim()
+        : findExactPlaceSuggestionMatch(toInput, toSuggestions)
+      : "";
+
+    if (fromInput && !resolvedFrom) {
+      return {
+        isValid: false,
+        from: "",
+        to: resolvedTo || "",
+        invalidField: "from" as const,
+      };
+    }
+
+    if (toInput && !resolvedTo) {
+      return {
+        isValid: false,
+        from: resolvedFrom || "",
+        to: "",
+        invalidField: "to" as const,
+      };
+    }
+
+    if (resolvedFrom && resolvedFrom !== selectedFromRef.current.trim()) {
+      selectedFromRef.current = resolvedFrom;
+      updateFromInputValue(resolvedFrom);
+      onFromSearchQueryChange(resolvedFrom);
+    }
+
+    if (resolvedTo && resolvedTo !== selectedToRef.current.trim()) {
+      selectedToRef.current = resolvedTo;
+      updateToInputValue(resolvedTo);
+      onToSearchQueryChange(resolvedTo);
+    }
+
+    return {
+      isValid: true,
+      from: resolvedFrom || "",
+      to: resolvedTo || "",
+      invalidField: null,
+    };
+  };
+
   return {
     fromInputValue,
     toInputValue,
@@ -128,6 +187,8 @@ export function useRiderSearchSuggestions({
     showToSuggestions,
     hasSelectedFrom,
     hasSelectedTo,
+    canResolveFromInput,
+    canResolveToInput,
     handleFromChangeText: (value: string) => {
       updateFromInputValue(normalizeEnglishPlaceInput(value));
     },
@@ -152,5 +213,6 @@ export function useRiderSearchSuggestions({
     },
     handleSelectFromSuggestion,
     handleSelectToSuggestion,
+    resolvePendingSearchSelections,
   };
 }

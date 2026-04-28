@@ -4,7 +4,7 @@ import { STATE_SEARCH_ALIASES } from "../data/australianStates";
 import { searchPostcodeApiSuggestions } from "../data/postcodeApiRepository";
 import type { StateFilter } from "../types";
 import { getPlaceSuggestions } from "../utils/placeQuickSearch";
-import { normalizeEnglishPlaceInput } from "../utils/placeInput";
+import { normalizeEnglishPlaceInput, normalizePlaceSearchText } from "../utils/placeInput";
 
 const API_REQUEST_DEBOUNCE_MS = 180;
 const MIN_QUERY_LENGTH_FOR_API = 3;
@@ -28,9 +28,10 @@ export function usePlaceSuggestions(
 
   const normalizedInput = normalizeEnglishPlaceInput(query);
   const trimmedQuery = normalizedInput.trim();
-  const normalizedQuery = trimmedQuery.toLowerCase();
+  const normalizedSearchInput = normalizePlaceSearchText(trimmedQuery);
+  const normalizedQuery = normalizedSearchInput;
   const fallbackSuggestions = useMemo(() => {
-    const localSuggestions = getPlaceSuggestions(normalizedInput, Math.max(limit * 3, limit));
+    const localSuggestions = getPlaceSuggestions(normalizedSearchInput, Math.max(limit * 3, limit));
     if (stateFilter === "ALL") {
       return localSuggestions.slice(0, limit);
     }
@@ -42,7 +43,7 @@ export function usePlaceSuggestions(
         return aliases.some((alias) => normalizedItem.includes(alias));
       })
       .slice(0, limit);
-  }, [limit, normalizedInput, stateFilter]);
+  }, [limit, normalizedSearchInput, stateFilter]);
 
   useEffect(() => {
     setApiQuery(normalizedQuery);

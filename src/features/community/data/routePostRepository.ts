@@ -4,6 +4,7 @@ import type { RouteKind, RoutePost } from "../../../model";
 import { STATE_SEARCH_ALIASES } from "./australianStates";
 import type { StateFilter } from "../types";
 import { sortByNewest } from "../utils/storage";
+import { normalizePlaceSearchText } from "../utils/placeInput";
 
 const ROUTE_POSTS_TABLE = "route_posts";
 const ROUTE_POSTS_SELECT =
@@ -25,12 +26,7 @@ const MAX_SEATS = 8;
 const QUERY_CACHE_TTL_MS = 60_000;
 const routePostsQueryCache = new Map<string, { fetchedAt: number; posts: RoutePost[] }>();
 
-const normalizeQuery = (value: string) =>
-  value
-    .toLowerCase()
-    .replace(/[^a-z0-9\s]/g, " ")
-    .replace(/\s+/g, " ")
-    .trim();
+const normalizeQuery = normalizePlaceSearchText;
 
 const tokenizeQuery = (value: string) => normalizeQuery(value).split(" ").filter(Boolean);
 

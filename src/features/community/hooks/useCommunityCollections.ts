@@ -4,6 +4,7 @@ import type { RoutePost } from "../../../model";
 import { SEED_POSTS, isSeedPostCatalogEnabled } from "../../../seed";
 import { getPostSaveKey, sortByNewest } from "../utils/storage";
 import { matchesRoutePostStateFilter } from "../utils/stateFilter";
+import { normalizePlaceSearchText } from "../utils/placeInput";
 import type { Filter, StateFilter } from "../types";
 
 type UseCommunityCollectionsArgs = {
@@ -16,12 +17,7 @@ type UseCommunityCollectionsArgs = {
   savedPostKeys: string[];
 };
 
-const normalizeQuery = (value: string) =>
-  value
-    .toLowerCase()
-    .replace(/[^a-z0-9\s]/g, " ")
-    .replace(/\s+/g, " ")
-    .trim();
+const normalizeQuery = normalizePlaceSearchText;
 
 const toTokens = (value: string) => normalizeQuery(value).split(" ").filter(Boolean);
 

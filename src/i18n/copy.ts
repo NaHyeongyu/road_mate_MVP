@@ -187,10 +187,11 @@ const APP_COPY = {
       savedRecent: "Saved recent",
       noticeRecent: "Notice recent",
       noSavedRides: "No saved rides yet.",
-	      chooseSearchPrompt: (isNotice: boolean) =>
-	        isNotice
-	          ? "Select both from and to to search notices."
-	          : "Select both from and to to search rides.",
+      chooseSearchPrompt: (isNotice: boolean) =>
+        isNotice
+          ? "Select both from and to to search notices."
+          : "Select both from and to to search rides.",
+      selectSearchSuggestionPrompt: "Select a suburb or region from the suggestions before searching.",
       tapSearchPrompt: (isNotice: boolean) =>
         isNotice ? "Tap search to view notices." : "Tap search to view rides.",
       pastOnlyPrompt: "Only past notices match this filter or search.",
@@ -639,10 +640,12 @@ const APP_COPY = {
       savedRecent: "Enregistrés récents",
       noticeRecent: "Annonces récentes",
       noSavedRides: "Aucun trajet enregistré pour le moment.",
-	      chooseSearchPrompt: (isNotice: boolean) =>
-	        isNotice
-	          ? "Sélectionnez départ et arrivée pour rechercher des annonces."
-	          : "Sélectionnez départ et arrivée pour rechercher des trajets.",
+      chooseSearchPrompt: (isNotice: boolean) =>
+        isNotice
+          ? "Sélectionnez départ et arrivée pour rechercher des annonces."
+          : "Sélectionnez départ et arrivée pour rechercher des trajets.",
+      selectSearchSuggestionPrompt:
+        "Sélectionnez une banlieue ou une région dans les suggestions avant de rechercher.",
       tapSearchPrompt: (isNotice: boolean) =>
         isNotice ? "Touchez Rechercher pour voir les annonces." : "Touchez Rechercher pour voir les trajets.",
       pastOnlyPrompt: "Seules des annonces passées correspondent à ce filtre ou à cette recherche.",
@@ -1110,10 +1113,11 @@ const APP_COPY = {
       savedRecent: "최근 저장순",
       noticeRecent: "공지 최신순",
       noSavedRides: "아직 저장한 라이드가 없습니다.",
-	      chooseSearchPrompt: (isNotice: boolean) =>
-	        isNotice
-	          ? "출발지와 도착지를 모두 선택해 공지를 검색하세요."
-	          : "출발지와 도착지를 모두 선택해 라이드를 검색하세요.",
+      chooseSearchPrompt: (isNotice: boolean) =>
+        isNotice
+          ? "출발지와 도착지를 모두 선택해 공지를 검색하세요."
+          : "출발지와 도착지를 모두 선택해 라이드를 검색하세요.",
+      selectSearchSuggestionPrompt: "검색하기 전에 추천 목록에서 지역을 선택하세요.",
       tapSearchPrompt: (isNotice: boolean) =>
         isNotice ? "검색 버튼을 눌러 공지를 확인하세요." : "검색 버튼을 눌러 라이드를 확인하세요.",
       pastOnlyPrompt: "이 필터 또는 검색에는 지난 공지만 일치합니다.",
@@ -1554,10 +1558,11 @@ const APP_COPY = {
       savedRecent: "保存順",
       noticeRecent: "お知らせ新着順",
       noSavedRides: "まだ保存したライドはありません。",
-	      chooseSearchPrompt: (isNotice: boolean) =>
-	        isNotice
-	          ? "出発地と到着地の両方を選択してお知らせを検索してください。"
-	          : "出発地と到着地の両方を選択してライドを検索してください。",
+      chooseSearchPrompt: (isNotice: boolean) =>
+        isNotice
+          ? "出発地と到着地の両方を選択してお知らせを検索してください。"
+          : "出発地と到着地の両方を選択してライドを検索してください。",
+      selectSearchSuggestionPrompt: "検索する前に候補から地域を選択してください。",
       tapSearchPrompt: (isNotice: boolean) =>
         isNotice ? "検索を押してお知らせを表示します。" : "検索を押してライドを表示します。",
       pastOnlyPrompt: "この条件では過去のお知らせのみ一致しています。",
@@ -2010,10 +2015,11 @@ const APP_COPY = {
       savedRecent: "按最近保存",
       noticeRecent: "按通知时间",
       noSavedRides: "还没有保存的行程。",
-	      chooseSearchPrompt: (isNotice: boolean) =>
-	        isNotice
-	          ? "同时选择出发地和目的地以搜索通知。"
-	          : "同时选择出发地和目的地以搜索行程。",
+      chooseSearchPrompt: (isNotice: boolean) =>
+        isNotice
+          ? "同时选择出发地和目的地以搜索通知。"
+          : "同时选择出发地和目的地以搜索行程。",
+      selectSearchSuggestionPrompt: "搜索前请先从建议列表中选择地区。",
       tapSearchPrompt: (isNotice: boolean) =>
         isNotice ? "点击搜索以查看通知。" : "点击搜索以查看行程。",
       pastOnlyPrompt: "当前筛选或搜索仅匹配到已过期通知。",

@@ -1,4 +1,4 @@
-import { useMemo, useRef } from "react";
+import { useMemo, useRef, useState } from "react";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Keyboard, Pressable, Text, TextInput, View } from "react-native";
 
@@ -67,6 +67,7 @@ export function RiderFeedSection({
   const { width } = useAppViewport();
   const isPhoneLayout = width <= PHONE_VIEWPORT_MAX_WIDTH;
   const isCompactLayout = width < 390;
+  const [searchValidationMessage, setSearchValidationMessage] = useState("");
   const savedPostKeySet = useMemo(() => new Set(savedPostKeys), [savedPostKeys]);
   const hasStateSelected = stateFilter !== "ALL";
   const toInputRef = useRef<TextInput>(null);
@@ -79,6 +80,8 @@ export function RiderFeedSection({
     showToSuggestions,
     hasSelectedFrom,
     hasSelectedTo,
+    canResolveFromInput,
+    canResolveToInput,
     handleFromChangeText,
     handleToChangeText,
     handleFromFocus,
@@ -89,6 +92,7 @@ export function RiderFeedSection({
     handleClearTo,
     handleSelectFromSuggestion,
     handleSelectToSuggestion,
+    resolvePendingSearchSelections,
   } = useRiderSearchSuggestions({
     stateFilter,
     fromSearchQuery,
@@ -97,11 +101,16 @@ export function RiderFeedSection({
     onFromSearchQueryChange,
     onToSearchQueryChange,
   });
+  const hasFromInput = Boolean(fromInputValue.trim());
+  const hasToInput = Boolean(toInputValue.trim());
+  const hasAnyRouteInput = hasFromInput || hasToInput;
   const hasRoutePairQuery = hasSelectedFrom && hasSelectedTo;
-  const hasUnselectedRouteQuery = Boolean(
-    (fromInputValue.trim() && !hasSelectedFrom) || (toInputValue.trim() && !hasSelectedTo)
-  );
-  const isSearchReady = (hasRoutePairQuery || hasStateSelected) && !hasUnselectedRouteQuery;
+  const hasResolvableRoutePair =
+    hasFromInput && hasToInput && canResolveFromInput && canResolveToInput;
+  const areTypedRouteInputsValid = canResolveFromInput && canResolveToInput;
+  const isSearchReady =
+    (hasRoutePairQuery || hasResolvableRoutePair || hasStateSelected) && areTypedRouteInputsValid;
+  const canAttemptSearch = hasStateSelected || hasAnyRouteInput;
   const stateFilterLabel = useMemo(
     () =>
       STATE_FILTER_OPTIONS.find((option) => option.value === stateFilter)?.label ??
@@ -155,10 +164,18 @@ export function RiderFeedSection({
     : null;
 
   const handleRunSearch = () => {
-    if (!isSearchReady) {
+    const resolvedSearch = resolvePendingSearchSelections();
+    if (!resolvedSearch.isValid) {
+      setSearchValidationMessage(copy.community.selectSearchSuggestionPrompt);
       return;
     }
 
+    if (!((resolvedSearch.from && resolvedSearch.to) || hasStateSelected)) {
+      setSearchValidationMessage(copy.community.chooseSearchPrompt(isNoticeFilter));
+      return;
+    }
+
+    setSearchValidationMessage("");
     onOpenSearchResultsPage();
     Keyboard.dismiss();
   };
@@ -289,11 +306,14 @@ export function RiderFeedSection({
             showSuggestions={showFromSuggestions}
             returnKeyType="next"
             blurOnSubmit={false}
-            onChangeText={handleFromChangeText}
+            onChangeText={(value) => {
+              setSearchValidationMessage("");
+              handleFromChangeText(value);
+            }}
             onFocus={handleFromFocus}
             onBlur={handleFromBlur}
             onSubmitEditing={() => {
-              if (hasSelectedFrom) {
+              if (canResolveFromInput) {
                 toInputRef.current?.focus();
               }
             }}
@@ -312,26 +332,29 @@ export function RiderFeedSection({
             showSuggestions={showToSuggestions}
             returnKeyType="search"
             inputRef={toInputRef}
-            onChangeText={handleToChangeText}
+            onChangeText={(value) => {
+              setSearchValidationMessage("");
+              handleToChangeText(value);
+            }}
             onFocus={handleToFocus}
             onBlur={handleToBlur}
-            onSubmitEditing={() => {
-              if (hasSelectedTo || !toInputValue.trim()) {
-                handleRunSearch();
-              }
-            }}
+            onSubmitEditing={handleRunSearch}
             onClear={handleClearTo}
             onSelectSuggestion={handleSelectToSuggestion}
           />
+
+          {searchValidationMessage ? (
+            <Text style={styles.routeSearchEmptyText}>{searchValidationMessage}</Text>
+          ) : null}
 
           <Pressable
             style={({ pressed }) => [
               styles.routeSearchActionButton,
               compactSearchButtonStyle,
-              !isSearchReady ? styles.routeSearchActionButtonDisabled : null,
+              !canAttemptSearch ? styles.routeSearchActionButtonDisabled : null,
               pressed ? styles.routeSearchActionButtonPressed : null,
             ]}
-            disabled={!isSearchReady}
+            disabled={!canAttemptSearch}
             onPress={handleRunSearch}
           >
             <MaterialCommunityIcons
